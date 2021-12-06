@@ -27,7 +27,9 @@
   <div id="app" style="width: 100vw; height: 100vw" v-on:mousemove="计算坐标($event)" v-on:paste="黏贴内容($event)">
     <cc-dragable-block-card v-if="item" :key="标记数组[i]['id']" v-model="标记数组[i]" :index="i" @activated="当前激活标签序号=i"
       @callbacklink="展开链接面板(i)" @calloutgoinglinks="获取正向链接(i)" @startlink="等待连接 = true" v-for="(item,i) in 标记数组"
-      @delete="移除标签(i)"></cc-dragable-block-card>
+      @delete="移除标签(i)" v-show="!item.hide">
+    
+    </cc-dragable-block-card>
     <div :style="`position: absolute; width: ${窗口大小.width}px; height:${窗口大小.height}px; `" v-on:paste="黏贴内容($event)"
       v-on:mousemove="计算坐标($event)">
 
@@ -108,7 +110,7 @@
           </el-popover>
           <el-popover trigger="hover">
             <div slot="reference" class="el-icon-help"></div>
-            <div v-for="不可见标记 in 不可见标记数组" @click="定位至标记(不可见标记)">
+            <div v-for="不可见标记 in 标记数组" v-if="不可见标记.hide" @click="定位至标记(不可见标记)">
               标签{{不可见标记.index}}坐标:{{不可见标记.left}}|{{不可见标记.top}}
             </div>
           </el-popover>
@@ -221,7 +223,7 @@
         等待连接: "",
         数据源id: "",
         协同缩放: false,
-        窗口大小: {},
+        窗口大小: {width:2000,height:2000},
         主界面: {},
         内部图片源: "",
         图片源: "",
@@ -315,17 +317,7 @@
             .replace(url, "")
             .replace("http://127.0.0.1:6806", "");
           let id = this.数据源id;
-          /* try {
-             this.挂件自身元素.setAttribute("custom-data-assets", assetpath);
-           } catch (e) {}
-           设置思源块属性(
-             this.思源伺服ip,
-             this.apitoken,
-             id,
-             "custom-data-assets",
-             assetpath
-           );*/
-
+   
           if (val) {
             this.内部图片源 = val;
           }
@@ -388,39 +380,15 @@
       },
       标记数组: {
         handler(val, oldval) {
-          for (i = 0; i < this.links; i++) {
-            console.log(this.links)
-            let link = this.links[i]
-            let 标记1 = this.以属性查找对象(this.标记数组, "id", link.from)
-            let 标记2 = this.以属性查找对象(this.标记数组, "id", link.to)
-            let 标记3 = this.标记数组[link['toIndex']]
-            let 标记4 = this.标记数组[link['fromIdex']]
-            if (!标记1.id || !标记2.id || !标记3.id || !标记4.id) {
-              this.links.splice(i, 1);
-              i = i - 1
-              this.links = JSON.parse(JSON.stringify(this.links));
-            }
-          }
-
+          this.检查链接()
         },
         deep: true,
         immediate: true
       },
       links: {
         handler(val, oldval) {
-          if (!this.$挂件模式()) {
-            return null;
-          }
-          /* let id = this.数据源id;
-           if (val) {
-             try {
-               this.挂件自身元素.setAttribute(
-                 "custom-links",
-                 JSON.stringify(val)
-               );
-             } catch (e) {}
-             let that = this;
-           }*/
+          this.检查链接()
+       
         },
         deep: true,
       },
@@ -433,6 +401,22 @@
       },
     },
     methods: {
+      检查链接:async function(){
+        for (i = 0; i < this.links; i++) {
+        //    console.log(this.links)
+            let link = this.links[i]
+            let 标记1 = this.以属性查找对象(this.标记数组, "id", link.from)
+            let 标记2 = this.以属性查找对象(this.标记数组, "id", link.to)
+            let 标记3 = this.标记数组[link['toIndex']]
+            let 标记4 = this.标记数组[link['fromIdex']]
+            if (!标记1.id || !标记2.id || !标记3.id || !标记4.id) {
+              this.links.splice(i, 1);
+              i = i - 1
+              this.links = JSON.parse(JSON.stringify(this.links));
+            }
+          }
+
+      },
       以属性查找对象(集合, 属性名, 属性值) {
         let obj = null
         集合.forEach(tag => {
@@ -640,7 +624,7 @@
                 this.$html转义(数据源属性["custom-links"])
               )
             } catch (e) { console.log(e) }
-            console.log(this.标记数组);
+           // console.log(this.标记数组);
             if (
               数据源属性["custom-resize"] &&
               数据源属性["custom-resize"] > 0
@@ -648,9 +632,9 @@
               this.图片缩放倍数 = parseFloat(
                 数据源属性["custom-resize"]
               ).toFixed(2);
-              console.log(数据源属性["custom-resize"]);
+          //    console.log(数据源属性["custom-resize"]);
             }
-            console.log(数据源属性);
+         //   console.log(数据源属性);
           }
         }
         let that = this
@@ -684,16 +668,16 @@
           }
 
           tag.def_block = tag.def_block.replace("((", "").replace("))", "");
-          console.log(tag)
+         // console.log(tag)
         })
         this.links.forEach(link => {
           if (!link.id || link.id.length < 5) {
             link.id = Lute.NewNodeID();
-            console.log(link.id)
+        //    console.log(link.id)
           }
           if (this.标记数组[link.from]) { link.from = this.标记数组[link.from]["id"] }
           if (this.标记数组[link.to]) { link.to = this.标记数组[link.to]["id"] }
-          console.log(link)
+        //  console.log(link)
         })
 
 
@@ -776,15 +760,18 @@
 
         this.保存计数器 = this.保存计数器 + 1;
         if (this.保存计数器 >= 50) {
-          this.保存标记();
+         // this.保存标记();
           this.保存计数器 = 1
         }
-        this.计算可见性();
-
-        this.窗口大小 = {
+       this.计算可见性();
+        
+        let 窗口大小 = {
           width: window.pageXOffset + $event.clientX + window.innerWidth,
           height: window.pageYOffset + $event.clientY + window.innerHeight,
         };
+        if(窗口大小.height>this.窗口大小.height){this.窗口大小.height=窗口大小.height}
+        if(窗口大小.width>this.窗口大小.width){this.窗口大小.width=窗口大小.width}
+
       },
 
       保存标记: async function () {
@@ -795,7 +782,7 @@
         文件数据.links = this.links
         文件数据.backgroundimage = this.图片源
         文件数据.resize = this.图片缩放倍数
-        console.log(文件数据)
+    //    console.log(文件数据)
         let 数据blob = new Blob([JSON.stringify(文件数据)], { type: 'application/json' })
         let 文件 = new File([数据blob], `dataof${this.数据源id}.cctag`, { lastModified: Date.now() })
         let data = new FormData
@@ -803,7 +790,7 @@
         data.append('file[]', 文件)
         let url = 'http://' + that.思源伺服ip + '/api/asset/upload'
         let filepath = ""
-        await fetch(url, {
+         fetch(url, {
           body: data,
           method: 'POST',
           headers: { 'Authorization': 'Token ' + that.apitoken },
@@ -819,34 +806,38 @@
           for (item in succMap) {
             filepath = filepath + succMap[item]
             console.log(filepath)
+            设置思源块属性(that.思源伺服ip, that.apitoken, that.数据源id, 'data-assets', filepath)
+        try { that.挂件自身元素.setAttribute('data-assets', filepath) }
+        catch (e) { }
           }
           //that.挂件自身元素.setAttribute('custom-data-assets',filepath)
         })
-        await 设置思源块属性(that.思源伺服ip, that.apitoken, that.数据源id, 'data-assets', filepath)
-        try { that.挂件自身元素.setAttribute('data-assets', filepath) }
-        catch (e) { }
+        
         ;
 
       },
-      计算可见性: function () {
+      计算可见性:async function () {
         let 不可见标记数组 = [];
         for (i = 0; i < this.标记数组.length; i++) {
+          this.标记数组[i]["hide"]=false
+
           let 标记 = JSON.parse(JSON.stringify(this.标记数组[i]));
           if (标记) {
             标记.index = i;
-
             if (
               window.pageYOffset > 标记.top ||
               window.pageYOffset + window.innerHeight < 标记.top ||
               window.pageXOffset > 标记.left ||
               window.pageXOffset + window.innerWidth < 标记.left
             ) {
-              不可见标记数组.push(标记);
+             // 不可见标记数组.push(标记);
+              this.标记数组[i]["hide"]=true;
             }
+           
           }
         }
 
-        this.不可见标记数组 = Array.from(new Set(不可见标记数组));
+    //    this.不可见标记数组 = Array.from(new Set(不可见标记数组));
       },
       设定当前标记() {
         let that = this;
@@ -903,7 +894,6 @@
 
       },
       获取正向链接: async function (i) {
-
         let that = this
         let id = that.标记数组[i]["def_block"]
         let 思源伺服ip = window.location.host
