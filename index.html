@@ -928,27 +928,7 @@
             height: window.pageYOffset + $event.clientY + window.innerHeight,
           };
         },
-       /* 保存标记: async function () {
-          if (this.保存计数器 >= 50) {
-            let id = this.数据源id;
-            await 设置思源块属性(
-              this.思源伺服ip,
-              this.apitoken,
-              id,
-              "tagarray",
-              JSON.stringify(this.标记数组)
-            );
-            await 设置思源块属性(
-              this.思源伺服ip,
-              this.apitoken,
-              id,
-              "links",
-              JSON.stringify(this.links)
-            );
-
-            this.保存计数器 = 1;
-          }
-        },*/
+      
         保存标记:async function(){
                 
                 let that = this
