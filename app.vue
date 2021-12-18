@@ -43,7 +43,6 @@ module.exports = {
   },
   data() {
     return {
-      timer:"",
       中止计算: false,
       书签列表: "",
       新属性: { "type": "原始文本", "name": "newattr", "label": "newattr", "value": "default" },
@@ -79,18 +78,7 @@ module.exports = {
           y: 0,
         },
       ],
-      图片数组: [
-        {
-          filepath: "",
-          url: "",
-          top: 200,
-          left: 200,
-          width: 100,
-          height: 100,
-          backgroundColor: "yellow",
-          showhandler: false,
-        },
-      ],
+      
       标记数组:[],
       links: [],
       当前激活标签序号: null,
@@ -102,13 +90,10 @@ module.exports = {
       当前背景色: "",
       当前文字色: "",
       图片缩放倍数: 1,
-      当前激活id: "",
       保存计数器: 1,
       定点添加: false,
       不可见标记数组: [],
-      当前锚文本: "",
       等待连接: false,
-    
     };
   },
   watch: {
