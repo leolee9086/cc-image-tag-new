@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <base target="“_blank”" />
+        <script src="./PrivateSrc/store/rxjs.umd.js"></script>
+        <script src="/widgets/cc-baselib/static/vue.js"></script>
+        <script src="/widgets/cc-baselib/static/element-ui/index.js"></script>
+        <script src="/widgets/cc-baselib/static/axios.min.js"></script>
+        <script src="/widgets/cc-baselib/static/vue-clipboard.min.js"></script>
+        <script src="/widgets/cc-baselib/static/vue-router.js"></script>
+        <script src="/widgets/cc-baselib/static/httpVueLoader.js"></script>
+        <script src="/widgets/cc-baselib/static/jszip.min.js"></script>
+        <script src="/widgets/cc-baselib/static/Sortable.min.js"></script>
+        <script src="/widgets/cc-baselib/static/vue-draggable-resizeable/VueDraggableResizable.umd.min.js"></script>
+        <script src="/widgets/cc-baselib/src/commonFunctionsForSiyuan.js"></script>
+        <script src="/widgets/cc-baselib/src/siYuanApi.js"></script>
+        <script src="/widgets/cc-baselib/src/componentsList.js"></script>
+        <script src="/widgets/cc-baselib/static/vditor/index.min.js"></script>
+        <script src="/widgets/cc-baselib/static/dexie.min.js"></script>
+        <link rel="stylesheet" href="/widgets/cc-baselib/static/vditor/index.css" />
+        <link rel="stylesheet" href="/widgets/cc-baselib/static/element-ui/theme-chalk/index.css" />
+        <link rel="stylesheet" href="/widgets/cc-baselib/static/vue-draggable-resizeable/VueDraggableResizable.css" />
+        <link id="themeDefaultStyle" />
+        <script src="./PrivateSrc/store/dataDefine.js"></script>
+        <script src="./PrivateSrc/EventDefine/EventBus.js" ></script>
+        <script src="/stage/protyle/js/lute/lute.min.js" id="vditorLuteScript"></script>
+
+      </head>
+</html>
+<body >
+    <div id="app" >
+        <cc-vditor-vue
+        :value="markdown"
+        @change="markdown = $event"
+        >
+        </cc-vditor-vue>
+    </div>
+</body>
+
+
+<script type="module">
+
+  const lute =  Lute.New()
+  Vue.use(httpVueLoader);
+  localStorage.clear();
+  var vm = new Vue({
+    el: "#app",
+    components: componentsList,
+    setup(){
+    },
+    data(){
+        return{
+            数据源id:"",
+            carddata:{},
+            id:"",
+            markdown:"",
+            timer:"",
+            JsonString:"",
+            htmlcontent:""
+
+        }
+    },
+   
+    async mounted() {
+        let liveQuery =  Dexie.liveQuery
+        let url参数= this.$解析url(window.location.href)
+        this.id =  url参数.id||""
+        this.数据源id = url参数.baseid
+        this.timer = liveQuery(
+            ()=>this.$数据库.tags.get(this.id)
+        ).subscribe(
+            {next:result=>this.carddata = result}
+        )  
+        
+    },
+    watch:{
+
+        carddata:{
+            handler: function(val,oldval){
+                if(val!=oldval){
+                this.markdown = val.markdown
+                
+                }
+            },
+            deep:true
+        },
+        markdown:{
+            handler:async function(val,oldval){
+                if(val==oldval){return null}
+                console.log(val)
+                this.carddata.markdown=val 
+                this.$数据库.tags.put(this.carddata) 
+                let DOM  = lute. Md2BlockDOM(val)
+                console.log(DOM)
+                this.htmlcontent = DOM
+            }
+        },
+    },
+    methods: {
+      
+    },
+  });
+</script>
