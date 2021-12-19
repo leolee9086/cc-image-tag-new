@@ -137,10 +137,10 @@ module.exports = {
                 
                 l ${路径矢量["x"]}  ${路径矢量["y"]}
                 `
-             
+               }
                 mid = { x: 起始节点.x + 路径矢量.x / 2, y: 起始节点.y + 路径矢量.y / 2 }
                 return  { "d": define, "mid": mid }
-            }
+
             }
             else { return { "d": "", "mid": { x: 0, y: 0 } } }
         },
