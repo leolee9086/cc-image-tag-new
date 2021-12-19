@@ -113,7 +113,7 @@ module.exports = {
                 let 路径矢量 = this.矢量减(结束节点,起始节点)
                 let define = ""
                 let mid = ""
-              /*  if (路径矢量["x"] * 路径矢量["x"] - 路径矢量["y"] * 路径矢量["y"] >= 0) {
+                if (路径矢量["x"] * 路径矢量["x"] - 路径矢量["y"] * 路径矢量["y"] >= 0) {
                     define = `
                 M ${起始节点.x} ${起始节点.y}
                 l ${路径矢量["x"] / 2}  0
@@ -130,17 +130,17 @@ module.exports = {
                 l ${路径矢量["x"] / 2}  0
                 l 0  ${路径矢量["y"] / 2}
                 `
-                }*/
-             //   if (this.链接.type == "simpleLine") {
+                }
+               if (this.链接.type == "simpleLine") {
                     define = `
                     M ${起始节点.x} ${起始节点.y}
                 
                 l ${路径矢量["x"]}  ${路径矢量["y"]}
                 `
-             //   }
+             
                 mid = { x: 起始节点.x + 路径矢量.x / 2, y: 起始节点.y + 路径矢量.y / 2 }
                 return  { "d": define, "mid": mid }
-
+            }
             }
             else { return { "d": "", "mid": { x: 0, y: 0 } } }
         },

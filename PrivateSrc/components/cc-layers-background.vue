@@ -1,5 +1,5 @@
 <template>
-    <div class = "ccbackground fixed fullscreen">
+    <div class = "background fixed fullscreen">
         <image
         class = "fullscreen"
         :src="填充图像路径"

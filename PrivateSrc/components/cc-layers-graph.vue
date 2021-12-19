@@ -1,5 +1,5 @@
 <template>
-  <div         :style="`position: absolute; width: ${窗口大小.width}px; height: ${窗口大小.height}px;z-index:11`"
+  <div  class="layer layer-graph" :style="`position: absolute; width: ${窗口大小.width}px; height: ${窗口大小.height}px;z-index:11`"
 >
     <div>
       <svg

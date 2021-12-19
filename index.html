@@ -20,16 +20,18 @@
   <script src="/stage/protyle/js/lute/lute.min.js" id="vditorLuteScript"></script>
   <script src="/widgets/cc-baselib/static/vditor/index.min.js"></script>
   <script src="/widgets/cc-baselib/static/dexie.min.js"></script>
- 
+
   
 
 
+  <link id="themeStyle" rel="stylesheet" type="text/css" href="cc-base.css">
 
-
-
+  <link id="themeStyle" rel="stylesheet" type="text/css" href="/appearance/themes/daylight/theme.css">
   <link rel="stylesheet" href="/widgets/cc-baselib/static/vditor/index.css" />
   <link rel="stylesheet" href="/widgets/cc-baselib/static/element-ui/theme-chalk/index.css" />
   <link id="themeDefaultStyle" />
+  <link id="protyleRevealStyle" rel="stylesheet" type="text/css" href="http://127.0.0.1:6806/stage/protyle/js/reveal/reveal.css">
+  <link id="protyleRevealThemeStyle" rel="stylesheet" type="text/css" href="http://127.0.0.1:6806/stage/protyle/js/reveal/theme/white.css">
   <script src="./PrivateSrc/store/dataDefine.js"></script>
   <script src="./PrivateSrc/EventDefine/EventBus.js" ></script>
 
@@ -52,7 +54,8 @@
     "cc-layers-background",
     "cc-layers-toolbar",
     "cc-layers-cards",
-    "cc-layers-graph"
+    "cc-layers-graph",
+    "cc-layers-tooltip"
   ]
   应用组件列表.forEach(组件名=>
     Vue.component(组件名,`url:/widgets/cc-image-tag-new/PrivateSrc/components/${组件名}.vue`)
@@ -132,6 +135,7 @@
     width:100vw;
     height:100vw
   }
+ 
 </style>
 
 </html>

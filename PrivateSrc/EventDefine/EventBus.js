@@ -6,15 +6,55 @@ console.log(url参数);
 let 数据源id = url参数.baseid
 Vue.prototype.$数据源id =  数据源id
 Vue.prototype.$数据库 =  数据库
-数据库.tags.hook("creating",function(id,tag,trans){
-  事件总线.$emit("检测到数据添加",{"id":id,"tag":tag})
-})
+
 Vue.prototype.$思源伺服ip =  window.location.host
 Vue.prototype.$主界面 =  window.parent.document||document
 
 const 事务列表 ={
     数据库:数据库,
-    上传数据到思源:async function(id){
+    解析剪贴板内容: async function (str) {
+      let 锚文本 = await 获取思源块链接锚文本(
+        this.思源伺服ip,
+        this.apitokn,
+        str
+      );
+      if (锚文本 != "解析错误") {
+        let 空标签对象 = {
+          def_block: str,
+          anchor: "",
+          top: window.pageYOffset + this.当前鼠标坐标.y,
+          left: window.pageXOffset + this.当前鼠标坐标.x,
+          width: 100,
+          height: 100,
+          backgroundColor: "yellow",
+          borderColor: "red",
+          showhandler: false,
+          color: "balck",
+          folded: false,
+          id: Lute.NewNodeID(),
+
+        };
+        this.标记数组.push(空标签对象);
+      } else {
+        let 空标签对象 = {
+          def_block: "",
+          anchor: str,
+          top: window.pageYOffset + this.当前鼠标坐标.y,
+          left: window.pageXOffset + this.当前鼠标坐标.x,
+          width: 100,
+          height: 100,
+          backgroundColor: "yellow",
+          borderColor: "red",
+          showhandler: false,
+          color: "balck",
+          folded: false,
+          id: Lute.NewNodeID(),
+
+        };
+        this.标记数组.push(空标签对象);
+      }
+    },
+    上传数据到思源:async function(){
         let that = this
         let 文件数据 = {}
         let url参数 = this.$解析url(window.location.href);
@@ -60,11 +100,21 @@ const 事务列表 ={
         await this.$数据库.tags.put(卡片数据)
         await self.上传数据到思源
     },
-    保存卡片:async function(卡片数据){
-        
-        await this.$数据库.tags.put(卡片数据)
+    保存卡片:async function(传入数据){
+      console.log(传入数据)
+      if(传入数据.styles){
+        let 原始数据 =await this.$数据库.tags.get(传入数据.id)
+        for(item in 传入数据.styles){
+          原始数据[item] = 传入数据.styles[item]
+          console.log(原始数据)
+        }
+        await this.$数据库.tags.put(原始数据)
         await self.上传数据到思源
-
+      }
+      else  if(传入数据.id){
+        await this.$数据库.tags.put(传入数据)
+        await self.上传数据到思源}
+        
     },
     删除卡片:async function(卡片数据){
         let id =  卡片数据.id||卡片数据
@@ -87,6 +137,8 @@ const 事务列表 ={
           );
     },
     激活卡片:async function(id){
+      console.log("开始链接")
+
       this.$当前窗口状态.currentCardid=id
       if(this.$当前窗口状态.等待连接卡片id){
         console.log(this.$当前窗口状态.等待连接卡片id)
@@ -103,10 +155,12 @@ const 事务列表 ={
       await  this.$数据库.states.put(this.$当前窗口状态)
     },
     开始连接: function(data){
+      console.log("开始链接")
       this.$当前窗口状态.等待连接卡片id=data.id
-      
     },
-   
+    显示提示: function(提示内容){
+      
+    }
     
 }
 
@@ -124,6 +178,4 @@ for (let item in 事务列表){
     }
 }
 Vue.prototype.$当前窗口状态= 窗口状态对象
-
-
 Vue.prototype.$事件总线 = 事件总线

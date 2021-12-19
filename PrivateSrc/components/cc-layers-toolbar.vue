@@ -1,11 +1,9 @@
 <template>
-  <div class = "front">
-    
- <!--   <cc-toolbar-file 
+  <div id="dock" class = "layout">
+    <cc-toolbar-edit 
     :卡片数据id="当前卡片数据id"
     :链接数据id="当前链接数据id"
-    :窗口状态数组="窗口状态数组"
-    ></cc-toolbar-file>-->
+    ></cc-toolbar-edit>
     <cc-toolbar-infor
     :卡片数据id="当前卡片数据id"
     ></cc-toolbar-infor>
@@ -16,7 +14,7 @@ module.exports = {
   name: "cc-layers-toolbar",
   props: [],
   components: {
-    "cc-toolbar-file": "url:../components/cc-toolbar-file.vue",
+    "cc-toolbar-edit": "url:../components/cc-toolbar-edit.vue",
     "cc-toolbar-infor":"url:../components/cc-toolbar-infor.vue"
   },
   data() {

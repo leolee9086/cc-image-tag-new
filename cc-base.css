@@ -1,0 +1,96 @@
+
+.layout{
+ z-index:1;
+}
+.toolbar {
+    position: fixed !important;
+    margin: 0px !important;
+    z-index:500 !important;
+}
+.background,.background *{
+    z-index:-1;
+}
+html,body,#app{
+    margin:0px;
+    padding:0px;
+
+}
+.layer {
+    overflow: hidden;
+}
+
+
+.resizer
+ {
+    position: absolute;
+    background-color: lightskyblue;
+    border: 1px solid black;
+    border-radius: 50%;
+    height: 7px;
+    width: 7px;
+    box-model: border-box;
+    -webkit-transition: all 300ms linear;
+    -ms-transition: all 300ms linear;
+    transition: all 300ms linear;
+    overflow: scroll;
+  }
+  
+.resizer-tl {
+    top: -7px;
+    left: -7px;
+    cursor: nw-resize;
+  }
+  
+  .resizer-tm {
+    top: -7px;
+    left: 50%;
+    margin-left: -3.5px;
+    cursor: n-resize;
+  }
+  
+  .resizer-tr {
+    top: -7px;
+    right: -7px;
+    cursor: ne-resize;
+  }
+  
+  .resizer-ml {
+    top: 50%;
+    margin-top: -3.5px;
+    left: -7px;
+    cursor: w-resize;
+  }
+  
+  .resizer-mr {
+    top: 50%;
+    margin-top: -3.5px;
+    right: -7px;
+    cursor: e-resize;
+  }
+  
+  .resizer-bl {
+    bottom: -7px;
+    left: -7px;
+    cursor: sw-resize;
+  }
+  
+  .resizer-bm {
+    bottom: -7px;
+    left: 50%;
+    margin-left: -3.5px;
+    cursor: s-resize;
+  }
+  
+  .resizer-br {
+    bottom: -7px;
+    right: -7px;
+    cursor: se-resize;
+  }
+  
+  .resizer-tl:hover,
+  .resizer-tr:hover,
+  .resizer-bl:hover,
+  .resizer-br:hover {
+    background-color: lightyellow;
+    transform: scale(1.4);
+  }

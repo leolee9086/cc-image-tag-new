@@ -58,7 +58,6 @@
             timer:"",
             JsonString:"",
             htmlcontent:""
-
         }
     },
    
@@ -78,9 +77,8 @@
 
         carddata:{
             handler: function(val,oldval){
-                if(val!=oldval){
+                if(val){
                 this.markdown = val.markdown
-                
                 }
             },
             deep:true
@@ -90,10 +88,9 @@
                 if(val==oldval){return null}
                 console.log(val)
                 this.carddata.markdown=val 
-                this.$数据库.tags.put(this.carddata) 
-                let DOM  = lute. Md2BlockDOM(val)
-                console.log(DOM)
-                this.htmlcontent = DOM
+                this.$更新数据时间戳(this.carddata)
+                await this.$数据库.tags.put(this.carddata) 
+                this.$事件总线.$emit("上传数据到思源")
             }
         },
     },

@@ -1,10 +1,8 @@
 <template>
     <div>
-        <div v-for="(item,i) in  卡片数组"
-          :data-node-id="卡片数组[i]['id']"
-
-        >
+        
             <cc-dragable-block-card
+                v-for="(item,i) in 卡片数组"
                 v-if="item && !item.hide"
                 :key="卡片数组[i]['id']"
                 v-model="卡片数组[i]"
@@ -12,7 +10,6 @@
                 @activated="当前激活标签id = i"
                 :窗口缩放倍数="窗口缩放倍数"
             ></cc-dragable-block-card>
-        </div>
     </div>
 </template>
 <script>
@@ -30,15 +27,15 @@ module.exports = {
             数组获取器:{},
         }
     },
-    async mounted() {
+     mounted() {
         this.数组获取器 = liveQuery(
             () => this.$数据库.tags
                 .toArray()
         )
-        let that =this
-       // this.数组获取器 =function(){that.$数据库.tags.toArray(array=>{that.卡片数组=array})}
         this.数组订阅器 = this.数组获取器.subscribe(
-            { next: result => this.卡片数组 = result }
+            { next: result => 
+            this.卡片数组 = result 
+            }
         )
         
     },
