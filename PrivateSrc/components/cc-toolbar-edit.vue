@@ -22,6 +22,8 @@
           </div>
           <div slot="reference" class="el-icon-zoom-in"></div>
         </el-popover>
+        <span class="el-icon-plus" @click="添加卡片()"></span>
+
         <div class="el-icon-help" @click="聚焦到卡片(卡片数据)"></div>
         <span class="el-icon-browser" @click="$窗口内打开超链接(卡片超链接)"></span>
       </el-col>
@@ -53,7 +55,6 @@
             margin:2px`"
           ></div>
           <h3>背景</h3>
-
           <cc-color-pane v-model="卡片数据.backgroundColor" @change="设定当前标记()" :自定义颜色数组="自定义颜色数组"></cc-color-pane>
         </el-popover>
       </el-col>
@@ -124,6 +125,23 @@ module.exports = {
 
         el.setAttribute("style", "")
       }, 1000);
+    },
+    添加卡片:function(){
+      let 卡片数据 = {
+          def_block: "",
+          anchor: "",
+          top: window.pageYOffset + window.innerHeight/2-50,
+          left: window.pageXOffset + window.innerWidth/2-50,
+          width: 100,
+          height: 100,
+          backgroundColor: "yellow",
+          borderColor: "red",
+          showhandler: false,
+          color: "balck",
+          folded: false,
+          id: Lute.NewNodeID(),
+        };
+      this.$事件总线.$emit("添加卡片",卡片数据)
     },
     设定当前标记: function () {
       let 上传数据 = { "id": "", "styles": {} }

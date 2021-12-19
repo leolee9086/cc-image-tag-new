@@ -96,7 +96,12 @@
                 :链接id="carddata.def_block"
               ></cc-link-siyuan>
             </div>
-            <cc-vditor-vue v-model="carddata.markdown" v-if="正在编辑" @html-change="预览HTML = $event"></cc-vditor-vue>
+            <cc-vditor-vue 
+            v-model="carddata.markdown" 
+            v-if="正在编辑" 
+            @html-change="预览HTML = $event"
+            :toolbarconfig="{'hide':false}"
+            ></cc-vditor-vue>
             <div v-if="!正在编辑" v-html="预览HTML"></div>
           </div>
         </div>

@@ -4,10 +4,15 @@
     style="width: 100vw; height: 100vw"
     v-on:paste="黏贴内容($event)"
   >
+  <div >
     <cc-layers-background class="layer"
-    :填充图像路径="`https://ss3.baidu.com/9fo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/562c11dfa9ec8a1391b655b4f603918fa0ecc032.jpg`"
+    :填充图像路径="`https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F1ed8cac5593ca73947eaca5e7476a406db12c639ef9b-YfnB5O_fw658&refer=http%3A%2F%2Fhbimg.b0.upaiyun.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1642524710&t=ed8c446f0d57983e6adb43d55683702c`"
     ></cc-layers-background>
-
+    <cc-layers-toolbar class="layer"
+     :窗口大小="窗口大小"></cc-layers-toolbar>
+    <cc-layers-tooltip class="layer"
+     :窗口大小="窗口大小" :当前鼠标坐标="当前鼠标坐标"></cc-layers-tooltip>
+  </div>
     <cc-layers-cards class="layer"
    :style="`position: absolute; width: ${窗口大小.width}px; height:${窗口大小.height}px; `"
       v-on:paste="黏贴内容($event)"
@@ -15,10 +20,7 @@
    
     <cc-layers-graph class="layer"
      :窗口大小="窗口大小"></cc-layers-graph>
-    <cc-layers-toolbar class="layer"
-     :窗口大小="窗口大小"></cc-layers-toolbar>
-    <cc-layers-tooltip class="layer"
-     :窗口大小="窗口大小" :当前鼠标坐标="当前鼠标坐标"></cc-layers-tooltip>
+
   </div>
 </template>
 <script >
@@ -27,6 +29,8 @@ module.exports = {
   name: "app",
   components: componentsList,
   mounted: async function () {
+    this.初始窗口大小 =  {H:window.innerHeight,W:window.innerWidth}
+    window.addEventListener("resize",this.计算比例)
     window.addEventListener("mousemove",this.计算坐标)
     this.主界面 = window.parent.document;
     console.log(this.主界面)
@@ -35,9 +39,12 @@ module.exports = {
     console.log(this.$数据库)
     this.定点添加=true
     await this.初始化();
+    
   },
   data() {
     return {
+      初始窗口大小:{},
+      窗口缩放比例:1,
       当前提示内容:"测试",
       中止计算: false,
       书签列表: "",
@@ -137,7 +144,12 @@ module.exports = {
     },
   },
   methods: {
-    
+    计算比例(){
+      console.log(this.初始窗口大小.H)
+      let 缩放比例 = this.初始窗口大小.H/window.innerHeight
+      this.窗口缩放比例 =  缩放比例
+
+    },
     以属性查找对象(集合, 属性名, 属性值) {
       let obj = null
       集合.forEach(tag => {

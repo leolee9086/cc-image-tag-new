@@ -32,6 +32,8 @@
           </marker>
         </defs>
         <cc-graph-link-path v-for="(link,i) in links" :link="link" />
+        <cc-graph-vertrualpath  v-if="显示虚拟连接" :虚拟起始标记="虚拟起始标记" :虚拟结束标记="虚拟结束标记"/>
+
       </svg>
               <cc-graph-link-label v-for="(link,i) in links" :link="link" ></cc-graph-link-label>
 
@@ -54,7 +56,8 @@ module.exports = {
     return {
       links: "",
       数组获取器: "",
-      数组订阅器: ""
+      数组订阅器: "",
+      显示虚拟连接:"",
     }
   },
   async mounted() {
@@ -67,8 +70,14 @@ module.exports = {
     this.数组订阅器 = this.数组获取器.subscribe(
       { next: result => this.links = result }
     )
+    this.$事件总线.$on("开始连接",this.显示虚拟连接)
   },
   methods: {
+    显示虚拟连接(){
+      this.虚拟连接={}
+      let 虚拟连接 = this.虚拟连接
+      虚拟连接.from_id = this.$数据库.get
+    }
   }
 }
 </script>

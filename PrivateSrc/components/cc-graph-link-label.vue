@@ -11,12 +11,16 @@
       `"
     >
       <el-row style="z-index: 100;">
-        <el-input v-model="链接.label" @change="保存链接修改(链接)" size="mini" >
           <el-popover slot="prepend" trigger="hover" width="300">
-            <cc-color-pane v-model="链接.color" @change="保存链接修改(链接)"></cc-color-pane>
+            <cc-color-pane v-model="链接.color" @change="保存链接修改()"></cc-color-pane>
             <span slot="reference" class="el-icon-edit"></span>
           </el-popover>
-        </el-input>
+          <el-card :body-style="`padding:0px;content-align:center`">
+            <el-popover  trigger="hover" width="300">
+            <div slot="reference">{{链接.type}}</div>
+            <div  v-html="html形式memo"></div>
+            </el-popover>
+          </el-card>
       </el-row>
     </div>
 </template>
@@ -36,12 +40,13 @@ module.exports={
     },
     data() {
         return {
-            链接: "",
+            链接:{},
             路径: "",
             width: 0,
             代理起始标记: {},
             代理结束标记: {},
-            timer: ""
+            timer: "",
+            html形式memo:""
         }
     },
     watch: {
@@ -49,15 +54,35 @@ module.exports={
             handler(val,oldval){
                 if(val!=oldval){
                     this.链接=val
+                    if(!val.type){
+                      this.链接.type="包含"
+                    }
                 }
             },
             deep:true
 
         },
+        链接:{
+             handler(val,oldval){
+                if(val!=oldval){
+                    this.生成html()
+                    this.保存链接修改()
+                }
+                 if(!val.type){
+                      this.链接.type="包含"
+                    }
+            },
+            deep:true
+
+        }
     },
     methods: {
-    保存链接修改: async function (链接) { await this.$数据库.links.put(链接) }
-
+    保存链接修改: async function () { await this.$数据库.links.put(this.链接) },
+    生成html:async  function(){
+      if(this.链接.memo){
+      this.html形式memo= await Vditor.md2html(this.链接.memo) }
+      else this.html形式memo= "有关"
+      }   
        
     } 
 }

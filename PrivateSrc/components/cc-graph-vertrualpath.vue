@@ -1,6 +1,5 @@
 <template>
     <path
-        @click="测试连接()"
         v-bind:d="路径.d || ''"
         marker-mid="url(#markerArrowFrom)"
         marker-start="url(#markerArrowFrom)"
@@ -13,14 +12,10 @@
 <script>
 module.exports = {
     name: "cc-graph-link",
-    props: ["link","虚拟起始标记","虚拟结束标记"],
+    props: ["虚拟起始标记","当前鼠标坐标"],
     async mounted() {
-        this.链接 = this.link
-        console.log(this.代理起始标记, this.代理结束标记)
-        this.代理起始标记 =this.虚拟起始标记|| await this.$数据库.tags.get(this.链接.from_id)
-        this.代理结束标记 =this.虚拟结束标记|| await this.$数据库.tags.get(this.链接.to_id)
-                this.计算路径()
-        this.$事件总线.$on("保存卡片",event=>this.判断id(event)) 
+        console.log(this.虚拟起始标记)
+        this.计算路径()
         },
     data() {
         return {
@@ -68,7 +63,6 @@ module.exports = {
                 this.计算路径()
             }
         },
-        测试连接() { console.log(this.link) },
         矢量加(矢量1, 矢量2) {
             return { x: 矢量1.x + 矢量2.x, y: 矢量1.y + 矢量2.y }
         },
@@ -88,8 +82,8 @@ module.exports = {
             return { x: 标量 * 矢量["x"], y: 标量 * 矢量["y"] }
         },
         计算路径: async function () {
-            let 代理起始标记 = this.代理起始标记
-            let 代理结束标记 = this.代理结束标记
+            let 代理起始标记 = this.虚拟起始标记
+            let 代理结束标记 = this.虚拟结束标记
             if (!代理起始标记 || !代理结束标记) { return null }
 
          /*   if (JSON.stringify(旧代理起始标记) == JSON.stringify(代理起始标记) && JSON.stringify(旧代理结束标记) == JSON.stringify(代理结束标记)) {

@@ -1,5 +1,5 @@
 <template>
-    <div class="tooltip">
+    <div class="tooltip" >
       <span
         v-if="显示提示"
         :style="`position:fixed;left:${当前鼠标坐标.x + 10}px;top: ${当前鼠标坐标.y + 10}px;z-index:251`"

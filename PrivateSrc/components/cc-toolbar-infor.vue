@@ -10,60 +10,83 @@
         class-name-handle="layout__resize--lr layout__resize resizer"
         class-name="toolbar toolbar-infor "
     >
-        <el-card
-            :body-style="`border:solid 1px black ;
+        <div
+            :style="`
+            position:absolute;
+            background-color:var(--b3-theme-background-light)
             overflow:hidden;
-            max-height:${工具栏高度}px
+            max-height:${工具栏高度-10}px;
+            height:${工具栏高度-10}px;
+            max-height:100%;
+            width:${工具栏宽度-10}px;
+            border-radius:5px;
+            padding:5px;
             `"
         >
-            <el-divider></el-divider>
+            <div class="toolbar-body">
 
-            <span
-                style="font-size: xx-small"
-                @click="定位至标记(标记数组[当前反向链接列表['index']])"
-                v-if="当前反向链接列表['index'] > 0"
-            >标签{{ 当前反向链接列表.index }}坐标:{{ 标记数组[当前反向链接列表['index']].left }}|{{ 标记数组[当前反向链接列表['index']].top }}</span>
-            <el-row>
-                <el-collapse>
-                    <el-collapse-item title="思源链接">
-                        <div>引用自id:</div>
+                <span
+                    style="font-size: xx-small"
+                    @click="定位至标记(标记数组[当前反向链接列表['index']])"
+                    v-if="当前反向链接列表['index'] > 0"
+                >标签{{ 当前反向链接列表.index }}坐标:{{ 标记数组[当前反向链接列表['index']].left }}|{{ 标记数组[当前反向链接列表['index']].top }}</span>
+                <el-row>
+                    <el-collapse>
+                        <el-collapse-item title="思源链接">
+                            <div>引用自id:</div>
 
-                        <el-input size="mini" v-model="当前卡片思源块id">
-                            <span class="el-icon-siyuan" slot="prepend"></span>
-                        </el-input>
-                        <cc-block-list
-                            :blocklist="当前反向链接列表['backlinks']"
-                            title="反向链接"
-                            :count="当前反向链接列表['linkRefsCount']"
-                        ></cc-block-list>
-                        <el-divider></el-divider>
-
-                        <cc-block-list
-                            :blocklist="当前反向链接列表['backmentions']"
-                            :count="当前反向链接列表['mentionsCount']"
-                            title="提及"
-                        ></cc-block-list>
-                        <cc-block-list :blocklist="当前正向链接列表" :count="当前正向链接列表.length" title="正向链接"></cc-block-list>
-                    </el-collapse-item>
-                    <el-collapse-item title="图上链接">
-                        <el-collapse-item v-for="(outgoinglink,i) in 当前图上正向链接列表">
-                            <el-row slot="title">
-                                <el-select v-model="outgoinglink.type">
-                                    <el-option v-for="item in 链接类型列表" :label="item" :value="item"></el-option>
-                                </el-select>
-                            </el-row>
-                            <el-input v-model="outgoinglink.label" size="mini">
-                                <div slot="prepend">标记</div>
+                            <el-input size="mini" v-model="当前卡片思源块id">
+                                <span class="el-icon-siyuan" slot="prepend"></span>
                             </el-input>
-                            <span>{{ outgoinglink.label }}</span>
+                            <cc-block-list
+                                :blocklist="当前反向链接列表['backlinks']"
+                                title="反向链接"
+                                :count="当前反向链接列表['linkRefsCount']"
+                            ></cc-block-list>
+                            <el-divider></el-divider>
+
+                            <cc-block-list
+                                :blocklist="当前反向链接列表['backmentions']"
+                                :count="当前反向链接列表['mentionsCount']"
+                                title="提及"
+                            ></cc-block-list>
+                            <cc-block-list
+                                :blocklist="当前正向链接列表"
+                                :count="当前正向链接列表.length"
+                                title="正向链接"
+                            ></cc-block-list>
                         </el-collapse-item>
-                        <el-collapse-item v-for="(backlink,i) in 当前图上反向链接列表">
-                            <span>{{ backlink.label }}</span>
+                        <el-collapse-item title="图上链接">
+                            <el-collapse-item title="出链">
+                                <el-collapse-item v-for="(outgoinglink,i) in 当前图上正向链接列表">
+                                    <el-row slot="title">
+                                        <el-select
+                                            v-model="outgoinglink.type"
+                                            @change="设定链接(outgoinglink)"
+                                        >
+                                            <el-option
+                                                v-for="item in 链接类型列表"
+                                                :label="item"
+                                                :value="item"
+                                            ></el-option>
+                                        </el-select>
+                                    </el-row>
+                                    <el-input v-model="outgoinglink.mardown" size="mini">
+                                        <div slot="prepend">标记</div>
+                                    </el-input>
+                                    <span>{{ outgoinglink.mardown }}</span>
+                                </el-collapse-item>
+                            </el-collapse-item>
+                            <el-collapse-item title="入链">
+                                <el-collapse-item v-for="(backlink,i) in 当前图上反向链接列表">
+                                    <span>{{ backlink.mardown }}</span>
+                                </el-collapse-item>
+                            </el-collapse-item>
                         </el-collapse-item>
-                    </el-collapse-item>
-                </el-collapse>
-            </el-row>
-        </el-card>
+                    </el-collapse>
+                </el-row>
+            </div>
+        </div>
     </vue-draggable-resizable>
 </template>
 <script>
@@ -141,16 +164,18 @@ module.exports = {
                 }
             }
         }
-        
+
     },
 
     methods: {
-            resizing: function (x, y,w,h) {
-      this.工具栏高度 = h
-      this.工具栏宽度 = w
+        resizing: function (x, y, w, h) {
+            this.工具栏高度 = h
+            this.工具栏宽度 = w
 
-    },
-
+        },
+        设定链接(link) {
+            this.$数据库.links.put(link)
+        },
         以id获取反向链接: async function (id) {
             let that = this
             console.log("aaa", this.$思源伺服ip)
@@ -175,8 +200,13 @@ module.exports = {
     }
 }
 </script>
-<style scope>
-.el-card.is-always-shadow{
-    overflow:hidden
+<style type=scope>
+
+.toolbar-infor {
+    overflow: hidden;
+}
+.toolbar-body{
+    border:solid 1px  ;
+    border-color:var(--b3-border-color);
 }
 </style>
