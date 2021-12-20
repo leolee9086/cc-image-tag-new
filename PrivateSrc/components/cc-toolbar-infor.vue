@@ -9,8 +9,11 @@
         @resizing="resizing"
         class-name-handle="resizer"
         class-name="toolbar toolbar-infor "
+        @dblclick="最小化窗口=!最小化窗口"
     >
         <div
+            @dblclick="最小化窗口=!最小化窗口"
+
             :style="`
             position:absolute;
             background-color:var(--b3-theme-background-light)
@@ -23,7 +26,9 @@
             padding:5px;
             `"
         >
-            <div class="toolbar-body">
+                    <div v-if="最小化窗口">...双击查看</div>
+
+            <div class="toolbar-body" v-if="!最小化窗口">
                 <span
                     style="font-size: xx-small"
                     @click="定位至标记(标记数组[当前反向链接列表['index']])"
@@ -109,8 +114,11 @@ module.exports = {
             当前图上反向链接列表: [],
             当前图上正向链接列表: [],
             链接类型列表: ["属于", "不属于"],
-            工具栏宽度: 600,
-            工具栏高度: 700,
+            工具栏宽度: 150,
+            工具栏高度: 30,
+            最小化窗口:true,
+            工具栏左侧位置:100,
+
         }
     },
     mounted() {
@@ -118,10 +126,7 @@ module.exports = {
         console.log(this.思源伺服ip)
     },
     computed: {
-        工具栏左侧位置() {
-
-            return window.innerWidth - this.工具栏宽度
-        }
+       
     },
     watch: {
         卡片数据id: {
@@ -175,11 +180,24 @@ module.exports = {
                     this.当前正向链接列表 = []
                 }
             }
+        },
+        最小化窗口:{
+            handler(val,oldval){
+                if(val){
+                    this.工具栏高度=30
+                    this.工具栏宽度=150
+                }
+                else{this.工具栏高度=600
+                    this.工具栏宽度=400
+                }
+
+            }
         }
 
     },
 
     methods: {
+        
         resizing: function (x, y, w, h) {
             this.工具栏高度 = h
             this.工具栏宽度 = w

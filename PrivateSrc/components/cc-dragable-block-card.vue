@@ -149,6 +149,10 @@ module.exports = {
       handler: function (val, oldval) {
         if (JSON.stringify(val) == JSON.stringify(oldval)) { return null }
         this.卡片数据 = val
+        if (val.id==this.$当前窗口状态.current_cardid){
+          this.激活=true
+        }
+        else{this.激活=false}
       },
       deep: true,
       immediate: true
@@ -163,6 +167,7 @@ module.exports = {
     卡片数据: {
       handler: async function (val, oldval) {
         this.folded=val.attrs.folded
+        
         this.保存卡片()
         this.生成html()
       },
@@ -185,8 +190,8 @@ module.exports = {
             this.height = null
             this.$refs.container["min-width"] = 100
             this.$refs.container["min-height"] = 30
-            this.$refs.container["width"] = this.卡片数据.attrs.width
-            this.$refs.container["height"] = this.卡片数据.attrs.height
+            this.$refs.container["width"] = this.卡片数据.attrs["width"]
+            this.$refs.container["height"] = this.卡片数据.attrs["height"]
             this.显示控制柄=true
 
           } catch (e) { }

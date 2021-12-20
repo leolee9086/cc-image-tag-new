@@ -1,3 +1,4 @@
+
 let url参数 = Vue.prototype.$解析url(window.location.href)
 
 if(!Vue.prototype.$挂件模式()){
@@ -12,14 +13,18 @@ const 数据库 = new Dexie(Vue.prototype.$baseid);
   tags: 'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs', 
   links:'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs',
   states:"++id,current_cardid,current_linkid,viewcenter",
+  metadata:"key,value"
 });
 
-const dataworker = new SharedWorker("./PrivateSrc/store/ceshi.js");        
-const 数据总线=dataworker.port
+const 画板元数据库 = new Dexie("cc_whiteboardfiles");
+画板元数据库.version(1).stores({
+  boards: 'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs', 
+});
+画板元数据库.open()
 
-数据总线.onerror = function(e){
-  console.log(e.data)
-}
+Vue.prototype.$数据库 =  数据库
+Vue.prototype.$画板元数据库 =  画板元数据库
+
 Vue.prototype.$从数据库获取更新数据 =async function(表名,本地数据){
   let 数据库数据 =  await this.$数据库[表名].get(本地数据.id)
   let 数据库数据更新时间 =  数据库数据.updated
@@ -59,7 +64,7 @@ Vue.prototype.$根据属性生成卡片=function(属性对象){
     alias:[],
     memo:"",
     content:"",
-    markdown:"",
+    markdown:"此处输入内容",
     length:"",
     type:"card",
     subtype:"",
@@ -96,7 +101,7 @@ Vue.prototype.$根据属性生成链接=function(属性对象){
     alias:[],
     memo:"",
     content:"",
-    markdown:"",
+    markdown:"此处输入内容",
     length:"",
     type:"card",
     subtype:"",

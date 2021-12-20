@@ -5,7 +5,6 @@ console.log(数据库)
 console.log(url参数);
 let 数据源id = url参数.baseid
 Vue.prototype.$数据源id =  数据源id
-Vue.prototype.$数据库 =  数据库
 
 Vue.prototype.$思源伺服ip =  window.location.host
 Vue.prototype.$主界面 =  window.parent.document||document

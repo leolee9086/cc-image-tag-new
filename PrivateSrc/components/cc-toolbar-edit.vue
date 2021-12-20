@@ -13,6 +13,25 @@
   >
     <el-row>
       <el-col :span="6">
+      <el-popover trigger="click">
+          <el-input v-model="当前画板命名">
+            <span slot="prepend">画板命名</span>
+          </el-input>
+          <div slot="reference" class="el-icon-setting"></div>
+        </el-popover>
+        <el-popover trigger="click">
+          <el-select
+           v-model="当前画板id"
+          >
+            <el-option
+            v-for="(item,i) in this.画板列表"
+            :label="item.name||item.id"
+            :value="item.id"
+            >
+            </el-option>
+          </el-select>
+          <div slot="reference" class="el-icon-folder"></div>
+        </el-popover>
         <el-popover trigger="click">
           <el-input v-model="搜索关键词" @input="搜索()" size="mini"></el-input>
           <div v-for="(item,i) in 搜索结果列表">
@@ -39,10 +58,14 @@
             text-decoration:underline 4px;
             text-align:center;
             `"
+                      :width="1000"
           >A</div>
           <h3>文字</h3>
 
-          <cc-color-pane v-model="属性对象.color" @change="设定当前标记()" :自定义颜色数组="自定义颜色数组"></cc-color-pane>
+          <cc-color-pane 
+          v-model="属性对象.color" 
+          @change="设定当前标记()" 
+          :自定义颜色数组="自定义颜色数组"></cc-color-pane>
         </el-popover>
       </el-col>
       <el-col :span="2">
@@ -92,13 +115,33 @@ module.exports = {
       自定义颜色数组: [],
       搜索关键词: "",
       搜索结果id: "",
-      搜索结果列表: ""
+      搜索结果列表: "",
+      当前画板id:"",
+      画板列表:[],
+      当前画板命名:"",
     }
   },
   async mounted() {
+    let 画板命名 =  await this.$数据库.metadata.get("name")
+    console.log(画板命名)
+    this.当前画板命名 = 画板命名.value||""
     this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.卡片数据.id}&baseid=${数据源id}`
+    this.画板列表 =  await this.$画板元数据库.boards.toArray()
+    console.log(this.画板列表)
+
   },
   watch: {
+    当前画板命名:{ handler:async function(val,oldval){
+        this.$数据库.metadata.put({key:"name",value:val})
+        let 画板元数据={id:this.$baseid,name:val}
+        this.$画板元数据库.boards.put(画板元数据)
+      },
+    },
+    当前画板id:{
+      handler:function(val,oldval){
+        this.$窗口内打开超链接(`/widgets/cc-image-tag-new/?baseid=${val}`)
+      },
+    },
     卡片数据id: {
       handler: async function (val, oldval) {
         if (val && val != oldval) {

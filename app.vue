@@ -42,14 +42,10 @@ module.exports = {
     let 数据源id = url参数.baseid;
     if (数据源id) 
     {await this.打开思源数据()};
-    
   },
   data() {
     return {
-      初始窗口大小:{},
-      窗口缩放比例:1,
-      当前提示内容:"测试",
-      中止计算: false,
+      画板列表:[],
       书签列表: "",
       新属性: { "type": "原始文本", "name": "newattr", "label": "newattr", "value": "default" },
       属性类型: ["图片", "文本", "块链接", "超链接", "原始文本", "附件"],
@@ -65,26 +61,6 @@ module.exports = {
       apitoken: "",
       格式列表: ["jpg", "png", "jpeg"],
       挂件自身元素: "",
-      空白标记: [
-        {
-          id: "",
-          parent_id: "",
-          root_id: "锚文本为空时显示来源块内容",
-          hash: "",
-          path: "",
-          attrs: "",
-          markdown: "",
-          html: "",
-          type: "",
-          index: "",
-          created: "",
-          updated: "",
-          children: "",
-          x: 0,
-          y: 0,
-        },
-      ],
-      
       标记数组:[],
       links: [],
       当前激活标签类型: "",
@@ -147,12 +123,7 @@ module.exports = {
     },
   },
   methods: {
-    计算比例(){
-      let 缩放比例 = this.初始窗口大小.H/window.innerHeight
-      this.窗口缩放比例 =  缩放比例
-      console.log(缩放比例)
-
-    },
+    
     以属性查找对象(集合, 属性名, 属性值) {
       let obj = null
       集合.forEach(tag => {
