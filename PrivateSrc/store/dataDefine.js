@@ -1,17 +1,17 @@
 let url参数 = Vue.prototype.$解析url(window.location.href)
 
 if(!Vue.prototype.$挂件模式()){
-  Vue.prototype.$baseid= url参数.baseid
+  
+  Vue.prototype.$baseid= url参数.baseid||Lute.NewNodeID()
 }
 else{  
   Vue.prototype.$baseid= Vue.prototype.$挂件自身元素().getAttribute("data-node-id")
 }
 const 数据库 = new Dexie(Vue.prototype.$baseid);
-数据库.version(4).stores({
-  tags: 'id,parent_id,root_id,hash,path,attrs,markdown,content,type,index,created,updated,children,x,y', 
-  links:'id,from_id,to_id,type,subtype,labels',
-  states:"++id,editMode,currentCardId,currentLinkId,LastViewpotCenter",
-  GraphConfig:"defalutCard,defaultNode,layout",
+数据库.version(1).stores({
+  tags: 'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs', 
+  links:'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs',
+  states:"++id,current_cardid,current_linkid,viewcenter",
 });
 
 const dataworker = new SharedWorker("./PrivateSrc/store/ceshi.js");        
@@ -37,26 +37,46 @@ Vue.prototype.$更新数据时间戳=function(数据){
   数据.updated = this.$用Lute生成时间戳()
   return 数据
 }
-Vue.prototype.$根据属性生成标签=function(属性对象){
+Vue.prototype.$生成ial=function(属性数组,卡片数据){
+  if (卡片数据){ }
+  else {
+    let string =""
+    for (i in 属性数组){
+      string = string+`${属性名}="${属性值}"`
+    }
+    string =`{: }`
+  }
+}
+Vue.prototype.$根据属性生成卡片=function(属性对象){
   let 空标签={
     id:Lute.NewNodeID(),
     parent_id:"",
     root_id:"",
     hash:"",
+    box:Vue.prototype.$baseid,
     path:"",
-    attrs:"",
-    markdown:"## 测试",
+    name:"未命名",
+    alias:[],
+    memo:"",
     content:"",
-    type:"",
-    index:"",
-    created:"",
-    updated:"",
-    children:"",
-    width:100,
-    height:100,
-    x:"",
-    y:"",
-    foled:true
+    markdown:"",
+    length:"",
+    type:"card",
+    subtype:"",
+    ial:{ },
+    sort:"",
+    created:Vue.prototype.$用Lute生成时间戳(),
+    updated:Vue.prototype.$用Lute生成时间戳(),
+    attrs:{
+      top:100,
+      left:100,
+      width:100,
+      height:100,
+      folded:false,
+      backgroundColor:"lightblue",
+      color:"black",
+      borderColor:"black",
+    }
   }
   for (属性名 in 属性对象){
     let 属性值 =  属性对象[属性名]
@@ -64,6 +84,38 @@ Vue.prototype.$根据属性生成标签=function(属性对象){
   }
   return 空标签
 }
+Vue.prototype.$根据属性生成链接=function(属性对象){
+  let 空标签={
+    id:Lute.NewNodeID(),
+    parent_id:"",
+    root_id:"",
+    hash:"",
+    box:Vue.prototype.$baseid,
+    path:"",
+    name:"未命名",
+    alias:[],
+    memo:"",
+    content:"",
+    markdown:"",
+    length:"",
+    type:"card",
+    subtype:"",
+    ial:{ },
+    sort:"",
+    created:"",
+    updated:Vue.prototype.$用Lute生成时间戳(),
+    attrs:{from_id:"",to_id:"",path_width:"",path_color:"",path_type:"simpleLine"}
+  }
+  for (属性名 in 空标签){
+    属性对象[属性名]?空标签[属性名]=属性对象[属性名]:null
+  }
+  for (属性名 in  属性对象){
+    空标签[属性名]?null:空标签.attrs[属性名]=属性对象[属性名]
+  }
+  console.log(空标签)
+  return 空标签
+}
+
 
 
 

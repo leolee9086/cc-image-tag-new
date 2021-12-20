@@ -1,5 +1,16 @@
 <template>
-    <div>
+    <div 
+    :style="` 
+        position:absolute;
+        top:0px;
+        left:0px;
+        width: ${窗口大小.width/$当前窗口状态.缩放倍数}px; 
+        height: ${窗口大小.height/$当前窗口状态.缩放倍数}px;
+        transform:scale(${$当前窗口状态.缩放倍数});
+        transform-origin:0% 0%;
+        z-index:100`
+        "
+    >
         
             <cc-dragable-block-card
                 v-for="(item,i) in 卡片数组"
@@ -15,6 +26,7 @@
 <script>
 module.exports = {
     name: "cc-layers-cards",
+    props:["窗口大小"],
     components: {
         "cc-dragable-block-card": "url:../components/cc-dragable-block-card.vue"
     },

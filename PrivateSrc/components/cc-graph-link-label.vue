@@ -34,8 +34,8 @@ module.exports={
     async mounted() {
         this.链接 = this.link
         this.链接 = await this.$数据库.links.get(this.link.id)
-        this.代理起始标记 = await this.$数据库.tags.get(this.链接.from_id)
-        this.代理结束标记 = await this.$数据库.tags.get(this.链接.to_id)
+        this.代理起始标记 = await this.$数据库.tags.get(this.链接.attrs.from_id)
+        this.代理结束标记 = await this.$数据库.tags.get(this.链接.attrs.to_id)
         console.log(this.代理起始标记, this.代理结束标记)
     },
     data() {
@@ -77,7 +77,7 @@ module.exports={
         }
     },
     methods: {
-    保存链接修改: async function () { await this.$数据库.links.put(this.链接) },
+    保存链接修改: async function () { this.$事件总线.$emit("保存链接",this.链接) },
     生成html:async  function(){
       if(this.链接.memo){
       this.html形式memo= await Vditor.md2html(this.链接.memo) }

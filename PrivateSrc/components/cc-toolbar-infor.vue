@@ -7,7 +7,7 @@
         :z="700"
         :draggable="true"
         @resizing="resizing"
-        class-name-handle="layout__resize--lr layout__resize resizer"
+        class-name-handle="resizer"
         class-name="toolbar toolbar-infor "
     >
         <div
@@ -15,16 +15,15 @@
             position:absolute;
             background-color:var(--b3-theme-background-light)
             overflow:hidden;
-            max-height:${工具栏高度-10}px;
-            height:${工具栏高度-10}px;
+            max-height:${工具栏高度 - 10}px;
+            height:${工具栏高度 - 10}px;
             max-height:100%;
-            width:${工具栏宽度-10}px;
+            width:${工具栏宽度 - 10}px;
             border-radius:5px;
             padding:5px;
             `"
         >
             <div class="toolbar-body">
-
                 <span
                     style="font-size: xx-small"
                     @click="定位至标记(标记数组[当前反向链接列表['index']])"
@@ -32,12 +31,15 @@
                 >标签{{ 当前反向链接列表.index }}坐标:{{ 标记数组[当前反向链接列表['index']].left }}|{{ 标记数组[当前反向链接列表['index']].top }}</span>
                 <el-row>
                     <el-collapse>
-                        <el-collapse-item title="思源链接">
-                            <div>引用自id:</div>
-
+                        <el-collapse-item>
+                            <strong slot="title">思源连接属性</strong>
                             <el-input size="mini" v-model="当前卡片思源块id">
-                                <span class="el-icon-siyuan" slot="prepend"></span>
+                                <span slot="prepend">
+                                    <span class="el-icon-siyuan"></span>
+                                    <span>id:</span>
+                                </span>
                             </el-input>
+
                             <cc-block-list
                                 :blocklist="当前反向链接列表['backlinks']"
                                 title="反向链接"
@@ -56,7 +58,9 @@
                                 title="正向链接"
                             ></cc-block-list>
                         </el-collapse-item>
-                        <el-collapse-item title="图上链接">
+                        <el-collapse-item>
+                            <strong slot="title">图上连接</strong>
+
                             <el-collapse-item title="出链">
                                 <el-collapse-item v-for="(outgoinglink,i) in 当前图上正向链接列表">
                                     <el-row slot="title">
@@ -71,15 +75,15 @@
                                             ></el-option>
                                         </el-select>
                                     </el-row>
-                                    <el-input v-model="outgoinglink.mardown" size="mini">
+                                    <el-input v-model="outgoinglink.markdown" size="mini">
                                         <div slot="prepend">标记</div>
                                     </el-input>
-                                    <span>{{ outgoinglink.mardown }}</span>
+                                    <span>{{ outgoinglink.markdown }}</span>
                                 </el-collapse-item>
                             </el-collapse-item>
                             <el-collapse-item title="入链">
                                 <el-collapse-item v-for="(backlink,i) in 当前图上反向链接列表">
-                                    <span>{{ backlink.mardown }}</span>
+                                    <span>{{ backlink.markdown }}</span>
                                 </el-collapse-item>
                             </el-collapse-item>
                         </el-collapse-item>
@@ -126,13 +130,21 @@ module.exports = {
                 if (val) {
                     this.当前卡片数据 = await this.$数据库.tags.get(val)
                     this.当前图上正向链接列表 = await this.$数据库.links
-                        .where("from_id")
-                        .equals(val)
-                        .toArray()
+                        .filter(value=>
+                        {
+                            if(value.attrs.from_id==val){
+                            return true
+                        }
+                        }
+                        ).toArray()
                     this.当前图上反向链接列表 = await this.$数据库.links
-                        .where("to_id")
-                        .equals(val)
-                        .toArray()
+                        .filter(value=>
+                        {
+                            if(value.attrs.to_id==val){
+                            return true
+                        }
+                        }
+                        ).toArray()
                 }
                 else {
                     this.当前卡片数据 = null
@@ -200,13 +212,5 @@ module.exports = {
     }
 }
 </script>
-<style type=scope>
-
-.toolbar-infor {
-    overflow: hidden;
-}
-.toolbar-body{
-    border:solid 1px  ;
-    border-color:var(--b3-border-color);
-}
+<style scoped>
 </style>

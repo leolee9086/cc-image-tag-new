@@ -1,14 +1,15 @@
 <template>
-  <el-card
-    body-style="border:solid 1px;
-        border-radius:5px;
+  <div
+    style="border:solid 0.01vw;
+        border-radius:0.2vw;
         position: fixed;
-        top:calc(100vh - 100px);
-        left:calc(50vw - 200px);
+        top:90vh ;
+        left:calc(50vw - 300px);
         background-color:white ;
         z-index:251;
-        padding:5px;
-        width:400px"
+        padding:0.2vw;
+        width:600px
+        "
   >
     <el-row>
       <el-col :span="6">
@@ -17,7 +18,7 @@
           <div v-for="(item,i) in 搜索结果列表">
             <el-link :value="item.id" @click="聚焦到卡片(item)">
               <span>{{ `id:${item.id}` }}</span>
-              <span>{{ `${item.markdown.slice(0, 22)}` }}</span>
+              <span>{{ `${item.markdown.slice(0, 22)||无内容}` }}</span>
             </el-link>
           </div>
           <div slot="reference" class="el-icon-zoom-in"></div>
@@ -33,7 +34,7 @@
           <div
             slot="reference"
             :style="`
-            color:${卡片数据.color};
+            color:${属性对象.color};
             font-weight:bolder;
             text-decoration:underline 4px;
             text-align:center;
@@ -41,39 +42,39 @@
           >A</div>
           <h3>文字</h3>
 
-          <cc-color-pane v-model="卡片数据.color" @change="设定当前标记()" :自定义颜色数组="自定义颜色数组"></cc-color-pane>
+          <cc-color-pane v-model="属性对象.color" @change="设定当前标记()" :自定义颜色数组="自定义颜色数组"></cc-color-pane>
         </el-popover>
       </el-col>
       <el-col :span="2">
         <el-popover trigger="click" width="350">
           <div
             slot="reference"
-            :style="`background-color:${卡片数据.backgroundColor};
+            :style="`background-color:${属性对象.backgroundColor};
             width:24px;
             height:24px;
             border:solid 1px;
             margin:2px`"
           ></div>
           <h3>背景</h3>
-          <cc-color-pane v-model="卡片数据.backgroundColor" @change="设定当前标记()" :自定义颜色数组="自定义颜色数组"></cc-color-pane>
+          <cc-color-pane v-model="属性对象.backgroundColor" @change="设定当前标记()" :自定义颜色数组="自定义颜色数组"></cc-color-pane>
         </el-popover>
       </el-col>
       <el-col :span="2">
         <el-popover trigger="click" width="350">
           <div
             slot="reference"
-            :style="`background-color:'';width:24px;height:24px;outline:solid 3px ${卡片数据.borderColor};margin:2px`"
+            :style="`background-color:'';width:24px;height:24px;outline:solid 3px ${属性对象.borderColor};margin:2px`"
           ></div>
           <h3>边框</h3>
-          <cc-color-pane v-model="卡片数据.borderColor" @change="设定当前标记()" :自定义颜色数组="自定义颜色数组"></cc-color-pane>
+          <cc-color-pane v-model="属性对象.borderColor" @change="设定当前标记()" :自定义颜色数组="自定义颜色数组"></cc-color-pane>
         </el-popover>
       </el-col>
       <span
         style="font-size:xx-small"
-        v-if="卡片数据"
-      >x:{{ 卡片数据.left }}y{{ 卡片数据.top }}|名称{{ 卡片数据.title }}</span>
+        v-if="属性对象"
+      >x:{{ 属性对象.left }}y{{ 属性对象.top }}|名称{{ 属性对象.title }}</span>
     </el-row>
-  </el-card>
+  </div>
 </template>
 <script>
 module.exports = {
@@ -85,6 +86,7 @@ module.exports = {
   components: componentsList,
   data() {
     return {
+      属性对象:{},
       卡片数据: {},
       链接数据: {},
       自定义颜色数组: [],
@@ -101,6 +103,7 @@ module.exports = {
       handler: async function (val, oldval) {
         if (val && val != oldval) {
           this.卡片数据 = await this.$数据库.tags.get(this.卡片数据id)
+          this.属性对象 = this.卡片数据.attrs
           this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.卡片数据.id}&baseid=${数据源id}`
         }
       }
@@ -127,11 +130,15 @@ module.exports = {
       }, 1000);
     },
     添加卡片:function(){
-      let 卡片数据 = {
+      let 卡片数据 = this.$根据属性生成卡片() 
+      卡片数据.attrs.top= (window.pageYOffset + window.innerHeight/2-50)/this.$当前窗口状态.缩放倍数,
+      卡片数据.attrs.left= (window.pageYOffset + window.innerHeight/2-50)/this.$当前窗口状态.缩放倍数,
+/*
+      {
           def_block: "",
           anchor: "",
-          top: window.pageYOffset + window.innerHeight/2-50,
-          left: window.pageXOffset + window.innerWidth/2-50,
+          top: (window.pageYOffset + window.innerHeight/2-50)/this.$当前窗口状态.缩放倍数,
+          left: (window.pageXOffset + window.innerWidth/2-50)/this.$当前窗口状态.缩放倍数,
           width: 100,
           height: 100,
           backgroundColor: "yellow",
@@ -140,15 +147,16 @@ module.exports = {
           color: "balck",
           folded: false,
           id: Lute.NewNodeID(),
-        };
+        };*/
+      
       this.$事件总线.$emit("添加卡片",卡片数据)
     },
     设定当前标记: function () {
       let 上传数据 = { "id": "", "styles": {} }
       上传数据.id = this.卡片数据id
-      上传数据["styles"].color = this.卡片数据.color
-      上传数据["styles"].borderColor = this.卡片数据.borderColor
-      上传数据["styles"].backgroundColor = this.卡片数据.backgroundColor
+      上传数据["styles"].color = this.属性对象.color
+      上传数据["styles"].borderColor = this.属性对象.borderColor
+      上传数据["styles"].backgroundColor = this.属性对象.backgroundColor
       this.$事件总线.$emit("保存卡片", 上传数据)
     },
 
@@ -157,21 +165,23 @@ module.exports = {
       if (关键词) {
         this.搜索结果列表 = await
           this.$数据库.tags
-            .filter(
-              function (value) {
+            .filter(value=>
+              {
+                if(value.markdown){
                 let markdown = value.markdown
                 if (markdown.indexOf(关键词) > 0) {
                   return true
-                }
+                }}
                 else { return false }
               }
             )
             .toArray()
-        console.log(this.搜索结果列表)
       }
       else {
         this.搜索结果列表 = await this.$数据库.tags.toArray()
       }
+              console.log("搜索结果",this.搜索结果列表)
+
     }
 
   },

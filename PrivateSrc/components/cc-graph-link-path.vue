@@ -17,8 +17,8 @@ module.exports = {
     async mounted() {
         this.链接 = this.link
         console.log(this.代理起始标记, this.代理结束标记)
-        this.代理起始标记 =this.虚拟起始标记|| await this.$数据库.tags.get(this.链接.from_id)
-        this.代理结束标记 =this.虚拟结束标记|| await this.$数据库.tags.get(this.链接.to_id)
+        this.代理起始标记 =this.虚拟起始标记|| await this.$数据库.tags.get(this.链接.attrs.from_id)
+        this.代理结束标记 =this.虚拟结束标记|| await this.$数据库.tags.get(this.链接.attrs.to_id)
                 this.计算路径()
         this.$事件总线.$on("保存卡片",event=>this.判断id(event)) 
         },
@@ -35,8 +35,8 @@ module.exports = {
     watch: {
         路径: {
             handler: function (val, oldval) {
-                this.链接.path = val.d
-                this.链接.labelPalcement = val.mid
+                this.链接.attrs.path = val.d
+                this.链接.attrs.labelPalcement = val.mid
                 if (val != oldval) {
                     this.$数据库.links.put(this.链接)
                 }
@@ -48,7 +48,7 @@ module.exports = {
             handler: function (val, oldval) {
                 if (val != oldval) {
                     this.链接 = val
-                    if (val.from_id == val.to_id) {
+                    if (val.attrs.from_id == val.attrs.to_id) {
                         this.$数据库.links.delete(val.id)
                     }
                 }
@@ -59,11 +59,11 @@ module.exports = {
     },
     methods: {
         判断id($event){
-            if($event.id==this.链接.from_id){
+            if($event.id==this.链接.attrs.from_id){
                 this.代理起始标记 = $event
                 this.计算路径()
             }
-            if($event.id==this.链接.to_id){
+            if($event.id==this.链接.attrs.to_id){
                 this.代理结束标记 = $event
                 this.计算路径()
             }
@@ -88,8 +88,8 @@ module.exports = {
             return { x: 标量 * 矢量["x"], y: 标量 * 矢量["y"] }
         },
         计算路径: async function () {
-            let 代理起始标记 = this.代理起始标记
-            let 代理结束标记 = this.代理结束标记
+            let 代理起始标记 = this.代理起始标记.attrs
+            let 代理结束标记 = this.代理结束标记.attrs
             if (!代理起始标记 || !代理结束标记) { return null }
 
          /*   if (JSON.stringify(旧代理起始标记) == JSON.stringify(代理起始标记) && JSON.stringify(旧代理结束标记) == JSON.stringify(代理结束标记)) {

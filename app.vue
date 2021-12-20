@@ -1,7 +1,8 @@
 <template>
   <div
     id="app"
-    style="width: 100vw; height: 100vw"
+    :style="`width: ${窗口大小.width}px; 
+        height:${窗口大小.height}px;`"
     v-on:paste="黏贴内容($event)"
   >
   <div >
@@ -14,11 +15,10 @@
      :窗口大小="窗口大小" :当前鼠标坐标="当前鼠标坐标"></cc-layers-tooltip>
   </div>
     <cc-layers-cards class="layer"
-   :style="`position: absolute; width: ${窗口大小.width}px; height:${窗口大小.height}px; `"
-      v-on:paste="黏贴内容($event)"
+      v-on:paste="黏贴内容($event)" :窗口大小="窗口大小"
     ></cc-layers-cards>
    
-    <cc-layers-graph class="layer"
+   <cc-layers-graph class="layer"
      :窗口大小="窗口大小"></cc-layers-graph>
 
   </div>
@@ -30,15 +30,18 @@ module.exports = {
   components: componentsList,
   mounted: async function () {
     this.初始窗口大小 =  {H:window.innerHeight,W:window.innerWidth}
-    window.addEventListener("resize",this.计算比例)
+    window.addEventListener("mousewheel",this.计算比例)
     window.addEventListener("mousemove",this.计算坐标)
     this.主界面 = window.parent.document;
     console.log(this.主界面)
     this.思源伺服ip = window.location.host;
     console.log(this.思源伺服ip)
     console.log(this.$数据库)
-    this.定点添加=true
-    await this.初始化();
+    let url参数 = this.$解析url(window.location.href);
+    console.log(url参数);
+    let 数据源id = url参数.baseid;
+    if (数据源id) 
+    {await this.打开思源数据()};
     
   },
   data() {
@@ -145,9 +148,9 @@ module.exports = {
   },
   methods: {
     计算比例(){
-      console.log(this.初始窗口大小.H)
       let 缩放比例 = this.初始窗口大小.H/window.innerHeight
       this.窗口缩放比例 =  缩放比例
+      console.log(缩放比例)
 
     },
     以属性查找对象(集合, 属性名, 属性值) {
@@ -178,7 +181,7 @@ module.exports = {
         }
       }
     },
-    初始化: async function (val) {
+    打开思源数据: async function (val) {
       if (this.$挂件模式()) {
         this.挂件自身元素 = window.frameElement.parentElement.parentElement;
         this.数据源id = this.挂件自身元素.getAttribute("data-node-id");

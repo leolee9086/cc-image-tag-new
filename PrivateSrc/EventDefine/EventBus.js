@@ -100,14 +100,14 @@ const 事务列表 ={
         await this.$数据库.tags.put(卡片数据)
         await self.上传数据到思源
     },
+
     保存卡片:async function(传入数据){
-      console.log(传入数据)
+      //console.log(传入数据)
       if(传入数据.styles){
         let 原始数据 =await this.$数据库.tags.get(传入数据.id)
-        for(item in 传入数据.styles){
-          原始数据[item] = 传入数据.styles[item]
-          console.log(原始数据)
-        }
+        for(属性名 in 传入数据.styles){
+        原始数据.attrs[属性名]=传入数据.styles[属性名]
+       }
         await this.$数据库.tags.put(原始数据)
         await self.上传数据到思源
       }
@@ -128,31 +128,32 @@ const 事务列表 ={
         .equals(id)
         .delete()
     },
+    保存链接:async function(传入数据){
+      
+      this.$数据库.links.put(传入数据)
+    },
     定位至卡片:async function(卡片数据){
         let id = 卡片数据.id||卡片数据
         let 目标卡片数据 = await this.$数据库.tags.get(id)
-        window.scrollTo(
+      /*  window.scrollTo(
             目标卡片数据.left+ 目标卡片数据.width/2- window.innerWidth / 2,
             目标卡片数据.top+目标卡片数据.width/2 - window.innerHeight / 2
-          );
+          );*/
     },
     激活卡片:async function(id){
-      console.log("开始链接")
+      console.log("开始链接",id)
 
-      this.$当前窗口状态.currentCardid=id
+      this.$当前窗口状态.current_cardid=id
       if(this.$当前窗口状态.等待连接卡片id){
-        console.log(this.$当前窗口状态.等待连接卡片id)
-        this.$数据库.links.put({
-          "id":Lute.NewNodeID(),
-          "type":"",
-          "from_id":this.$当前窗口状态.等待连接卡片id,
-          "to_id":id,
-          "subtype":"",
-          "labels":""
-        })
+      let 属性对象 = {
+        from_id:this.$当前窗口状态.等待连接卡片id,
+        to_id:id
+      }
+      let 新链接 =  this.$根据属性生成链接(属性对象)
+       this.$数据库.links.put(新链接)
         this.$当前窗口状态.等待连接卡片id=null
       }
-      await  this.$数据库.states.put(this.$当前窗口状态)
+     await  this.$数据库.states.put(this.$当前窗口状态)
     },
     开始连接: function(data){
       console.log("开始链接")
@@ -160,6 +161,10 @@ const 事务列表 ={
     },
     显示提示: function(提示内容){
       
+    },
+    窗口缩放:function(缩放倍数){
+      console.log(缩放倍数)
+      this.$当前窗口状态.缩放倍数=缩放倍数
     }
     
 }
