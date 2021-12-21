@@ -1,39 +1,24 @@
  
 <template>
-<div
-      v-if="属性对象.labelPalcement"
-      :style="`
-      position:absolute;
-      top:${属性对象.labelPalcement['y']}px;
-      left:${属性对象.labelPalcement['x']}px;
-      height:50px;
-      width:100px;
-      `"
-    >
-      
-          <el-tooltip  trigger="hover" width="300" content="测试">
-            <cc-color-pane v-model="属性对象.color" @change="保存链接数据修改()"></cc-color-pane>
-            <span slot="reference" class="el-icon-edit"></span>
-          </el-tooltip>
-          <div :style="`padding:0px;content-align:center`">
-            <div slot="reference">{{链接数据.type}}</div>
-            <div class="content" v-html="预览HTML"></div>
-          </div>
-     
-    </div>
+  <cc-dragable-block-linklabel
+      v-if="链接数据 && !链接数据.hide"
+      v-model="链接数据"
+      :index="index"
+  ></cc-dragable-block-linklabel>
 </template>
 <script>
 module.exports={
     name: "cc-graph-link-label",
-    props: ["link"],
+    props: ["link","index"],
       components: {
         "cc-color-pane":"url:/widgets/cc-baselib/components/cc-color-pane.vue",
+        "cc-dragable-block-linklabel":"url:../components/cc-dragable-block-linklabel.vue",
+
     },
     async mounted() {
+        console.log("加载卡片", this.value)
         this.链接数据 = this.link
         this.链接数据 = await this.$数据库.links.get(this.link.id)
-        this.代理起始标记 = await this.$数据库.tags.get(this.链接数据.attrs.from_id)
-        this.代理结束标记 = await this.$数据库.tags.get(this.链接数据.attrs.to_id)
         this.生成html()
         console.log(this.代理起始标记, this.代理结束标记)
     },
@@ -52,10 +37,10 @@ module.exports={
     watch: {
         link:{
             handler(val,oldval){
-                if(val!=oldval){
+                if(val.updated>oldval.updated){
                     this.链接数据=val
                     if(!val.type){
-                      this.链接数据.type="包含"
+                      this.链接数据.type="link"
                     }
                 }
             },
@@ -78,7 +63,7 @@ module.exports={
         }
     },
     methods: {
-    保存链接数据修改: async function () { this.$事件总线.$emit("保存链接数据",this.链接数据) },
+    保存链接数据修改: async function () { this.$事件总线.$emit("保存链接",this.链接数据) },
     生成html:async  function(){
       if(this.链接数据.markdown){
       console.log*(this.链接数据.markdown)
