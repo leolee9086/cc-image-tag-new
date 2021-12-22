@@ -44,7 +44,7 @@
         </el-popover>
         <span class="el-icon-plus" @click="添加卡片()"></span>
 
-        <div class="el-icon-help" @click="聚焦到卡片(卡片数据)"></div>
+        <div class="el-icon-help" @click="聚焦到卡片(对象数据)"></div>
         <span class="el-icon-browser" @click="$窗口内打开超链接(卡片超链接)"></span>
       </el-col>
       <el-col :span="6"></el-col>
@@ -110,8 +110,7 @@ module.exports = {
   data() {
     return {
       属性对象:{},
-      卡片数据: {},
-      链接数据: {},
+      对象数据: {},
       自定义颜色数组: [],
       搜索关键词: "",
       搜索结果id: "",
@@ -122,19 +121,17 @@ module.exports = {
     }
   },
   async mounted() {
-    let 画板命名 =  await this.$数据库.metadata.get("name")
+    let 画板命名 =  await this.$数据库.metadata.get("name")||"未命名"
     console.log(画板命名)
-    this.当前画板命名 = 画板命名.value||""
-    this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.卡片数据.id}&baseid=${数据源id}`
+    this.当前画板命名 = 画板命名.value||画板命名
+    this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${数据源id}`
     this.画板列表 =  await this.$画板元数据库.boards.toArray()
     console.log(this.画板列表)
 
   },
   watch: {
     当前画板命名:{ handler:async function(val,oldval){
-        this.$数据库.metadata.put({key:"name",value:val})
-        let 画板元数据={id:this.$baseid,name:val}
-        this.$画板元数据库.boards.put(画板元数据)
+        this.$事件总线.$emit("修改画板元数据",{key:"name",value:val})
       },
     },
     当前画板id:{
@@ -145,9 +142,18 @@ module.exports = {
     卡片数据id: {
       handler: async function (val, oldval) {
         if (val && val != oldval) {
-          this.卡片数据 = await this.$数据库.tags.get(this.卡片数据id)
-          this.属性对象 = this.卡片数据.attrs
-          this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.卡片数据.id}&baseid=${数据源id}`
+          this.对象数据 = await this.$数据库.cards.get(this.卡片数据id)
+          this.属性对象 = this.对象数据.attrs
+          this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${数据源id}&table=cards`
+        }
+      }
+    },
+    链接数据id:{
+      handler: async function (val, oldval) {
+        if (val && val != oldval) {
+          this.对象数据 = await this.$数据库.links.get(this.链接数据id)
+          this.属性对象 = this.对象数据.attrs
+          this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${数据源id}&table=cards`
         }
       }
     },
@@ -159,55 +165,44 @@ module.exports = {
     }
   },
   methods: {
-    聚焦到卡片: function (卡片数据) {
-      this.$事件总线.$emit("定位至卡片", 卡片数据)
+    聚焦到卡片: function (对象数据) {
+      this.$事件总线.$emit("定位至卡片", 对象数据)
       setTimeout(() => {
-        let el = document.querySelector(`[data-node-id='${卡片数据.id}']`)
+        let el = document.querySelector(`[data-node-id='${对象数据.id}']`)
+        let style = el.getAttribute("style")
+        el.setAttribute("style", style+"border:solid 5px lightblue")
+        setTimeout(() => {
+        let el = document.querySelector(`[data-node-id='${对象数据.id}']`)
 
-        el.setAttribute("style", "border:solid 5px lightblue")
+        el.setAttribute("style",style)
       }, 500);
-      setTimeout(() => {
-        let el = document.querySelector(`[data-node-id='${卡片数据.id}']`)
 
-        el.setAttribute("style", "")
-      }, 1000);
+      }, 500);
+      
     },
     添加卡片:function(){
       let 卡片数据 = this.$根据属性生成卡片() 
       卡片数据.attrs.top= (window.pageYOffset + window.innerHeight/2-50)/this.$当前窗口状态.缩放倍数,
-      卡片数据.attrs.left= (window.pageYOffset + window.innerHeight/2-50)/this.$当前窗口状态.缩放倍数,
-/*
-      {
-          def_block: "",
-          anchor: "",
-          top: (window.pageYOffset + window.innerHeight/2-50)/this.$当前窗口状态.缩放倍数,
-          left: (window.pageXOffset + window.innerWidth/2-50)/this.$当前窗口状态.缩放倍数,
-          width: 100,
-          height: 100,
-          backgroundColor: "yellow",
-          borderColor: "red",
-          showhandler: false,
-          color: "balck",
-          folded: false,
-          id: Lute.NewNodeID(),
-        };*/
-      
+      卡片数据.attrs.left= (window.pageXOffset + window.innerWidth/2-50)/this.$当前窗口状态.缩放倍数,
       this.$事件总线.$emit("添加卡片",卡片数据)
     },
     设定当前标记: function () {
       let 上传数据 = { "id": "", "styles": {} }
-      上传数据.id = this.卡片数据id
+      上传数据.id = this.对象数据.id
       上传数据["styles"].color = this.属性对象.color
       上传数据["styles"].borderColor = this.属性对象.borderColor
       上传数据["styles"].backgroundColor = this.属性对象.backgroundColor
-      this.$事件总线.$emit("保存卡片", 上传数据)
+      if (this.对象数据.type=="card"){
+      this.$事件总线.$emit("保存卡片", 上传数据)}
+       if (this.对象数据.type=="link"){
+      this.$事件总线.$emit("保存链接", 上传数据)}
     },
 
     搜索: async function () {
       let 关键词 = this.搜索关键词
       if (关键词) {
         this.搜索结果列表 = await
-          this.$数据库.tags
+          this.$数据库.cards
             .filter(value=>
               {
                 if(value.markdown){
@@ -221,7 +216,7 @@ module.exports = {
             .toArray()
       }
       else {
-        this.搜索结果列表 = await this.$数据库.tags.toArray()
+        this.搜索结果列表 = await this.$数据库.cards.toArray()
       }
               console.log("搜索结果",this.搜索结果列表)
 

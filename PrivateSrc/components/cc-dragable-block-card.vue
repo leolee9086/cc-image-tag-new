@@ -15,12 +15,17 @@
     :w="width || 卡片数据.attrs.width"
     :h="height || 卡片数据.attrs.height"
     :x="卡片数据.attrs.left"
-    :z="200"
+    :z="210"
     class-name-handle="resizer"
     class-name="card"
   >
-    <div :data-node-id="卡片数据.id">
+    <div :data-node-id="卡片数据.id"
+        :style="`width:${卡片数据.attrs.width}px;
+        height:${卡片数据.attrs.height}px
+        `"
+    >
       <el-popover
+
         popper-class="tagpoper"
         trigger="hover"
         :open-delay="300"
@@ -138,6 +143,8 @@ module.exports = {
   async mounted() {
     console.log("加载卡片", this.value)
     this.卡片数据 = this.value
+            this.卡片数据.type= "card"
+
     this.开始监听 = true
     this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.卡片数据.id}&baseid=${数据源id}`
     this.hide = false
@@ -168,7 +175,6 @@ module.exports = {
       handler: async function (val, oldval) {
         this.folded=val.attrs.folded
         
-        this.保存卡片()
         this.生成html()
       },
       deep: true,
@@ -196,6 +202,8 @@ module.exports = {
 
           } catch (e) { }
         }
+                this.保存卡片()
+
       },
       immediate: true
     },
@@ -246,12 +254,15 @@ module.exports = {
       this.卡片数据.attrs.top = y
       this.卡片数据.attrs.left = x
       this.卡片数据 = this.$更新数据时间戳(this.卡片数据)
+              this.保存卡片()
+
 
     },
     dragstop(x, y) {
       this.卡片数据.attrs.top = y
       this.卡片数据.attrs.left = x
       this.卡片数据 = this.$更新数据时间戳(this.卡片数据)
+        this.保存卡片()
 
 
     },
@@ -261,6 +272,7 @@ module.exports = {
       this.卡片数据.attrs.width = width
       this.卡片数据.attrs.height = height
       this.卡片数据 = this.$更新数据时间戳(this.卡片数据)
+        this.保存卡片()
 
     },
 
@@ -270,6 +282,7 @@ module.exports = {
       this.卡片数据.attrs.width = width
       this.卡片数据.attrs.height = height
       this.卡片数据 = this.$更新数据时间戳(this.卡片数据)
+        this.保存卡片()
 
     },
     保存卡片: function () {

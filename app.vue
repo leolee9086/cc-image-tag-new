@@ -15,10 +15,13 @@
      :窗口大小="窗口大小" :当前鼠标坐标="当前鼠标坐标"></cc-layers-tooltip>
   </div>
     <cc-layers-cards class="layer"
-      v-on:paste="黏贴内容($event)" :窗口大小="窗口大小"
+    
+      v-on:paste="黏贴内容($event)" 
+      :窗口大小="窗口大小"
     ></cc-layers-cards>
    
    <cc-layers-graph class="layer"
+  
      :窗口大小="窗口大小"></cc-layers-graph>
 
   </div>
@@ -40,8 +43,10 @@ module.exports = {
     let url参数 = this.$解析url(window.location.href);
     console.log(url参数);
     let 数据源id = url参数.baseid;
-    if (数据源id) 
-    {await this.打开思源数据()};
+  //  if (数据源id) 
+   // {await this.打开思源数据()};
+   
+        
   },
   data() {
     return {
@@ -49,69 +54,15 @@ module.exports = {
       书签列表: "",
       新属性: { "type": "原始文本", "name": "newattr", "label": "newattr", "value": "default" },
       属性类型: ["图片", "文本", "块链接", "超链接", "原始文本", "附件"],
-      等待连接: "",
       数据源id: "",
-      协同缩放: false,
       窗口大小: { width: 2000, height: 2000 },
       主界面: {},
-      内部图片源: "",
-      图片源: "",
-      图片格式: "jpg",
-      思源伺服ip: "",
-      apitoken: "",
-      格式列表: ["jpg", "png", "jpeg"],
       挂件自身元素: "",
-      标记数组:[],
-      links: [],
-      当前激活标签类型: "",
+     
       当前鼠标坐标: { x: "", y: "" },
-      当前块引: "",
-      自定义颜色数组: [],
-      当前边框色: "",
-      当前背景色: "",
-      当前文字色: "",
-      图片缩放倍数: 1,
-      保存计数器: 1,
-      定点添加: false,
-      不可见标记数组: [],
-      等待连接: false,
     };
   },
   watch: {
-    图片源: async function (val) {
-      if (val) {
-        let that = this;
-        console.log(this.图片源);
-        let url = "http://" + this.思源伺服ip;
-        let assetpath = this.图片源
-          .replace(url, "")
-          .replace("http://127.0.0.1:6806", "");
-        let id = this.数据源id;
-
-        if (val) {
-          this.内部图片源 = val;
-        }
-        console.log(this.$refs["image"]);
-        let image = this.$refs["image"];
-        image.onload = function (event) {
-          console.log(event.target);
-          console.log(
-            event.target.naturalWidth,
-            event.target.naturalHeight
-          );
-          event.target.style.width =
-            event.target.naturalWidth * that.图片缩放倍数 + "px";
-          event.target.style.height =
-            event.target.naturalHeight * that.图片缩放倍数 + "px";
-        };
-      }
-    },
-    内部图片源(val) {
-      if (this.图片源 != val) {
-        this.图片源 = val;
-      }
-    },
-   
   
  
 
@@ -126,10 +77,10 @@ module.exports = {
     
     以属性查找对象(集合, 属性名, 属性值) {
       let obj = null
-      集合.forEach(tag => {
-        if (tag) {
-          if (tag[属性名] == 属性值) {
-            obj = tag
+      集合.forEach(card => {
+        if (card) {
+          if (card[属性名] == 属性值) {
+            obj = card
           }
         }
       }
@@ -165,13 +116,13 @@ module.exports = {
         }
       }
       let that = this
-      let filepath = `assets/datao-${this.数据源id}.cctag`      
+      let filepath = `assets/datao-${this.数据源id}.cccard`      
       if (this.$挂件模式()) { filepath = this.挂件自身元素.getAttribute("data-assets") }
       let url = 'http://' + that.思源伺服ip + '/' + filepath
       console.log(url)
       await axios.get(url).then((res) => {
         文件数据 = res.data
-        if (文件数据["tagarray"]) {
+        if (文件数据["cardarray"]) {
 
           try {
             this.图片缩放倍数 = parseFloat(
@@ -183,24 +134,24 @@ module.exports = {
       })
       if (!this.标记数组) { this.标记数组 = [] }
       if (!this.links) { this.links = [] }
-      this.标记数组=文件数据["tagarray"]
+      this.标记数组=文件数据["cardarray"]
       this.links=文件数据["links"]
       console.log(this.标记数组)
       for(i in this.标记数组){
-        let tag = this.标记数组[i]
-        if (!tag.id) {
-          tag.id = Lute.NewNodeID();
-          console.log(tag.id)
+        let card = this.标记数组[i]
+        if (!card.id) {
+          card.id = Lute.NewNodeID();
+          console.log(card.id)
         }
-        if (!tag.markdown) {
-          tag.markdown = "## 此处输入内容";
+        if (!card.markdown) {
+          card.markdown = "## 此处输入内容";
         }
-        tag.attrs=tag.attrs||{}
-        tag.attrs["custom-x"]=tag.left
-        tag.attrs["custom-y"]=tag.top
-        if(tag.def_block){
-          tag.def_block = tag.def_block.replace("((", "").replace("))", "")};
-        await this.$数据库.tags.put(tag)
+        card.attrs=card.attrs||{}
+        card.attrs["custom-x"]=card.left
+        card.attrs["custom-y"]=card.top
+        if(card.def_block){
+          card.def_block = card.def_block.replace("((", "").replace("))", "")};
+        await this.$数据库.cards.put(card)
       }
 
       for(i in this.links){

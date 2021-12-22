@@ -10,7 +10,7 @@ else{
 }
 const 数据库 = new Dexie(Vue.prototype.$baseid);
 数据库.version(1).stores({
-  tags: 'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs', 
+  cards: 'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs', 
   links:'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs',
   states:"++id,current_cardid,current_linkid,viewcenter",
   metadata:"key,value"
@@ -103,13 +103,27 @@ Vue.prototype.$根据属性生成链接=function(属性对象){
     content:"",
     markdown:"此处输入内容",
     length:"",
-    type:"card",
+    type:"link",
     subtype:"",
     ial:{ },
     sort:"",
     created:"",
     updated:Vue.prototype.$用Lute生成时间戳(),
-    attrs:{from_id:"",to_id:"",path_width:"",path_color:"",path_type:"simpleLine"}
+    attrs:{
+      offsetx:0,
+      offsety:0,
+      from_id:"",
+      to_id:"",
+      path_width:"",
+      path_color:"",
+      width:100,
+      height:100,
+      path_type:"simpleLine",
+      folded:false,
+      backgroundColor:"lightblue",
+      color:"black",
+      borderColor:"black",
+    }
   }
   for (属性名 in 空标签){
     属性对象[属性名]?空标签[属性名]=属性对象[属性名]:null

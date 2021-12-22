@@ -7,7 +7,7 @@ const window = {
 importScripts("/widgets/cc-baselib/static/dexie.min.js")
 const 数据库 = new Dexie('datas');
 数据库.version(4).stores({
-  tags: 'id,parent_id,root_id,hash,path,attrs,markdown,content,type,index,created,updated,children,x,y', 
+  cards: 'id,parent_id,root_id,hash,path,attrs,markdown,content,type,index,created,updated,children,x,y', 
   links:'id,from_id,to_id,type,subtype,labels',
   states:"++id,editMode,currentCardId,currentLinkId,LastViewpotCenter",
   GraphConfig:"defalutCard,defaultNode,layout",
@@ -20,7 +20,7 @@ const 数据库 = new Dexie('datas');
   return 消息["data"]["数据"]
 }
 变更卡片数据=function(数据){
-  数据库.tags.put(数据)
+  数据库.cards.put(数据)
   setTimeout(广播消息({"类型":"变更卡片数据","id":数据.id,"数据":数据}),10)
   return `卡片数据${数据.id}变更为${JSON.stringify(数据)}`
 }

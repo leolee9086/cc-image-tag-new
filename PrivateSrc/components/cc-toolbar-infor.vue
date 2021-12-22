@@ -16,7 +16,8 @@
 
             :style="`
             position:absolute;
-            background-color:var(--b3-theme-background-light)
+            background-color:var(--b3-theme-background-light);
+            border:solid 2px blue;
             overflow:hidden;
             max-height:${工具栏高度 - 10}px;
             height:${工具栏高度 - 10}px;
@@ -133,7 +134,7 @@ module.exports = {
             async handler(val) {
                 console.log(val)
                 if (val) {
-                    this.当前卡片数据 = await this.$数据库.tags.get(val)
+                    this.当前卡片数据 = await this.$数据库.cards.get(val)
                     this.当前图上正向链接列表 = await this.$数据库.links
                         .filter(value=>
                         {
@@ -173,7 +174,7 @@ module.exports = {
                     this.当前反向链接列表 = await this.以id获取反向链接(id)
                     this.当前正向链接列表 = await this.以id获取正向链接(id)
                     this.当前卡片数据["def_block"] = val
-                    this.$数据库.tags.put(this.当前卡片数据)
+                    this.$数据库.cards.put(this.当前卡片数据)
                 }
                 else {
                     this.当前反向链接列表 = []

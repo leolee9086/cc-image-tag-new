@@ -67,7 +67,7 @@
         this.id =  url参数.id||""
         this.数据源id = url参数.baseid
         this.timer = liveQuery(
-            ()=>this.$数据库.tags.get(this.id)
+            ()=>this.$数据库.cards.get(this.id)
         ).subscribe(
             {next:result=>this.carddata = result}
         )  
@@ -89,7 +89,7 @@
                 console.log(val)
                 this.carddata.markdown=val 
                 this.$更新数据时间戳(this.carddata)
-                await this.$数据库.tags.put(this.carddata) 
+                await this.$数据库.cards.put(this.carddata) 
                 this.$事件总线.$emit("上传数据到思源")
             }
         },
