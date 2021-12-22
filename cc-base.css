@@ -110,3 +110,76 @@ html,body,#app{
     overflow-x: hidden
 
 }
+.el-popover.tagpoper,
+.el-popover .el-popper.tagpoper {
+  padding: 0;
+  background-color: transparent;
+  border: none;
+}
+
+.el-icon-browser {
+  background: url("/widgets/cc-baselib/icons/browser-o.svg") center no-repeat;
+  background-size: contain;
+}
+
+.el-icon-browser::before {
+  content: "\8d3a";
+  font-size: 14px;
+  visibility: hidden;
+}
+
+.el-icon-siyuan {
+  background: url("/widgets/cc-baselib/icons/siyuan.svg") center no-repeat;
+  background-size: contain;
+}
+
+.el-icon-siyuan::before {
+  content: "\8d3a";
+  font-size: 14px;
+  visibility: hidden;
+}
+
+.el-icon-focus {
+  background: url("/widgets/cc-baselib/icons/focus.svg") center no-repeat;
+  background-size: contain;
+}
+
+.el-icon-focus::before {
+  content: "\8d3a";
+  font-size: 14px;
+  visibility: hidden;
+}
+
+.el-icon-markdown {
+  background: url("/widgets/cc-baselib/icons/markdown.svg") center no-repeat;
+  background-size: contain;
+}
+
+.el-icon-markdown::before {
+  content: "\8d3a";
+  font-size: 14px;
+  visibility: hidden;
+}
+
+
+.draggable {
+  padding: 0px;
+}
+.fullscreen{
+
+}
+
+.ccbackground{
+      position: fixed;
+      left:0px;
+      top:0px;
+      z-index:  1;;
+  }
+
+.fixed{
+  position: fixed;
+}
+.fullscreen{
+  width:100vw;
+  height:100vw
+}

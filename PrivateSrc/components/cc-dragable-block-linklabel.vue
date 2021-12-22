@@ -148,7 +148,7 @@ module.exports = {
     this.链接数据 = JSON.parse(JSON.stringify(this.value));
     this.链接数据.type = "link";
     this.开始监听 = true;
-    this.链接超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.链接数据.id}&baseid=${数据源id}`;
+    this.链接超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.链接数据.id}&baseid=${this.$baseid}`;
     this.hide = false;
   },
 

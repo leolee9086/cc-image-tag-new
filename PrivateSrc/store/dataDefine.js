@@ -1,8 +1,13 @@
 
+
+
+
+
 let url参数 = Vue.prototype.$解析url(window.location.href)
+/*挂件模式的判定在baselib的commonfunctionforsiyuan里*/
+/*挂件自身元素的获取也在baselib的commonfunctionforsiyuan里*/
 
 if(!Vue.prototype.$挂件模式()){
-  
   Vue.prototype.$baseid= url参数.baseid||Lute.NewNodeID()
 }
 else{  
@@ -13,7 +18,8 @@ const 数据库 = new Dexie(Vue.prototype.$baseid);
   cards: 'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs', 
   links:'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs',
   states:"++id,current_cardid,current_linkid,viewcenter",
-  metadata:"key,value"
+  metadata:"key,value",
+  history:"++id,data"
 });
 
 const 画板元数据库 = new Dexie("cc_whiteboardfiles");
@@ -133,8 +139,14 @@ Vue.prototype.$根据属性生成链接=function(属性对象){
   }
   console.log(空标签)
   return 空标签
+},
+Vue.prototype.$从数据生成文件= function (数据, 文件类型, 文件名) {
+  let 数据blob = new Blob([JSON.stringify(数据)], {
+    type: 文件类型,
+  });
+  let 文件 = new File([数据blob], 文件名, { lastModified: Date.now() });
+  return 文件;
 }
-
 
 
 

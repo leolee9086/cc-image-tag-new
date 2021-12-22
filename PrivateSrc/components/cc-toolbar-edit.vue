@@ -1,51 +1,63 @@
 <template>
   <div
-    style="border:solid 0.01vw;
-        border-radius:0.2vw;
-        position: fixed;
-        top:90vh ;
-        left:calc(50vw - 300px);
-        background-color:white ;
-        z-index:251;
-        padding:0.2vw;
-        width:600px
-        "
+    style="
+      border: solid 0.01vw;
+      border-radius: 0.2vw;
+      position: fixed;
+      top: 90vh;
+      left: calc(50vw - 300px);
+      background-color: white;
+      z-index: 251;
+      padding: 0.2vw;
+      width: 600px;
+      justify-content: center;
+    "
   >
     <el-row>
       <el-col :span="6">
-      <el-popover trigger="click">
-          <el-input v-model="当前画板命名">
+        <el-popover trigger="click">
+          <el-input v-model="当前画板命名" size="mini">
             <span slot="prepend">画板命名</span>
           </el-input>
+          <el-button
+            size="mini"
+            class="el-icon-time"
+            @click="显示历史面板 = !显示历史面板"
+            >查看历史版本</el-button
+          >
+
           <div slot="reference" class="el-icon-setting"></div>
         </el-popover>
         <el-popover trigger="click">
-          <el-select
-           v-model="当前画板id"
-          >
+          <span>打开画板</span>
+          <el-select v-model="当前画板id" size="mini">
             <el-option
-            v-for="(item,i) in this.画板列表"
-            :label="item.name||item.id"
-            :value="item.id"
+              v-for="(item, i) in this.画板列表"
+              :label="item.name || item.id"
+              :value="item.id"
             >
+              <el-tooltip trigger="hover" :content="item.id" placement="top-start">
+                <span>{{ item.name }}</span>
+              </el-tooltip>
             </el-option>
           </el-select>
           <div slot="reference" class="el-icon-folder"></div>
         </el-popover>
         <el-popover trigger="click">
           <el-input v-model="搜索关键词" @input="搜索()" size="mini"></el-input>
-          <div v-for="(item,i) in 搜索结果列表">
+          <div v-for="(item, i) in 搜索结果列表">
             <el-link :value="item.id" @click="聚焦到卡片(item)">
               <span>{{ `id:${item.id}` }}</span>
-              <span>{{ `${item.markdown.slice(0, 22)||无内容}` }}</span>
+              <span>{{ `${item.markdown.slice(0, 22) || 无内容}` }}</span>
             </el-link>
           </div>
           <div slot="reference" class="el-icon-zoom-in"></div>
         </el-popover>
+
         <span class="el-icon-plus" @click="添加卡片()"></span>
 
         <div class="el-icon-help" @click="聚焦到卡片(对象数据)"></div>
-        <span class="el-icon-browser" @click="$窗口内打开超链接(卡片超链接)"></span>
+        <span class="el-icon-browser" @click="$窗口内打开超链接(画板超链接)"></span>
       </el-col>
       <el-col :span="6"></el-col>
       <el-col :span="2">
@@ -58,14 +70,17 @@
             text-decoration:underline 4px;
             text-align:center;
             `"
-                      :width="1000"
-          >A</div>
+            :width="1000"
+          >
+            A
+          </div>
           <h3>文字</h3>
 
-          <cc-color-pane 
-          v-model="属性对象.color" 
-          @change="设定当前标记()" 
-          :自定义颜色数组="自定义颜色数组"></cc-color-pane>
+          <cc-color-pane
+            v-model="属性对象.color"
+            @change="设定当前标记()"
+            :自定义颜色数组="自定义颜色数组"
+          ></cc-color-pane>
         </el-popover>
       </el-col>
       <el-col :span="2">
@@ -79,7 +94,11 @@
             margin:2px`"
           ></div>
           <h3>背景</h3>
-          <cc-color-pane v-model="属性对象.backgroundColor" @change="设定当前标记()" :自定义颜色数组="自定义颜色数组"></cc-color-pane>
+          <cc-color-pane
+            v-model="属性对象.backgroundColor"
+            @change="设定当前标记()"
+            :自定义颜色数组="自定义颜色数组"
+          ></cc-color-pane>
         </el-popover>
       </el-col>
       <el-col :span="2">
@@ -89,140 +108,368 @@
             :style="`background-color:'';width:24px;height:24px;outline:solid 3px ${属性对象.borderColor};margin:2px`"
           ></div>
           <h3>边框</h3>
-          <cc-color-pane v-model="属性对象.borderColor" @change="设定当前标记()" :自定义颜色数组="自定义颜色数组"></cc-color-pane>
+          <cc-color-pane
+            v-model="属性对象.borderColor"
+            @change="设定当前标记()"
+            :自定义颜色数组="自定义颜色数组"
+          ></cc-color-pane>
         </el-popover>
       </el-col>
-      <span
-        style="font-size:xx-small"
-        v-if="属性对象"
-      >x:{{ 属性对象.left }}y{{ 属性对象.top }}|名称{{ 属性对象.title }}</span>
+      <span style="font-size: xx-small" v-if="属性对象"
+        >x:{{ 属性对象.left }}y{{ 属性对象.top }}</span
+      >
+      <el-input v-model="当前对象名称" size="mini" @input="修改对象名称()">
+        <span slot="prepend">名称</span>
+      </el-input>
     </el-row>
+    <el-drawer :modal="false" title="历史版本" :visible.sync="显示历史面板">
+      <el-timeline>
+        <el-timeline-item
+          v-for="(版本, 序号) in 文件历史列表"
+          :key="序号"
+          :timestamp="版本.timestamp"
+          placement="top"
+        >
+          <el-card>
+            <strong>{{ 版本.metadata[版本.metadata.length - 1]["value"] }}</strong>
+            <div>
+              卡片数量:{{ 版本.cards.length }} 链接数量:{{ 版本.links.length }}
+              <el-tooltip content="删除这个版本">
+                <span class="el-icon-delete" @click="删除版本数据(版本)"></span>
+              </el-tooltip>
+              <el-tooltip content="回滚到这个版本">
+                <span class="el-icon-check" @click="应用版本数据(版本)"></span>
+              </el-tooltip>
+              <el-tooltip content="导出数据">
+                <span class="el-icon-download" @click="导出版本数据(版本)"></span>
+              </el-tooltip>
+              <el-tooltip content="导出markdown">
+                <span class="el-icon-markdown" @click="导出版本markdown(版本)"></span>
+              </el-tooltip>
+            </div>
+          </el-card>
+        </el-timeline-item>
+      </el-timeline>
+    </el-drawer>
   </div>
 </template>
 <script>
 module.exports = {
   name: "cc-toolbar-edit",
-  props: [
-    "卡片数据id",
-    "链接数据id",
-  ],
+  props: ["卡片数据id", "链接数据id", "思源伺服ip"],
   components: componentsList,
   data() {
     return {
-      属性对象:{},
+      数据源id: {},
+      属性对象: {},
       对象数据: {},
       自定义颜色数组: [],
       搜索关键词: "",
       搜索结果id: "",
       搜索结果列表: "",
-      当前画板id:"",
-      画板列表:[],
-      当前画板命名:"",
-    }
+      当前画板id: "",
+      画板列表: [],
+      当前画板命名: "",
+      画板超链接: `http://${this.思源伺服ip}/widgets/cc-image-tag-new/?baseid=${this.$baseid}`,
+      显示历史面板: false,
+      文件历史列表: [],
+      当前对象名称: "",
+    };
   },
   async mounted() {
-    let 画板命名 =  await this.$数据库.metadata.get("name")||"未命名"
-    console.log(画板命名)
-    this.当前画板命名 = 画板命名.value||画板命名
-    this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${数据源id}`
-    this.画板列表 =  await this.$画板元数据库.boards.toArray()
-    console.log(this.画板列表)
-
+    let 画板命名 = (await this.$数据库.metadata.get("name")) || "未命名";
+    console.log(画板命名);
+    this.当前画板命名 = 画板命名.value || 画板命名;
+    this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}`;
+    this.画板列表 = await this.$画板元数据库.boards.toArray();
+    console.log(this.画板列表);
+    try {
+      await this.保存历史();
+      await this.从思源块加载数据(this.$baseid);
+    } catch (error) {
+      console.log(error);
+      alert("加载挂件块数据失败,注意手动保存数据");
+    }
   },
   watch: {
-    当前画板命名:{ handler:async function(val,oldval){
-        this.$事件总线.$emit("修改画板元数据",{key:"name",value:val})
+    当前画板命名: {
+      handler: async function (val, oldval) {
+        this.$事件总线.$emit("修改画板元数据", { key: "name", value: val });
       },
     },
-    当前画板id:{
-      handler:function(val,oldval){
-        this.$窗口内打开超链接(`/widgets/cc-image-tag-new/?baseid=${val}`)
+    当前画板id: {
+      handler: function (val, oldval) {
+        this.$窗口内打开超链接(`/widgets/cc-image-tag-new/?baseid=${val}`);
       },
     },
     卡片数据id: {
       handler: async function (val, oldval) {
         if (val && val != oldval) {
-          this.对象数据 = await this.$数据库.cards.get(this.卡片数据id)
-          this.属性对象 = this.对象数据.attrs
-          this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${数据源id}&table=cards`
+          this.对象数据 = await this.$数据库.cards.get(this.卡片数据id);
+          this.属性对象 = this.对象数据.attrs;
+          this.当前对象名称 = this.对象数据.name;
+          this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}&table=cards`;
         }
-      }
+      },
     },
-    链接数据id:{
+    链接数据id: {
       handler: async function (val, oldval) {
         if (val && val != oldval) {
-          this.对象数据 = await this.$数据库.links.get(this.链接数据id)
-          this.属性对象 = this.对象数据.attrs
-          this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${数据源id}&table=cards`
+          this.对象数据 = await this.$数据库.links.get(this.链接数据id);
+          this.属性对象 = this.对象数据.attrs;
+          this.当前对象名称 = this.对象数据.name;
+
+          this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}&table=cards`;
         }
-      }
+      },
     },
     搜索结果id: {
       handler: async function (val, oldval) {
-        if (val) { console.log(val) }
-      }
-
-    }
+        if (val) {
+          console.log(val);
+        }
+      },
+    },
   },
   methods: {
-    聚焦到卡片: function (对象数据) {
-      this.$事件总线.$emit("定位至卡片", 对象数据)
-      setTimeout(() => {
-        let el = document.querySelector(`[data-node-id='${对象数据.id}']`)
-        let style = el.getAttribute("style")
-        el.setAttribute("style", style+"border:solid 5px lightblue")
-        setTimeout(() => {
-        let el = document.querySelector(`[data-node-id='${对象数据.id}']`)
-
-        el.setAttribute("style",style)
-      }, 500);
-
-      }, 500);
-      
+    删除版本数据: async function (版本数据) {
+      await this.$数据库.history.delete(版本数据.id);
+      this.文件历史列表 = await this.$数据库.history.toArray();
     },
-    添加卡片:function(){
-      let 卡片数据 = this.$根据属性生成卡片() 
-      卡片数据.attrs.top= (window.pageYOffset + window.innerHeight/2-50)/this.$当前窗口状态.缩放倍数,
-      卡片数据.attrs.left= (window.pageXOffset + window.innerWidth/2-50)/this.$当前窗口状态.缩放倍数,
-      this.$事件总线.$emit("添加卡片",卡片数据)
+    应用版本数据: async function (版本数据) {
+      await this.保存历史();
+      await this.$数据库.cards.clear();
+      await this.$数据库.links.clear();
+      let historycards = 版本数据.cards;
+      for (i in historycards) {
+        try {
+          await this.$数据库.cards.add(historycards[i]);
+        } catch (e) {
+          console.log(historycards[i], i, e);
+        }
+      }
+      let historylinks = 版本数据.links;
+      for (j in historycards) {
+        try {
+          await this.$数据库.links.add(historylinks[j]);
+        } catch (e) {
+          console.log(historylinks[j], j, e);
+        }
+      }
+    },
+    导出版本数据: async function () {
+      let that = this;
+      let JSON数据 = {};
+      await that.$数据库.cards.toArray((array) => (JSON数据.cards = array));
+      await that.$数据库.links.toArray((array) => (JSON数据.links = array));
+      let 文件名 = `${this.当前画板命名}.cccards`;
+      let 文件数据 = this.$从数据生成文件(JSON数据, "application/json", 文件名);
+      this.保存(文件数据, 文件名);
+    },
+    保存: function (blob, filename) {
+      let type = blob.type;
+      let force_saveable_type = "application/octet-stream";
+      if (type && type != force_saveable_type) {
+        // 强制下载，而非在浏览器中打开
+        var slice = blob.slice || blob.webkitSlice || blob.mozSlice;
+        blob = slice.call(blob, 0, blob.size, force_saveable_type);
+      }
+
+      let url = URL.createObjectURL(blob);
+      let save_link = document.createElement("a");
+      save_link.href = url;
+      save_link.download = filename;
+      let event = document.createEvent("MouseEvents");
+      event.initMouseEvent(
+        "click",
+        true,
+        false,
+        window,
+        0,
+        0,
+        0,
+        0,
+        0,
+        false,
+        false,
+        false,
+        false,
+        0,
+        null
+      );
+      save_link.dispatchEvent(event);
+      URL.revokeObjectURL(url);
+      // console.log(blob)
+    },
+    导出版本markdown: async function () {
+      let that = this;
+      let cards = {};
+      let links = {};
+
+      cards = await this.$数据库.cards.toArray();
+      links = await this.$数据库.links.toArray();
+      let zip = new JSZip();
+      for (i in cards) {
+        try {
+          let yaml = this.生成yaml(cards[i]);
+          let markdown = yaml + cards[i]["markdown"];
+          zip.file(`${"卡片" + i + cards[i]["name"]}.md`, markdown);
+        } catch (e) {
+          console.log(i, links[i]["id"], e);
+        }
+      }
+      for (i in links) {
+        try {
+          let yaml = this.生成yaml(links[i]);
+          let markdown = yaml + links[i]["markdown"];
+          zip.file(`${"关系" + i + links[i]["name"]}.md`, markdown);
+        } catch (e) {
+          console.log(i, links[i]["id"], e);
+        }
+      }
+      zip.generateAsync({ type: "blob" }).then((content) => {
+        that.保存(content, `${that.当前画板命名}-${that.当前画板id}.zip`);
+      });
+    },
+    生成yaml: function (对象数据) {
+      let yaml = `---
+id:"${对象数据.id}"
+parent_id:"${对象数据.parent_id}"
+root_id:"${对象数据.root_id}"
+hash:"${对象数据.hash}"
+box:"${对象数据.box}"
+path:"${对象数据.path}"
+name:"${对象数据.name}"
+alias:"${对象数据.alias}"
+memo:"${对象数据.memo}"
+content:"${对象数据.content}"
+length:"${对象数据.length}"
+type:"${对象数据.type}"
+subtype:"${对象数据.subtype}"
+ial:"${对象数据.ial}"
+sort:"${对象数据.sort}"
+created:"${对象数据.created}"
+updated:"${对象数据.updated}"
+attrs:'${JSON.stringify(对象数据.attrs)}'
+---
+
+`;
+      return yaml;
+    },
+    保存历史: async function () {
+      let data = {};
+      data.cards = await this.$数据库.cards.toArray();
+      data.links = await this.$数据库.links.toArray();
+      data.metadata = await this.$数据库.metadata.toArray();
+      data.states = await this.$数据库.states.toArray();
+      data.timestamp = this.$用Lute生成时间戳();
+      await this.$数据库.history.put(data);
+      this.文件历史列表 = await this.$数据库.history.toArray();
+    },
+    从思源块加载数据: async function (id) {
+      let that = this;
+      let filepath = `assets/data-${id}.cccards`;
+      if (this.$挂件模式()) {
+        this.挂件自身元素 = window.frameElement.parentElement.parentElement;
+
+        filepath =
+          this.挂件自身元素.getAttribute("data-assets") ||
+          this.挂件自身元素.getAttribute("custom-data-assets") ||
+          `assets/data-${this.挂件自身元素.getAttribute("data-node-id")}.cccards`;
+      }
+      let url = "http://" + this.思源伺服ip + "/" + filepath;
+      console.log(url);
+      await axios.get(url).then((res) => {
+        文件数据 = res.data;
+        if (文件数据["cardarray"]) {
+          try {
+            this.图片缩放倍数 = parseFloat(文件数据.resize).toFixed(2);
+          } catch (e) {
+            console.log(e);
+          }
+        }
+      });
+
+      let 卡片数组 = 文件数据["cards"];
+      let 链接数组 = 文件数据["links"];
+      for (i in 卡片数组) {
+        await this.$数据库.cards.put(卡片数组[i]);
+      }
+
+      for (i in 链接数组) {
+        await this.$数据库.links.put(链接数组[i]);
+      }
+      console.log("加载完成");
+    },
+    聚焦到卡片: function (对象数据) {
+      this.$事件总线.$emit("定位至卡片", 对象数据);
+      setTimeout(() => {
+        let el = document.querySelector(`[data-node-id='${对象数据.id}']`);
+        let style = el.getAttribute("style");
+        el.setAttribute("style", style + "border:solid 5px lightblue");
+        setTimeout(() => {
+          let el = document.querySelector(`[data-node-id='${对象数据.id}']`);
+
+          el.setAttribute("style", style);
+        }, 500);
+      }, 500);
+    },
+    添加卡片: function () {
+      let 卡片数据 = this.$根据属性生成卡片();
+      (卡片数据.attrs.top =
+        (window.pageYOffset + window.innerHeight / 2 - 50) / this.$当前窗口状态.缩放倍数),
+        (卡片数据.attrs.left =
+          (window.pageXOffset + window.innerWidth / 2 - 50) /
+          this.$当前窗口状态.缩放倍数),
+        this.$事件总线.$emit("添加卡片", 卡片数据);
     },
     设定当前标记: function () {
-      let 上传数据 = { "id": "", "styles": {} }
-      上传数据.id = this.对象数据.id
-      上传数据["styles"].color = this.属性对象.color
-      上传数据["styles"].borderColor = this.属性对象.borderColor
-      上传数据["styles"].backgroundColor = this.属性对象.backgroundColor
-      if (this.对象数据.type=="card"){
-      this.$事件总线.$emit("保存卡片", 上传数据)}
-       if (this.对象数据.type=="link"){
-      this.$事件总线.$emit("保存链接", 上传数据)}
+      let 上传数据 = { id: "", styles: {} };
+      上传数据.id = this.对象数据.id;
+      上传数据["styles"].color = this.属性对象.color;
+      上传数据["styles"].borderColor = this.属性对象.borderColor;
+      上传数据["styles"].backgroundColor = this.属性对象.backgroundColor;
+      if (this.对象数据.type == "card") {
+        this.$事件总线.$emit("保存卡片", 上传数据);
+      }
+      if (this.对象数据.type == "link") {
+        this.$事件总线.$emit("保存链接", 上传数据);
+      }
+    },
+    修改对象名称: async function () {
+      if (this.对象数据.type == "card") {
+        let 真实数据 = await this.$数据库.cards.get(this.对象数据.id);
+        真实数据.name = this.当前对象名称;
+        this.$事件总线.$emit("保存卡片", 真实数据);
+      }
+      if (this.对象数据.type == "link") {
+        let 真实数据 = await this.$数据库.links.get(this.对象数据.id);
+        真实数据.name = this.当前对象名称;
+        this.$事件总线.$emit("保存链接", 真实数据);
+      }
     },
 
     搜索: async function () {
-      let 关键词 = this.搜索关键词
+      let 关键词 = this.搜索关键词;
       if (关键词) {
-        this.搜索结果列表 = await
-          this.$数据库.cards
-            .filter(value=>
-              {
-                if(value.markdown){
-                let markdown = value.markdown
-                if (markdown.indexOf(关键词) > 0) {
-                  return true
-                }}
-                else { return false }
+        this.搜索结果列表 = await this.$数据库.cards
+          .filter((value) => {
+            if (value.markdown) {
+              let markdown = value.markdown;
+              if (markdown.indexOf(关键词) > 0) {
+                return true;
               }
-            )
-            .toArray()
+            } else {
+              return false;
+            }
+          })
+          .toArray();
+      } else {
+        this.搜索结果列表 = await this.$数据库.cards.toArray();
       }
-      else {
-        this.搜索结果列表 = await this.$数据库.cards.toArray()
-      }
-              console.log("搜索结果",this.搜索结果列表)
-
-    }
-
+      console.log("搜索结果", this.搜索结果列表);
+    },
   },
-  computed: {}
-}
+  computed: {},
+};
 </script>
