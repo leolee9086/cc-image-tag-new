@@ -232,6 +232,21 @@ module.exports = {
     },
   },
   methods: {
+    增量导入JSON数据: async function (JSON数据) {
+      await this.保存历史();
+      let cards = JSON数据.cards;
+      let links = JSON数据.links;
+      try {
+        for (i in cards) {
+          await this.$数据库.cards.put(cards[i]);
+        }
+        for (i in links) {
+          await this.$数据库.links.put(links[i]);
+        }
+      } catch (e) {
+        alert("导入出错", e);
+      }
+    },
     删除版本数据: async function (版本数据) {
       await this.$数据库.history.delete(版本数据.id);
       this.文件历史列表 = await this.$数据库.history.toArray();

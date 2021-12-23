@@ -1,15 +1,26 @@
 <template>
-  <path
-    v-if="链接['attrs']"
-    @click="测试连接()"
-    v-bind:d="路径.d || ''"
-    marker-mid="url(#markerArrowFrom)"
-    marker-start="url(#markerArrowFrom)"
-    marker-end="url(#markerArrowTo)"
-    :stroke="链接['attrs']['borderColor'] || 'black'"
-    :storke-width="链接['attrs']['path_width'] || 1"
-    fill="transparent"
-  ></path>
+  <g>
+    <path
+      v-if="链接['attrs']"
+      @click="测试连接()"
+      v-bind:d="路径.d || ''"
+      marker-mid="url(#markerArrowFrom)"
+      marker-start="url(#markerArrowFrom)"
+      marker-end="url(#markerArrowTo)"
+      :stroke="链接['attrs']['borderColor'] || 'black'"
+      :storke-width="链接['attrs']['path_width'] || 1"
+      fill="transparent"
+    ></path>
+    <path
+      v-if="显示引线 && 引线路径"
+      @click="测试连接()"
+      v-bind:d="引线路径.d || ''"
+      marker-end="url(#markerArrowTo)"
+      :stroke="链接['attrs']['borderColor'] || 'black'"
+      :storke-width="链接['attrs']['path_width'] || 1"
+      fill="transparent"
+    ></path>
+  </g>
 </template>
 <script>
 module.exports = {
@@ -33,6 +44,8 @@ module.exports = {
       代理结束标记: {},
       timer: "",
       监听: false,
+      显示引线: "",
+      引线路径: {},
     };
   },
   watch: {
@@ -90,7 +103,7 @@ module.exports = {
     矢量加(矢量1, 矢量2) {
       return { x: 矢量1.x + 矢量2.x, y: 矢量1.y + 矢量2.y };
     },
-    矢量减(矢量1, 矢量2) {
+    矢量减: function (矢量1, 矢量2) {
       return { x: 矢量1.x - 矢量2.x, y: 矢量1.y - 矢量2.y };
     },
     矢量内积(矢量1, 矢量2) {
@@ -152,8 +165,37 @@ module.exports = {
           this.链接.attrs.left = this.路径.mid.x;
         }
         this.链接 = this.$更新数据时间戳(this.链接);
+
+        if (Math.abs(this.链接.attrs.offsetx) > 50 || this.链接.attrs.offsety > 50) {
+          console.log("计算引线");
+          this.显示引线 = true;
+          this.计算引线(this.链接);
+        } else {
+          this.显示引线 = false;
+        }
       }
     },
+    计算引线: function (链接) {
+      let 引线链接 = JSON.parse(JSON.stringify(链接));
+      let 引线终点 = { x: 引线链接.attrs.left, y: 引线链接.attrs.top };
+      let 引线矢量 = {
+        x: (引线链接.attrs.offsetx + 引线链接.attrs.width / 2) * -1,
+        y: (引线链接.attrs.offsety + 引线链接.attrs.height / 2) * -1,
+      };
+      let 真实矩形 = {
+        left: 引线链接.attrs.left + 引线链接.attrs.offsetx,
+        top: 引线链接.attrs.top + 引线链接.attrs.offsety,
+        width: 引线链接.attrs.width,
+        height: 引线链接.attrs.height,
+      };
+      let 引线起点 = this.矩形与矢量交点(真实矩形, 引线矢量);
+
+      let 引线线段 = { 起点: 引线起点, 终点: 引线终点 };
+      console.log(JSON.stringify(引线线段));
+      this.引线路径 = this.生成直线路径(引线线段);
+      console.log("引线", this.引线路径);
+    },
+
     生成直线路径: function (路径线段) {
       let 起始节点 = 路径线段.起点;
       let 结束节点 = 路径线段.终点;
@@ -222,6 +264,7 @@ module.exports = {
     },
     矩形与矢量交点(矩形, 矢量) {
       let 矩形中心 = this.计算中心(矩形);
+      console.log(矩形中心);
       x偏移 = Math.abs(((矩形.height / 2) * 矢量.x) / 矢量.y);
       y偏移 = Math.abs(((矩形.width / 2) * 矢量.y) / 矢量.x);
       if (Math.abs(y偏移) > Math.abs(矩形.height / 2)) {
