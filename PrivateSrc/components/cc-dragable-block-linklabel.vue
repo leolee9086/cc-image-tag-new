@@ -16,7 +16,7 @@
     :x="链接数据.attrs.left + 链接数据.attrs.offsetx"
     :z="300"
     class-name-handle="resizer"
-    class-name="card"
+    class-name="cc-card-container"
   >
     <div :data-node-id="链接数据.id">
       <el-popover
@@ -28,21 +28,13 @@
         v-if="链接数据.attrs.folded"
       >
         <div
-          class="lableFolded"
+          class="cc-card-body cc-link folded"
           slot="reference"
-          :style="`position: absolute;                
+          :style="`             
           background-color:${链接数据.attrs.backgroundColor};
           color:${链接数据.attrs.color};
           border:solid ${链接数据.attrs.borderColor} 2px;
-          width:15px;
-          height:15px;
-          min-width:15px;
-          min-height:15px;
-          max-width:15px;
-          max-height:15px;
-          border-radius:100%;
-          text-align:center;
-          padding-bottom:3px
+        
           `"
           @dblclick="链接数据.attrs.folded = !链接数据.attrs.folded"
         >
@@ -51,6 +43,7 @@
         <div
           :style="`
           overflow:hidden;
+          color:${链接数据.attrs.color};
           border:solid ${链接数据.attrs.borderColor} 1px;
           background-color:${链接数据.attrs.backgroundColor};
           border-radius:5px`"
@@ -67,51 +60,49 @@
         </div>
       </el-popover>
       <div
+        class="cc-card-body cc-link not-folded"
         v-if="!链接数据.attrs.folded"
         @dblclick="链接数据.attrs.folded = !链接数据.attrs.folded"
+        :style="`
+        color:${链接数据.attrs.color};
+        
+        border:solid ${链接数据.attrs.borderColor} ${边框宽度}px;
+        background-color:${链接数据.attrs.backgroundColor};
+        width:${链接数据.attrs.width - 27 + 'px'};
+        height:${链接数据.attrs.height - 27 + 'px'};
+       `"
       >
-        <div
-          :style="`position:absolute;
-                                            overflow:hidden;
-                                            border:solid ${
-                                              链接数据.attrs.borderColor
-                                            } ${边框宽度}px;
-                                            background-color:${
-                                              链接数据.attrs.backgroundColor
-                                            };
-                                            width:${链接数据.attrs.width - 5 + 'px'};
-                                            height:${链接数据.attrs.height - 5 + 'px'};
-                                            border-radius:5px`"
-        >
-          <div class="cc-node-toolbar">
-            <span style="float: right">{{ index }}</span>
-            <span class="el-icon-delete" v-on:click="删除()"></span>
-            <span class="el-icon-edit" v-if="!正在编辑" @click="正在编辑 = true"></span>
-            <span class="el-icon-check" v-if="正在编辑" @click="正在编辑 = false"></span>
-            <span class="el-icon-refresh" v-on:click="转化为卡片()"></span>
-            <el-tooltip content="新窗口打开编辑">
-              <span class="el-icon-browser" @click="$窗口内打开超链接(链接超链接)"></span>
-            </el-tooltip>
-            <strong>{{ 链接数据.name }}</strong>
+        <div v-if="激活" class="cc-card-toolbar">
+          <span style="float: right">{{ index }}</span>
+          <span class="el-icon-delete" v-on:click="删除()"></span>
+          <span class="el-icon-edit" v-if="!正在编辑" @click="正在编辑 = true"></span>
+          <span class="el-icon-check" v-if="正在编辑" @click="正在编辑 = false"></span>
+          <span class="el-icon-refresh" v-on:click="转化为卡片()"></span>
+          <el-tooltip content="新窗口打开编辑">
+            <span class="el-icon-browser" @click="$窗口内打开超链接(链接超链接)"></span>
+          </el-tooltip>
+        </div>
+        <div>
+          <span class="el-icon-siyuan" v-if="链接数据.attrs.def_block"></span>
+
+          <strong>{{ 链接数据.name }}</strong>
+        </div>
+        <div class="cc-card-content">
+          <div :style="`color:${链接数据.attrs.color};`">
+            <cc-link-siyuan
+              v-if="链接数据.attrs.def_block"
+              :style="`color:${链接数据.attrs.color};`"
+              :锚文本="`引用自${链接数据.attrs.def_block}`"
+              :链接id="链接数据.attrs.def_block"
+            ></cc-link-siyuan>
           </div>
-          <div class="cc-node-content">
-            <div :style="`color:${链接数据.attrs.color};`">
-              <span class="el-icon-siyuan" v-if="链接数据.attrs.def_block"></span>
-              <cc-link-siyuan
-                v-if="链接数据.attrs.def_block"
-                :style="`color:${链接数据.attrs.color};`"
-                :锚文本="`引用自${链接数据.attrs.def_block}`"
-                :链接id="链接数据.attrs.def_block"
-              ></cc-link-siyuan>
-            </div>
-            <cc-vditor-vue
-              v-model="链接数据.markdown"
-              v-if="正在编辑"
-              @html-change="预览HTML = $event"
-              :toolbarconfig="{ hide: false }"
-            ></cc-vditor-vue>
-            <div v-if="!正在编辑" v-html="预览HTML"></div>
-          </div>
+          <cc-vditor-vue
+            v-model="链接数据.markdown"
+            v-if="正在编辑"
+            @html-change="预览HTML = $event"
+            :toolbarconfig="{ hide: false }"
+          ></cc-vditor-vue>
+          <div v-if="!正在编辑" v-html="预览HTML"></div>
         </div>
       </div>
     </div>
@@ -159,11 +150,6 @@ module.exports = {
           return null;
         }
         this.链接数据 = val;
-        if (val.id == this.$当前窗口状态.current_linkid) {
-          this.激活 = true;
-        } else {
-          this.激活 = false;
-        }
       },
       deep: true,
       immediate: true,
@@ -214,7 +200,7 @@ module.exports = {
       } else {
         this.边框宽度 = 1;
         this.链接数据 = this.$更新数据时间戳(this.链接数据);
-        //  this.$emit("deactivated", "")
+        this.$事件总线.$emit("反激活链接", this.链接数据.id);
       }
     },
     正在编辑(val) {
@@ -329,5 +315,8 @@ module.exports = {
 }
 pre.vditor-reset {
   background-color: transparent !important;
+}
+.el-drawer__wrapper {
+  z-index: -1 !important;
 }
 </style>

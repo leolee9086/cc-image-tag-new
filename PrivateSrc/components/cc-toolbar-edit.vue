@@ -218,7 +218,6 @@ module.exports = {
           this.对象数据 = await this.$数据库.links.get(this.链接数据id);
           this.属性对象 = this.对象数据.attrs;
           this.当前对象名称 = this.对象数据.name;
-
           this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}&table=cards`;
         }
       },
@@ -232,6 +231,12 @@ module.exports = {
     },
   },
   methods: {
+    覆盖导入JSON数据: async function (JSON数据) {
+      await this.保存历史();
+      await this.$数据库.links.clear();
+      await this.$数据库.cards.clear();
+      await this.增量导入JSON数据(JSON数据);
+    },
     增量导入JSON数据: async function (JSON数据) {
       await this.保存历史();
       let cards = JSON数据.cards;
@@ -417,6 +422,7 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
       console.log("加载完成");
     },
     聚焦到卡片: function (对象数据) {
+      this.$事件总线.$emit("窗口缩放", 1);
       this.$事件总线.$emit("定位至卡片", 对象数据);
       setTimeout(() => {
         let el = document.querySelector(`[data-node-id='${对象数据.id}']`);

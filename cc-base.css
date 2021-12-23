@@ -1,4 +1,46 @@
 
+/*卡片外容器样式*/
+.cc-card-container{
+  position: absolute;
+  background-color: none;
+  border: none;
+
+}
+
+.cc-card-body.folded{
+  position: absolute;  
+  width:15px;
+  height:15px;
+  min-width:15px;
+  min-height:15px;
+  max-width:15px;
+  max-height:15px;
+  border-radius:100%;
+  text-align:center;
+  padding-bottom:3px
+}
+.cc-node-content{
+}
+.cc-card-body.not-folded{
+  position:absolute;
+  overflow:hidden;
+  padding:10px;
+  box-shadow: 0 2px 6px 0 rgba(16, 42, 75, 0.493);
+  border-radius:5px
+}
+/*工具栏和面板样式*/
+.drawer-button-container{
+  position: fixed;
+  top:5vh;
+  left:10vw;
+  z-index:500;
+}
+.drawer-button-container .is-circle{
+  border-style: solid ;
+  border-width: 2px; 
+  border-color:var(--b3-theme-primary);
+  background-color:var(--b3-theme-primary-light)
+}
 .layout{
  z-index:1;
  width:100%;

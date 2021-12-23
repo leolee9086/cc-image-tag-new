@@ -16,14 +16,9 @@
     :x="卡片数据.attrs.left"
     :z="210"
     class-name-handle="resizer"
-    class-name="card"
+    class-name="cc-card-container"
   >
-    <div
-      :data-node-id="卡片数据.id"
-      :style="`width:${卡片数据.attrs.width}px;
-        height:${卡片数据.attrs.height}px
-        `"
-    >
+    <div :data-node-id="卡片数据.id" class="cc-card-main">
       <el-popover
         popper-class="tagpoper"
         trigger="hover"
@@ -33,21 +28,12 @@
         v-if="卡片数据.attrs.folded"
       >
         <div
-          class="lableFolded"
+          class="cc-card-body folded"
           slot="reference"
-          :style="`position: absolute;                
+          :style="`              
           background-color:${卡片数据.attrs.backgroundColor};
           color:${卡片数据.attrs.color};
           border:solid ${卡片数据.attrs.borderColor} 2px;
-          width:15px;
-          height:15px;
-          min-width:15px;
-          min-height:15px;
-          max-width:15px;
-          max-height:15px;
-          border-radius:100%;
-          text-align:center;
-          padding-bottom:3px
           `"
           @dblclick="卡片数据.attrs.folded = !卡片数据.attrs.folded"
         >
@@ -55,10 +41,10 @@
         </div>
         <div
           :style="`
-          overflow:hidden;
+         
           border:solid ${卡片数据.attrs.borderColor} 1px;
           background-color:${卡片数据.attrs.backgroundColor};
-          border-radius:5px`"
+          `"
         >
           <cc-link-siyuan
             :style="`color:${卡片数据.attrs.color};`"
@@ -72,21 +58,20 @@
         </div>
       </el-popover>
       <div
+        class="cc-card-body not-folded"
         v-if="!卡片数据.attrs.folded"
         @dblclick="卡片数据.attrs.folded = !卡片数据.attrs.folded"
+        :style="`
+          
+          color:${卡片数据.attrs.color};
+          border:solid ${卡片数据.attrs.borderColor} ${边框宽度}px;
+          background-color:${卡片数据.attrs.backgroundColor};
+          width:${卡片数据.attrs.width - 27 + 'px'};
+          height:${卡片数据.attrs.height - 27 + 'px'};
+          `"
       >
-        <div
-          :style="`position:absolute;
-                                  overflow:hidden;
-                                  border:solid ${
-                                    卡片数据.attrs.borderColor
-                                  } ${边框宽度}px;
-                                  background-color:${卡片数据.attrs.backgroundColor};
-                                  width:${卡片数据.attrs.width - 5 + 'px'};
-                                  height:${卡片数据.attrs.height - 5 + 'px'};
-                                  border-radius:5px`"
-        >
-          <div class="cc-node-toolbar">
+        <div>
+          <div v-if="激活" class="cc-card-toolbar">
             <span style="float: right">{{ index }}</span>
             <span class="el-icon-delete" v-on:click="删除()"></span>
             <span class="el-icon-share" @click="开始连接()"></span>
@@ -99,11 +84,15 @@
             <el-tooltip content="新窗口打开编辑">
               <span class="el-icon-browser" @click="$窗口内打开超链接(卡片超链接)"></span>
             </el-tooltip>
+          </div>
+
+          <div>
+            <span class="el-icon-siyuan" v-if="卡片数据.attrs.def_block"></span>
+
             <strong>{{ 卡片数据.name }}</strong>
           </div>
           <div class="cc-node-content">
             <div :style="`color:${卡片数据.attrs.color};`">
-              <span class="el-icon-siyuan" v-if="卡片数据.attrs.def_block"></span>
               <cc-link-siyuan
                 v-if="卡片数据.attrs.def_block"
                 :style="`color:${卡片数据.attrs.color};`"
@@ -138,7 +127,6 @@ module.exports = {
       激活: false,
       正在编辑: false,
       开始监听: false,
-      边框宽度: 1,
       卡片超链接: "",
       folded: "",
       width: "",
@@ -168,11 +156,7 @@ module.exports = {
           return null;
         }
         this.卡片数据 = val;
-        if (val.id == this.$当前窗口状态.current_cardid) {
-          this.激活 = true;
-        } else {
-          this.激活 = false;
-        }
+        this.卡片数据.type = "card";
       },
       deep: true,
       immediate: true,
@@ -218,20 +202,23 @@ module.exports = {
     },
     激活(val) {
       if (val) {
-        this.边框宽度 = 3;
         console.log(this.卡片数据);
         this.卡片数据 = this.$更新数据时间戳(this.卡片数据);
         this.$事件总线.$emit("激活卡片", this.卡片数据.id);
       } else {
-        this.边框宽度 = 1;
         this.卡片数据 = this.$更新数据时间戳(this.卡片数据);
-        //  this.$emit("deactivated", "")
+        this.$事件总线.$emit("反激活卡片", this.卡片数据.id);
       }
     },
     正在编辑(val) {
       if (val) {
         console.log(this.卡片数据);
       }
+    },
+  },
+  computed: {
+    边框宽度() {
+      return this.$当前窗口状态["current_cardid"] ? 3 : 1;
     },
   },
   methods: {
@@ -319,11 +306,7 @@ module.exports = {
   width: 100%;
   height: 100%;
 }
-.card {
-  position: absolute;
-  background-color: none;
-  border: none;
-}
+
 pre.vditor-reset {
   background-color: transparent !important;
 }

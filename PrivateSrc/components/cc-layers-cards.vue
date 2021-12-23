@@ -13,6 +13,8 @@
         z-index:200`"
   >
     <cc-dragable-block-card
+      :data-node-id="item.id"
+      :ref="item.id"
       v-for="(item, i) in 卡片数组"
       v-if="item && !item.hide"
       :key="卡片数组[i]['id']"
@@ -22,6 +24,8 @@
       :窗口缩放倍数="窗口缩放倍数"
     ></cc-dragable-block-card>
     <cc-dragable-block-linklabel
+      :ref="item.id"
+      :data-node-id="item.id"
       v-for="(item, i) in 链接数组"
       :key="链接数组[i]['id'] + 'label'"
       v-model="链接数组[i]"

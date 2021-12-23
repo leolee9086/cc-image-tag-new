@@ -8,7 +8,7 @@
     <div>
       <cc-layers-background
         class="layer"
-        :填充图像路径="`https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F1ed8cac5593ca73947eaca5e7476a406db12c639ef9b-YfnB5O_fw658&refer=http%3A%2F%2Fhbimg.b0.upaiyun.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1642524710&t=ed8c446f0d57983e6adb43d55683702c`"
+        :填充图像路径="`https://img1.baidu.com/it/u=3705788448,184693213&fm=26&fmt=auto`"
       ></cc-layers-background>
       <cc-layers-toolbar
         class="layer"

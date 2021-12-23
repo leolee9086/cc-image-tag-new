@@ -1,14 +1,24 @@
 <template>
-  <div id="dock" class="layout">
+  <div class="layout">
+    <div class="drawer-button-container">
+      <el-button
+        type="primary"
+        @click="显示详情面板 = !显示详情面板"
+        circle
+        icon="el-icon-share"
+      >
+      </el-button>
+    </div>
     <cc-toolbar-edit
       :思源伺服ip="思源伺服ip"
       :卡片数据id="当前卡片数据id"
       :链接数据id="当前链接数据id"
     ></cc-toolbar-edit>
     <cc-toolbar-infor
-      v-if="当前卡片数据id"
+      :显示="显示详情面板"
       :思源伺服ip="思源伺服ip"
       :卡片数据id="当前卡片数据id"
+      :链接数据id="当前链接数据id"
     ></cc-toolbar-infor>
     <cc-toolbar-view></cc-toolbar-view>
   </div>
@@ -30,6 +40,8 @@ module.exports = {
       当前链接数据id: "",
       窗口状态获取器: {},
       操作历史获取器: {},
+      最近窗口状态: {},
+      显示详情面板: false,
     };
   },
   async mounted() {
@@ -54,6 +66,7 @@ module.exports = {
         console.log("当前链接", this.当前链接数据id);
       },
     },
+    当前卡片数据id: {},
   },
 };
 </script>

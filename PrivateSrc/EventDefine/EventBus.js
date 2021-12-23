@@ -224,3 +224,5 @@ for (let item in 事务列表) {
 
 Vue.prototype.$当前窗口状态 = 窗口状态对象;
 Vue.prototype.$事件总线 = 事件总线;
+Vue.prototype.$思源伺服ip = window.location.host;
+Vue.prototype.$主界面 = window.parent.document
