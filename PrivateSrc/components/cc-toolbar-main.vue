@@ -47,6 +47,7 @@
           <el-upload
             class="upload-demo"
             drag
+            accept=".cccards"
             :http-request="覆盖导入JSON数据"
             :action="`http://${思源伺服ip}/api/asset/upload`"
             :headers="{ Authorization: 'Token' + apitoken }"

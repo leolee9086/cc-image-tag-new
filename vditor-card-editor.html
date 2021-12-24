@@ -57,31 +57,39 @@
             markdown:"",
             timer:"",
             JsonString:"",
-            htmlcontent:""
+            htmlcontent:"",
+            表名:"",
         }
     },
    
-    async mounted() {
+     mounted() {
         let liveQuery =  Dexie.liveQuery
-        let url参数= this.$解析url(window.location.href)
-        this.id =  url参数.id||""
-        this.数据源id = url参数.baseid
-        this.timer = liveQuery(
-            ()=>this.$数据库.cards.get(this.id)
+        let that = this
+        console.log(this.$数据库)
+        window.onload=function(){
+        let url参数= that.$解析url(window.location.href)
+        this.表名= url参数.type+"s"
+        console.log(url参数)
+        that.id =  url参数["id"]||""
+        that.数据源id = url参数.baseid
+        that.timer = liveQuery(
+            ()=>that.$数据库[this.表名].get(url参数.id)
         ).subscribe(
-            {next:result=>this.carddata = result}
+            {next:result=>that.carddata = result}
         )  
-        
+        }
     },
     watch:{
 
         carddata:{
             handler: function(val,oldval){
                 if(val){
+                console.log(this.数据源id)
                 this.markdown = val.markdown
                 }
             },
-            deep:true
+            deep:true,
+            
         },
         markdown:{
             handler:async function(val,oldval){
@@ -89,7 +97,7 @@
                 console.log(val)
                 this.carddata.markdown=val 
                 this.$更新数据时间戳(this.carddata)
-                await this.$数据库.cards.put(this.carddata) 
+                await this.$数据库[this.表名].put(this.carddata) 
                 this.$事件总线.$emit("上传数据到思源")
             }
         },

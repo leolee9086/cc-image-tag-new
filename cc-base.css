@@ -19,6 +19,11 @@
   text-align:center;
   padding-bottom:3px
 }
+.cc-card-toolbar{
+  position:absolute;
+  top:-30px;
+  width:200px;
+}
 .cc-node-content{
 }
 .cc-card-body.not-folded{

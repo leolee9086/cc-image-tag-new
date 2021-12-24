@@ -57,6 +57,20 @@
           </div>
         </div>
       </el-popover>
+      <div v-if="激活" class="cc-card-toolbar">
+        <span style="float: right">{{ index }}</span>
+        <span class="el-icon-delete" v-on:click="删除()"></span>
+        <span class="el-icon-share" @click="开始连接()"></span>
+        <span class="el-icon-edit" v-if="!正在编辑" @click="正在编辑 = true"></span>
+        <span class="el-icon-check" v-if="正在编辑" @click="正在编辑 = false"></span>
+        <span
+          class="el-icon-focus"
+          @click="$事件总线.$emit('定位至卡片', 卡片数据.id)"
+        ></span>
+        <el-tooltip content="新窗口打开编辑">
+          <span class="el-icon-browser" @click="$窗口内打开超链接(卡片超链接)"></span>
+        </el-tooltip>
+      </div>
       <div
         class="cc-card-body not-folded"
         v-if="!卡片数据.attrs.folded"
@@ -71,21 +85,6 @@
           `"
       >
         <div>
-          <div v-if="激活" class="cc-card-toolbar">
-            <span style="float: right">{{ index }}</span>
-            <span class="el-icon-delete" v-on:click="删除()"></span>
-            <span class="el-icon-share" @click="开始连接()"></span>
-            <span class="el-icon-edit" v-if="!正在编辑" @click="正在编辑 = true"></span>
-            <span class="el-icon-check" v-if="正在编辑" @click="正在编辑 = false"></span>
-            <span
-              class="el-icon-focus"
-              @click="$事件总线.$emit('定位至卡片', 卡片数据.id)"
-            ></span>
-            <el-tooltip content="新窗口打开编辑">
-              <span class="el-icon-browser" @click="$窗口内打开超链接(卡片超链接)"></span>
-            </el-tooltip>
-          </div>
-
           <div>
             <span class="el-icon-siyuan" v-if="卡片数据.attrs.def_block"></span>
 
@@ -144,7 +143,7 @@ module.exports = {
     this.卡片数据.type = "card";
 
     this.开始监听 = true;
-    this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.卡片数据.id}&baseid=${this.数据源id}`;
+    this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html/?id=${this.卡片数据.id}&baseid=${this.$baseid}&type=card`;
     this.hide = false;
     this.timer = setInterval(this.计算可见性, 100);
   },
@@ -208,6 +207,7 @@ module.exports = {
       } else {
         this.卡片数据 = this.$更新数据时间戳(this.卡片数据);
         this.$事件总线.$emit("反激活卡片", this.卡片数据.id);
+        this.正在编辑 = false;
       }
     },
     正在编辑(val) {

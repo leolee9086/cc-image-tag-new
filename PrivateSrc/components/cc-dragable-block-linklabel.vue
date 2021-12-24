@@ -59,6 +59,16 @@
           </div>
         </div>
       </el-popover>
+      <div v-if="激活" class="cc-card-toolbar">
+        <span style="float: right">{{ index }}</span>
+        <span class="el-icon-delete" v-on:click="删除()"></span>
+        <span class="el-icon-edit" v-if="!正在编辑" @click="正在编辑 = true"></span>
+        <span class="el-icon-check" v-if="正在编辑" @click="正在编辑 = false"></span>
+        <span class="el-icon-refresh" v-on:click="转化为卡片()"></span>
+        <el-tooltip content="新窗口打开编辑">
+          <span class="el-icon-browser" @click="$窗口内打开超链接(链接超链接)"></span>
+        </el-tooltip>
+      </div>
       <div
         class="cc-card-body cc-link not-folded"
         v-if="!链接数据.attrs.folded"
@@ -72,16 +82,6 @@
         height:${链接数据.attrs.height - 27 + 'px'};
        `"
       >
-        <div v-if="激活" class="cc-card-toolbar">
-          <span style="float: right">{{ index }}</span>
-          <span class="el-icon-delete" v-on:click="删除()"></span>
-          <span class="el-icon-edit" v-if="!正在编辑" @click="正在编辑 = true"></span>
-          <span class="el-icon-check" v-if="正在编辑" @click="正在编辑 = false"></span>
-          <span class="el-icon-refresh" v-on:click="转化为卡片()"></span>
-          <el-tooltip content="新窗口打开编辑">
-            <span class="el-icon-browser" @click="$窗口内打开超链接(链接超链接)"></span>
-          </el-tooltip>
-        </div>
         <div>
           <span class="el-icon-siyuan" v-if="链接数据.attrs.def_block"></span>
 
@@ -139,7 +139,7 @@ module.exports = {
     this.链接数据 = JSON.parse(JSON.stringify(this.value));
     this.链接数据.type = "link";
     this.开始监听 = true;
-    this.链接超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.链接数据.id}&baseid=${this.$baseid}`;
+    this.链接超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.链接数据.id}&baseid=${this.$baseid}&type=link`;
     this.hide = false;
   },
 
@@ -201,6 +201,7 @@ module.exports = {
         this.边框宽度 = 1;
         this.链接数据 = this.$更新数据时间戳(this.链接数据);
         this.$事件总线.$emit("反激活链接", this.链接数据.id);
+        this.正在编辑 = false;
       }
     },
     正在编辑(val) {
@@ -214,10 +215,7 @@ module.exports = {
       this.预览HTML = await Vditor.md2html(this.链接数据.markdown);
       this.保存链接();
     },
-    开始连接() {
-      //  console.log("开始连接");
-      this.$事件总线.$emit("开始连接", this.链接数据);
-    },
+
     删除() {
       if ((this.开始监听 = true)) {
         this.移除标签;
