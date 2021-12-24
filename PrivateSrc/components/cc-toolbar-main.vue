@@ -19,13 +19,26 @@
           <el-input v-model="当前画板命名" size="mini">
             <span slot="prepend">画板命名</span>
           </el-input>
+
           <el-button
             size="mini"
             class="el-icon-time"
             @click="显示历史面板 = !显示历史面板"
             >查看历史版本</el-button
           >
-
+          <el-upload
+            class="upload-demo"
+            accept=".cctag"
+            :http-request="导入旧版JSON数据"
+            :action="`http://${思源伺服ip}/api/asset/upload`"
+            :headers="{ Authorization: 'Token' + apitoken }"
+            :flile-list="JSON文件列表"
+            :multiple="false"
+          >
+            <el-button slot="trigger" size="mini" class="el-icon-upload"
+              >导入旧版文件</el-button
+            >
+          </el-upload>
           <div slot="reference" class="el-icon-setting"></div>
         </el-popover>
         <el-popover trigger="click">
@@ -82,7 +95,6 @@
         <span class="el-icon-browser" @click="$窗口内打开超链接(画板超链接)"></span>
       </el-col>
       <strong style="font-size: small">{{ 当前画板命名 }}</strong>
-      <span style="font-size: small">{{ 对象数据.name }}</span>
       <span style="font-size: small" v-if="属性对象"
         >当前元素坐标 x:{{ 属性对象.left }}y{{ 属性对象.top }}</span
       >
@@ -221,6 +233,43 @@ module.exports = {
         .catch((err) => {
           console.log(err);
         });
+    },
+    导入旧版JSON数据: async function (data) {
+      let that = this;
+      await that.保存历史();
+      await that.$数据库.links.clear();
+      await that.$数据库.cards.clear();
+      console.log("aaa", data.file);
+      var reader = new FileReader(data.file);
+      reader.onload = function (evt) {
+        that.解析旧版JSON数据(JSON.parse(evt.target.result));
+        console.log(evt.target.result);
+      };
+
+      reader
+        .readAsText(data.file)
+        .then((result) => {
+          that.解析旧版JSON数据(JSON.parse(result));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    解析旧版JSON数据: async function (旧版JSON数据) {
+      console.log(旧版JSON数据);
+      for (标记序号 in 旧版JSON数据.tagarray) {
+        let 标记 = 旧版JSON数据.tagarray[标记序号];
+        let 空标签 = this.$根据属性生成卡片();
+        console.log(空标签);
+        空标签.name = 标记.anchor;
+        空标签.attrs.backgroundColor = 标记.backgroundColor;
+        空标签.attrs.borderColor = 标记.borderColor;
+        空标签.attrs.color = 标记.color;
+        空标签.attrs.left = 标记.left;
+        空标签.attrs.top = 标记.top;
+        空标签.attrs.def_block = 标记.def_block;
+        await this.$数据库.cards.put(空标签);
+      }
     },
     增量导入JSON数据: async function (JSON数据) {
       console.log(JSON数据);
