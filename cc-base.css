@@ -31,9 +31,9 @@
 /*工具栏和面板样式*/
 .drawer-button-container{
   position: fixed;
-  top:5vh;
-  left:10vw;
-  z-index:500;
+  top:2vh;
+  left:calc(100vw - 200px);
+  z-index:3000;
 }
 .drawer-button-container .is-circle{
   border-style: solid ;

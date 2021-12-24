@@ -1,5 +1,11 @@
 const 事件总线 = new Vue();
-
+const 窗口状态对象 = {
+  currentLinkid: "",
+  editMode: "",
+  currentCardid: "",
+  lastviewcentter: "",
+  等待连接卡片id: "",
+};
 
 const 事务列表 = {
   数据库: 数据库,
@@ -208,13 +214,7 @@ const 事务列表 = {
 
 };
 
-const 窗口状态对象 = {
-  currentLinkid: "",
-  editMode: "",
-  currentCardid: "",
-  lastviewcentter: "",
-  等待连接卡片id: "",
-};
+
 
 for (let item in 事务列表) {
   if (item != "数据库") {
