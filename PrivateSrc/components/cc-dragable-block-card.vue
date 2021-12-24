@@ -264,8 +264,8 @@ module.exports = {
     },
 
     resizestop: function (x, y, width, height) {
-      this.卡片数据.attrs.top = y;
-      this.卡片数据.attrs.left = x;
+      this.卡片数据.attrs.top = y > 0 ? y : 0;
+      this.卡片数据.attrs.left = x > 0 ? x : 0;
       this.卡片数据.attrs.width = width;
       this.卡片数据.attrs.height = height;
       this.卡片数据 = this.$更新数据时间戳(this.卡片数据);

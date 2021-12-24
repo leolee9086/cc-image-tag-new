@@ -238,8 +238,10 @@ module.exports = {
       this.保存链接();
     },
     dragstop(x, y) {
-      this.链接数据.attrs.offsety = y - this.链接数据.attrs.top;
-      this.链接数据.attrs.offsetx = x - this.链接数据.attrs.left;
+      this.链接数据.attrs.offsety =
+        y > 0 ? y - this.链接数据.attrs.top : 0 - this.链接数据.attrs.top;
+      this.链接数据.attrs.offsetx =
+        x > 0 ? x - this.链接数据.attrs.left : 0 - this.链接数据.attrs.left;
       this.链接数据 = this.$更新数据时间戳(this.链接数据);
       this.保存链接();
     },
@@ -253,8 +255,10 @@ module.exports = {
     },
 
     resizestop: function (x, y, width, height) {
-      this.链接数据.attrs.offsety = y - this.链接数据.attrs.top;
-      this.链接数据.attrs.offsetx = x - this.链接数据.attrs.left;
+      this.链接数据.attrs.offsety =
+        y > 0 ? y - this.链接数据.attrs.top : 0 - this.链接数据.attrs.top;
+      this.链接数据.attrs.offsetx =
+        x > 0 ? x - this.链接数据.attrs.left : 0 - this.链接数据.attrs.left;
       this.链接数据.attrs.width = width;
       this.链接数据.attrs.height = height;
       this.链接数据 = this.$更新数据时间戳(this.链接数据);
