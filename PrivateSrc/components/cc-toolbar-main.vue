@@ -44,6 +44,27 @@
           <div slot="reference" class="el-icon-folder"></div>
         </el-popover>
         <el-popover trigger="click">
+          <el-upload
+            class="upload-demo"
+            drag
+            :http-request="覆盖导入JSON数据"
+            :action="`http://${思源伺服ip}/api/asset/upload`"
+            :headers="{ Authorization: 'Token' + apitoken }"
+            :flile-list="JSON文件列表"
+            :multiple="false"
+          >
+            <i class="el-icon-upload"></i>
+            <div class="el-upload__text">
+              将文件拖到此处，或
+              <em>点击上传</em>
+            </div>
+            <div class="el-upload__tip" slot="tip">只能上传cccards|cctags文件</div>
+          </el-upload>
+
+          <div slot="reference" class="el-icon-upload"></div>
+        </el-popover>
+
+        <el-popover trigger="click" placement="top" :height="500">
           <el-input v-model="搜索关键词" @input="搜索()" size="mini"></el-input>
           <div v-for="(item, i) in 搜索结果列表">
             <el-link :value="item.id" @click="聚焦到卡片(item)">
@@ -51,7 +72,7 @@
               <span>{{ `${item.markdown.slice(0, 22) || 无内容}` }}</span>
             </el-link>
           </div>
-          <div slot="reference" class="el-icon-zoom-in"></div>
+          <div slot="reference" @focus="搜索()" class="el-icon-zoom-in"></div>
         </el-popover>
 
         <span class="el-icon-plus" @click="添加卡片()"></span>
@@ -59,64 +80,10 @@
         <div class="el-icon-help" @click="聚焦到卡片(对象数据)"></div>
         <span class="el-icon-browser" @click="$窗口内打开超链接(画板超链接)"></span>
       </el-col>
-      <el-col :span="6"></el-col>
-      <el-col :span="2">
-        <el-popover trigger="click" width="350">
-          <div
-            slot="reference"
-            :style="`
-            color:${属性对象.color};
-            font-weight:bolder;
-            text-decoration:underline 4px;
-            text-align:center;
-            `"
-            :width="1000"
-          >
-            A
-          </div>
-          <h3>文字</h3>
-
-          <cc-color-pane
-            v-model="属性对象.color"
-            @change="设定当前标记()"
-            :自定义颜色数组="自定义颜色数组"
-          ></cc-color-pane>
-        </el-popover>
-      </el-col>
-      <el-col :span="2">
-        <el-popover trigger="click" width="350">
-          <div
-            slot="reference"
-            :style="`background-color:${属性对象.backgroundColor};
-            width:24px;
-            height:24px;
-            border:solid 1px;
-            margin:2px`"
-          ></div>
-          <h3>背景</h3>
-          <cc-color-pane
-            v-model="属性对象.backgroundColor"
-            @change="设定当前标记()"
-            :自定义颜色数组="自定义颜色数组"
-          ></cc-color-pane>
-        </el-popover>
-      </el-col>
-      <el-col :span="2">
-        <el-popover trigger="click" width="350">
-          <div
-            slot="reference"
-            :style="`background-color:'';width:24px;height:24px;outline:solid 3px ${属性对象.borderColor};margin:2px`"
-          ></div>
-          <h3>边框</h3>
-          <cc-color-pane
-            v-model="属性对象.borderColor"
-            @change="设定当前标记()"
-            :自定义颜色数组="自定义颜色数组"
-          ></cc-color-pane>
-        </el-popover>
-      </el-col>
-      <span style="font-size: xx-small" v-if="属性对象"
-        >x:{{ 属性对象.left }}y{{ 属性对象.top }}</span
+      <strong style="font-size: small">{{ 当前画板命名 }}</strong>
+      <span style="font-size: small">{{ 对象数据.name }}</span>
+      <span style="font-size: small" v-if="属性对象"
+        >当前元素坐标 x:{{ 属性对象.left }}y{{ 属性对象.top }}</span
       >
       <el-input v-model="当前对象名称" size="mini" @input="修改对象名称()">
         <span slot="prepend">名称</span>
@@ -160,6 +127,7 @@ module.exports = {
   components: componentsList,
   data() {
     return {
+      apitoken: "",
       数据源id: {},
       属性对象: {},
       对象数据: {},
@@ -174,6 +142,7 @@ module.exports = {
       显示历史面板: false,
       文件历史列表: [],
       当前对象名称: "",
+      JSON文件列表: [],
     };
   },
   async mounted() {
@@ -231,22 +200,37 @@ module.exports = {
     },
   },
   methods: {
-    覆盖导入JSON数据: async function (JSON数据) {
-      await this.保存历史();
-      await this.$数据库.links.clear();
-      await this.$数据库.cards.clear();
-      await this.增量导入JSON数据(JSON数据);
+    覆盖导入JSON数据: async function (data) {
+      let that = this;
+      await that.保存历史();
+      await that.$数据库.links.clear();
+      await that.$数据库.cards.clear();
+      console.log("aaa", data.file);
+      var reader = new FileReader();
+      reader.onload = function (evt) {
+        that.增量导入JSON数据(JSON.parse(evt.target.result));
+        console.log(evt.target.result);
+      };
+
+      reader
+        .readAsText(data.file)
+        .then((result) => {
+          that.增量导入JSON数据(JSON.parse(result));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
     增量导入JSON数据: async function (JSON数据) {
-      await this.保存历史();
+      console.log(JSON数据);
       let cards = JSON数据.cards;
       let links = JSON数据.links;
       try {
         for (i in cards) {
-          await this.$数据库.cards.put(cards[i]);
+          await this.$数据库.cards.add(cards[i]);
         }
         for (i in links) {
-          await this.$数据库.links.put(links[i]);
+          await this.$数据库.links.add(links[i]);
         }
       } catch (e) {
         alert("导入出错", e);
@@ -372,7 +356,6 @@ created:"${对象数据.created}"
 updated:"${对象数据.updated}"
 attrs:'${JSON.stringify(对象数据.attrs)}'
 ---
-
 `;
       return yaml;
     },
@@ -473,7 +456,7 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
     搜索: async function () {
       let 关键词 = this.搜索关键词;
       if (关键词) {
-        this.搜索结果列表 = await this.$数据库.cards
+        let 卡片列表 = await this.$数据库.cards
           .filter((value) => {
             if (value.markdown) {
               let markdown = value.markdown;
@@ -485,8 +468,23 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
             }
           })
           .toArray();
+        let 链接列表 = await this.$数据库.links
+          .filter((value) => {
+            if (value.markdown) {
+              let markdown = value.markdown;
+              if (markdown.indexOf(关键词) > 0) {
+                return true;
+              }
+            } else {
+              return false;
+            }
+          })
+          .toArray();
+        this.搜索结果列表 = 卡片列表.concat(链接列表);
       } else {
-        this.搜索结果列表 = await this.$数据库.cards.toArray();
+        let 卡片列表 = await this.$数据库.cards.toArray();
+        let 链接列表 = await this.$数据库.cards.toArray();
+        this.搜索结果列表 = 卡片列表.concat(链接列表);
       }
       console.log("搜索结果", this.搜索结果列表);
     },

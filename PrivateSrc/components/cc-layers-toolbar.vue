@@ -1,14 +1,13 @@
 <template>
   <div class="layout">
     <div class="drawer-button-container">
-      <el-button @click="当前面板 = '详情面板'" circle icon="el-icon-share"> </el-button>
       <el-button @click="当前面板 = '详情面板'" circle icon="el-icon-edit"> </el-button>
     </div>
-    <cc-toolbar-edit
+    <cc-toolbar-main
       :思源伺服ip="思源伺服ip"
       :卡片数据id="当前卡片数据id"
       :链接数据id="当前链接数据id"
-    ></cc-toolbar-edit>
+    ></cc-toolbar-main>
     <cc-toolbar-infor
       :显示="当前面板 == '详情面板'"
       :思源伺服ip="思源伺服ip"
@@ -23,7 +22,7 @@ module.exports = {
   name: "cc-layers-toolbar",
   props: ["思源伺服ip"],
   components: {
-    "cc-toolbar-edit": "url:../components/cc-toolbar-edit.vue",
+    "cc-toolbar-main": "url:../components/cc-toolbar-main.vue",
     "cc-toolbar-infor": "url:../components/cc-toolbar-infor.vue",
     "cc-toolbar-view": "url:../components/cc-toolbar-view.vue",
   },

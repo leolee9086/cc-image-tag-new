@@ -135,7 +135,7 @@ module.exports = {
     this.folded = null;
   },
   mounted() {
-    console.log("加载链接", this.value.attrs);
+    //  console.log("加载链接", this.value.attrs);
     this.链接数据 = JSON.parse(JSON.stringify(this.value));
     this.链接数据.type = "link";
     this.开始监听 = true;
@@ -165,7 +165,7 @@ module.exports = {
     },
     链接数据: {
       handler: async function (val, oldval) {
-        console.log(val);
+        //    console.log(val);
         this.folded = val.attrs.folded;
         this.生成html();
       },
@@ -194,7 +194,7 @@ module.exports = {
     激活(val) {
       if (val) {
         this.边框宽度 = 3;
-        console.log(this.链接数据);
+        //  console.log(this.链接数据);
         this.链接数据 = this.$更新数据时间戳(this.链接数据);
         this.$事件总线.$emit("激活链接", this.链接数据.id);
       } else {
@@ -205,7 +205,7 @@ module.exports = {
     },
     正在编辑(val) {
       if (val) {
-        console.log(this.链接数据);
+        //  console.log(this.链接数据);
       }
     },
   },
@@ -215,7 +215,7 @@ module.exports = {
       this.保存链接();
     },
     开始连接() {
-      console.log("开始连接");
+      //  console.log("开始连接");
       this.$事件总线.$emit("开始连接", this.链接数据);
     },
     删除() {

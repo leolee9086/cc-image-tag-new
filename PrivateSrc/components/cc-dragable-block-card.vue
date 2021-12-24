@@ -139,7 +139,7 @@ module.exports = {
     this.folded = null;
   },
   async mounted() {
-    console.log("加载卡片", this.value);
+    //console.log("加载卡片", this.value);
     this.卡片数据 = this.value;
     this.卡片数据.type = "card";
 
@@ -212,7 +212,7 @@ module.exports = {
     },
     正在编辑(val) {
       if (val) {
-        console.log(this.卡片数据);
+        //console.log(this.卡片数据);
       }
     },
   },
@@ -226,7 +226,7 @@ module.exports = {
       this.预览HTML = await Vditor.md2html(this.卡片数据.markdown);
     },
     开始连接() {
-      console.log("开始连接");
+      //console.log("开始连接");
       this.$事件总线.$emit("开始连接", this.卡片数据);
     },
     删除() {

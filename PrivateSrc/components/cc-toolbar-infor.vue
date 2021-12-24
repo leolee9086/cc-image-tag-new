@@ -71,6 +71,16 @@
             </el-collapse-item>
           </el-collapse-item>
         </el-collapse-item>
+        <el-collapse-item title="节点样式">
+          <strong slot="title">节点样式</strong>
+          <cc-csscons-font
+            :思源伺服ip="思源伺服ip"
+            apitoken=""
+            v-model="属性对象"
+            :自定义颜色数组="自定义颜色数组"
+          >
+          </cc-csscons-font>
+        </el-collapse-item>
       </el-collapse>
     </el-row>
   </el-drawer>
@@ -94,6 +104,10 @@ module.exports = {
       工具栏高度: 30,
       最小化窗口: true,
       工具栏左侧位置: 100,
+      属性对象: {
+        color: "",
+      },
+      自定义颜色数组: [],
     };
   },
   mounted() {},
@@ -170,9 +184,29 @@ module.exports = {
         }
       },
     },
+    属性对象: {
+      handler: function (val, oldval) {
+        console.log(val);
+        this.设定当前标记(val);
+      },
+      deep: true,
+    },
   },
 
   methods: {
+    设定当前标记: function (val) {
+      let 上传数据 = { id: "", styles: {} };
+      上传数据.id = this.对象数据.id;
+      上传数据["styles"].color = val.color;
+      上传数据["styles"].borderColor = val.borderColor;
+      上传数据["styles"].backgroundColor = val.backgroundColor;
+      if (this.对象数据.type == "card") {
+        this.$事件总线.$emit("保存卡片", 上传数据);
+      }
+      if (this.对象数据.type == "link") {
+        this.$事件总线.$emit("保存链接", 上传数据);
+      }
+    },
     resizing: function (x, y, w, h) {
       this.工具栏高度 = h;
       this.工具栏宽度 = w;

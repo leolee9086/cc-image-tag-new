@@ -20,6 +20,8 @@
       :storke-width="链接['attrs']['path_width'] || 1"
       fill="transparent"
     ></path>
+    <circle :cx="起点.x || 0" :cy="起点.y || 0" :r="2"> </circle>
+    <circle :cx="终点.x || 0" :cy="终点.y || 0" :r="2"> </circle>
   </g>
 </template>
 <script>
@@ -31,6 +33,7 @@ module.exports = {
     this.监听 = true;
     this.$事件总线.$on("保存卡片", (event) => this.判断id(event));
     this.$事件总线.$on("保存链接", (event) => this.判断id(event));
+    this.计算路径();
   },
   beforeDestroy() {
     this.监听 = false;
@@ -46,6 +49,10 @@ module.exports = {
       监听: false,
       显示引线: "",
       引线路径: {},
+      路径线段: {},
+      起点: {},
+      终点: {},
+      中点: {},
     };
   },
   watch: {
@@ -59,11 +66,13 @@ module.exports = {
       deep: true,
       immediate: true,
     },
+
     链接: {
       handler: function (val, oldval) {
         if (!val.attrs) {
           return null;
         }
+
         this.$事件总线.$emit("保存链接", val);
       },
       deep: true,
@@ -93,7 +102,6 @@ module.exports = {
       if ($event.id == that.链接.id) {
         that.代理起始标记 = await that.$数据库.cards.get(that.链接.attrs.from_id);
         that.代理结束标记 = await that.$数据库.cards.get(that.链接.attrs.to_id);
-
         that.计算路径();
       }
     },
@@ -151,23 +159,35 @@ module.exports = {
         代理结束标记.height = 10;
       }
       let 路径线段 = this.计算路径线段(代理起始标记, 代理结束标记);
+      this.起点 = 路径线段.起点;
+      this.终点 = 路径线段.终点;
       if (路径线段) {
         let 路径类型 = this.链接.type;
-        if (路径类型 == "折线") {
-          this.路径 = this.生成折线路径(路径线段);
-          this.链接.attrs.path = this.路径.d;
-          this.链接.attrs.top = this.路径.mid.y;
-          this.链接.attrs.left = this.路径.mid.x;
-        } else {
-          this.路径 = this.生成直线路径(路径线段);
-          this.链接.attrs.path = this.路径.d;
-          this.链接.attrs.top = this.路径.mid.y;
-          this.链接.attrs.left = this.路径.mid.x;
+        switch (路径类型) {
+          case "折线": {
+            this.路径 = this.生成折线路径(路径线段);
+            this.链接.attrs.path = this.路径.d;
+            this.链接.attrs.top = this.路径.mid.y;
+            this.链接.attrs.left = this.路径.mid.x;
+          }
+
+          case "简单曲线": {
+            this.路径 = this.两点生成三次贝塞尔曲线(路径线段);
+            this.链接.attrs.path = this.路径.d;
+            this.链接.attrs.top = this.路径.mid.y;
+            this.链接.attrs.left = this.路径.mid.x;
+          }
+          default: {
+            this.路径 = this.生成直线路径(路径线段);
+            this.链接.attrs.path = this.路径.d;
+            this.链接.attrs.top = this.路径.mid.y;
+            this.链接.attrs.left = this.路径.mid.x;
+          }
         }
         this.链接 = this.$更新数据时间戳(this.链接);
 
         if (Math.abs(this.链接.attrs.offsetx) > 50 || this.链接.attrs.offsety > 50) {
-          console.log("计算引线");
+          // console.log("计算引线");
           this.显示引线 = true;
           this.计算引线(this.链接);
         } else {
@@ -191,9 +211,9 @@ module.exports = {
       let 引线起点 = this.矩形与矢量交点(真实矩形, 引线矢量);
 
       let 引线线段 = { 起点: 引线起点, 终点: 引线终点 };
-      console.log(JSON.stringify(引线线段));
+      //   console.log(JSON.stringify(引线线段));
       this.引线路径 = this.生成直线路径(引线线段);
-      console.log("引线", this.引线路径);
+      // console.log("引线", this.引线路径);
     },
 
     生成直线路径: function (路径线段) {
@@ -207,6 +227,25 @@ module.exports = {
             l ${路径矢量.x} ${路径矢量.y}
             `;
       midpoint = this.矢量加(起始节点, this.矢量除标量(路径矢量, 2));
+      return { d: define, mid: midpoint };
+    },
+    两点生成三次贝塞尔曲线: function (路径线段) {
+      let 起始节点 = 路径线段.起点;
+      let 结束节点 = 路径线段.终点;
+
+      let 路径矢量 = this.矢量减(结束节点, 起始节点);
+      let define = "";
+      let midpoint = {};
+      midpoint = this.矢量加(起始节点, this.矢量除标量(路径矢量, 2));
+
+      define = `
+            M ${起始节点.x} ${起始节点.y}
+            C ${起始节点.x + Math.sign(路径矢量.x) * 100} ${
+        起始节点.y + Math.sign(路径矢量.y) * 100
+      } ${结束节点.x - Math.sign(路径矢量.x) * 100} ${
+        结束节点.y - Math.sign(路径矢量.y) * 100
+      } ${结束节点.x} ${结束节点.y} 
+            `;
       return { d: define, mid: midpoint };
     },
     生成折线路径: function (路径线段) {
@@ -264,7 +303,7 @@ module.exports = {
     },
     矩形与矢量交点(矩形, 矢量) {
       let 矩形中心 = this.计算中心(矩形);
-      console.log(矩形中心);
+      //    console.log(矩形中心);
       x偏移 = Math.abs(((矩形.height / 2) * 矢量.x) / 矢量.y);
       y偏移 = Math.abs(((矩形.width / 2) * 矢量.y) / 矢量.x);
       if (Math.abs(y偏移) > Math.abs(矩形.height / 2)) {
