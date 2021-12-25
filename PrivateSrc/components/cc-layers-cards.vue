@@ -1,6 +1,7 @@
 <template>
   <div
     @dblclick="添加卡片($event)"
+    v-on:paste="黏贴内容($event)"
     class="cardscontainer"
     :style="` 
         position:absolute;
@@ -39,7 +40,7 @@
 <script>
 module.exports = {
   name: "cc-layers-cards",
-  props: ["窗口大小"],
+  props: ["窗口大小", "当前鼠标坐标"],
   components: {
     "cc-dragable-block-card": "url:../components/cc-dragable-block-card.vue",
     "cc-dragable-block-linklabel": "url:../components/cc-dragable-block-linklabel.vue",
@@ -78,17 +79,55 @@ module.exports = {
   },
   computed: {},
   methods: {
+    黏贴内容: function ($event) {
+      let clipboardData = $event.clipboardData;
+
+      if (!(clipboardData && clipboardData.items)) {
+        return;
+      }
+      for (var i = 0, len = clipboardData.items.length; i < len; i++) {
+        var item = clipboardData.items[i];
+        if (item.kind === "string" && item.type == "text/plain") {
+          item.getAsString((str) => {
+            console.log(str);
+            this.解析剪贴板内容(str + "");
+          });
+        }
+      }
+    },
+    解析剪贴板内容: async function (剪贴板数据) {
+      let 当前鼠标坐标 = this.当前鼠标坐标;
+      let 思源伺服ip = window.location.host;
+      let apitoken = "";
+      let 空标签 = this.$根据属性生成卡片({
+        top: (window.pageYOffset + 当前鼠标坐标.y) / this.$当前窗口状态.缩放倍数,
+        left: (window.pageXOffset + 当前鼠标坐标.x) / this.$当前窗口状态.缩放倍数,
+      });
+      let id = 剪贴板数据.replace("((", "").replace("))", "").slice(0, 22);
+      console.log(id);
+      let 思源块属性 = await 以id获取思源块信息(思源伺服ip, apitoken, id);
+      console.log(思源块属性);
+
+      if (思源块属性["id"]) {
+        空标签["attrs"]["def_block"] = 思源块属性["id"];
+        空标签["attrs"]["def_block_name"] = 思源块属性["name"];
+      } else {
+        空标签.markdown = 剪贴板数据;
+      }
+
+      console.log(空标签);
+      await this.$数据库.cards.put(空标签);
+    },
     添加卡片: function ($event) {
       console.log($event.target);
       if ($event.target.className != "cardscontainer layer") {
         return null;
       }
-      let 卡片数据 = this.$根据属性生成卡片();
-      (卡片数据.attrs.top =
-        (window.pageYOffset + $event.clientY) / this.$当前窗口状态.缩放倍数),
-        (卡片数据.attrs.left =
-          (window.pageXOffset + $event.clientX) / this.$当前窗口状态.缩放倍数),
-        this.$事件总线.$emit("添加卡片", 卡片数据);
+      let 卡片数据 = this.$根据属性生成卡片({
+        top: (window.pageYOffset + $event.clientY) / this.$当前窗口状态.缩放倍数,
+        left: (window.pageXOffset + $event.clientX) / this.$当前窗口状态.缩放倍数,
+      });
+      this.$事件总线.$emit("添加卡片", 卡片数据);
     },
   },
 };

@@ -1,7 +1,8 @@
 <template>
   <div class="layout">
     <div class="drawer-button-container">
-      <el-button @click="当前面板 = '详情面板'" circle icon="el-icon-edit"> </el-button>
+      <el-button @click="显示详情面板 = !显示详情面板" circle icon="el-icon-edit">
+      </el-button>
     </div>
     <cc-toolbar-main
       :思源伺服ip="思源伺服ip"
@@ -9,7 +10,7 @@
       :链接数据id="当前链接数据id"
     ></cc-toolbar-main>
     <cc-toolbar-infor
-      :显示="当前面板 == '详情面板'"
+      :显示="显示详情面板"
       :思源伺服ip="思源伺服ip"
       :卡片数据id="当前卡片数据id"
       :链接数据id="当前链接数据id"
@@ -35,9 +36,10 @@ module.exports = {
       窗口状态获取器: {},
       操作历史获取器: {},
       最近窗口状态: {},
-      当前面板: "",
       数据获取器: "",
       当前数据: "",
+      /*操作面板显示*/
+      显示详情面板: false,
     };
   },
   mounted() {
@@ -66,6 +68,7 @@ module.exports = {
     当前链接数据id: {
       handler: function (val) {
         if (val) {
+          console.log(val);
           this.数据获取器 = liveQuery(() => this.$数据库.links.get(val)).subscribe({
             next: (result) => {
               result ? (this.当前数据 = result) : null;
@@ -77,6 +80,8 @@ module.exports = {
     当前卡片数据id: {
       handler: function (val) {
         if (val) {
+          console.log(val);
+
           this.数据获取器 = liveQuery(() => this.$数据库.cards.get(val)).subscribe({
             next: (result) => {
               result ? (this.当前数据 = result) : null;

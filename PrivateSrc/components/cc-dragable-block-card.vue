@@ -95,7 +95,9 @@
               <cc-link-siyuan
                 v-if="卡片数据.attrs.def_block"
                 :style="`color:${卡片数据.attrs.color};`"
-                :锚文本="`引用自${卡片数据.attrs.def_block}`"
+                :锚文本="`引用自${
+                  卡片数据.attrs.def_block_name || 卡片数据.attrs.def_block
+                }`"
                 :链接id="卡片数据.attrs.def_block"
               ></cc-link-siyuan>
             </div>

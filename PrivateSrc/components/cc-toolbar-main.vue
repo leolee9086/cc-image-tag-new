@@ -14,7 +14,7 @@
     "
   >
     <el-row>
-      <el-col :span="6">
+      <el-col :span="8">
         <el-popover trigger="click">
           <el-input v-model="当前画板命名" size="mini">
             <span slot="prepend">画板命名</span>
@@ -92,11 +92,13 @@
         <span class="el-icon-plus" @click="添加卡片()"></span>
 
         <div class="el-icon-help" @click="聚焦到卡片(对象数据)"></div>
+
         <span class="el-icon-browser" @click="$窗口内打开超链接(画板超链接)"></span>
+        <span class="el-icon-picture"></span>
       </el-col>
       <strong style="font-size: small">{{ 当前画板命名 }}</strong>
       <span style="font-size: small" v-if="属性对象"
-        >当前元素坐标 x:{{ 属性对象.left }}y{{ 属性对象.top }}</span
+        >当前元素坐标 x:{{ parseInt(属性对象.left) }}y{{ parseInt(属性对象.top) }}</span
       >
       <el-input v-model="当前对象名称" size="mini" @input="修改对象名称()">
         <span slot="prepend">名称</span>
@@ -478,11 +480,11 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
         this.$事件总线.$emit("添加卡片", 卡片数据);
     },
     设定当前标记: function () {
-      let 上传数据 = { id: "", styles: {} };
+      let 上传数据 = { id: "", attrsproxy: {} };
       上传数据.id = this.对象数据.id;
-      上传数据["styles"].color = this.属性对象.color;
-      上传数据["styles"].borderColor = this.属性对象.borderColor;
-      上传数据["styles"].backgroundColor = this.属性对象.backgroundColor;
+      上传数据["attrsproxy"].color = this.属性对象.color;
+      上传数据["attrsproxy"].borderColor = this.属性对象.borderColor;
+      上传数据["attrsproxy"].backgroundColor = this.属性对象.backgroundColor;
       if (this.对象数据.type == "card") {
         this.$事件总线.$emit("保存卡片", 上传数据);
       }

@@ -31,7 +31,7 @@ const 事务列表 = {
       })
       .then(function (resData) {
         let succMap = resData["data"]["succMap"];
-        console.log(succMap);
+      //  console.log(succMap);
         for (let item in succMap) {
           filepath = filepath + succMap[item];
           设置思源块属性(
@@ -112,10 +112,10 @@ const 事务列表 = {
 
   保存卡片: async function (传入数据) {
     //console.log(传入数据)
-    if (传入数据.styles) {
+    if (传入数据.attrsproxy) {
       let 原始数据 = await this.$数据库.cards.get(传入数据.id);
-      for (属性名 in 传入数据.styles) {
-        原始数据.attrs[属性名] = 传入数据.styles[属性名];
+      for (属性名 in 传入数据.attrsproxy) {
+        原始数据.attrs[属性名] = 传入数据.attrsproxy[属性名];
       }
       await this.$数据库.cards.put(原始数据);
       this.$事件总线.$emit("上传当前画板文件数据到思源")

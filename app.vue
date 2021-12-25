@@ -3,13 +3,9 @@
     id="app"
     :style="`width: ${窗口大小.width}px; 
         height:${窗口大小.height}px;`"
-    v-on:paste="黏贴内容($event)"
   >
     <div>
-      <cc-layers-background
-        class="layer"
-        :填充图像路径="`https://img1.baidu.com/it/u=3705788448,184693213&fm=26&fmt=auto`"
-      ></cc-layers-background>
+      <cc-layers-background class="layer"></cc-layers-background>
       <cc-layers-toolbar
         class="layer"
         :窗口大小="窗口大小"
@@ -25,6 +21,7 @@
       class="layer"
       v-on:paste="黏贴内容($event)"
       :窗口大小="窗口大小"
+      :当前鼠标坐标="当前鼠标坐标"
     ></cc-layers-cards>
 
     <cc-layers-graph class="layer" :窗口大小="窗口大小"></cc-layers-graph>
@@ -86,22 +83,6 @@ module.exports = {
         }
       });
       return obj;
-    },
-    黏贴内容: function ($event) {
-      let clipboardData = $event.clipboardData;
-
-      if (!(clipboardData && clipboardData.items)) {
-        return;
-      }
-      for (var i = 0, len = clipboardData.items.length; i < len; i++) {
-        var item = clipboardData.items[i];
-        if (item.kind === "string" && item.type == "text/plain") {
-          item.getAsString((str) => {
-            console.log(str);
-            this.解析剪贴板内容(str + "");
-          });
-        }
-      }
     },
 
     计算坐标($event) {

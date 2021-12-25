@@ -1,19 +1,11 @@
 <template>
   <el-drawer
     :modal="false"
-    title="节点信息"
+    :title="`节点信息:${当前对象数据.id}`"
     size="100%"
     :visible="显示"
-    :wrapperClosable="false"
+    :wrapper-closable="false"
   >
-    <span
-      style="font-size: xx-small"
-      @click="定位至标记(标记数组[当前反向链接列表['index']])"
-      v-if="当前反向链接列表['index'] > 0"
-      >标签{{ 当前反向链接列表.index }}坐标:{{
-        标记数组[当前反向链接列表["index"]].left
-      }}|{{ 标记数组[当前反向链接列表["index"]].top }}</span
-    >
     <el-row>
       <el-collapse>
         <el-collapse-item>
@@ -93,7 +85,7 @@ module.exports = {
   data() {
     return {
       apitoken: "",
-      对象数据: "",
+      当前对象数据: "",
       当前正向链接列表: [],
       当前反向链接列表: [],
       当前思源块id: "",
@@ -104,9 +96,7 @@ module.exports = {
       工具栏高度: 30,
       最小化窗口: true,
       工具栏左侧位置: 100,
-      属性对象: {
-        color: "",
-      },
+      属性对象: {},
       自定义颜色数组: [],
     };
   },
@@ -116,29 +106,28 @@ module.exports = {
     卡片数据id: {
       handler: async function (val, oldval) {
         if (val && val != oldval) {
-          this.对象数据 = await this.$数据库.cards.get(this.卡片数据id);
-          this.属性对象 = this.对象数据.attrs;
-          this.当前对象名称 = this.对象数据.name;
-          this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}&table=cards`;
+          this.当前对象数据 = await this.$数据库.cards.get(this.卡片数据id);
+          this.属性对象 = this.当前对象数据.attrs;
+          this.当前对象名称 = this.当前对象数据.name;
+          this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.当前对象数据.id}&baseid=${this.$baseid}&table=cards`;
         }
       },
     },
     链接数据id: {
       handler: async function (val, oldval) {
         if (val && val != oldval) {
-          this.对象数据 = await this.$数据库.links.get(this.链接数据id);
-          this.属性对象 = this.对象数据.attrs;
-          this.当前对象名称 = this.对象数据.name;
-          this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}&table=cards`;
+          this.当前对象数据 = await this.$数据库.links.get(this.链接数据id);
+          this.属性对象 = this.当前对象数据.attrs;
+          this.当前对象名称 = this.当前对象数据.name;
+          this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.当前对象数据.id}&baseid=${this.$baseid}&table=cards`;
         }
       },
     },
-
-    对象数据: {
+    当前对象数据: {
       handler: async function (val, oldval) {
         console.log("当前数据", val);
         if (val.type == "card") {
-          this.当前卡片思源块id = val.attrs.def_block;
+          this.当前思源块id = val.attrs.def_block;
           this.当前图上正向链接列表 = await this.$数据库.links
             .filter((value) => {
               if (value.attrs.from_id == val) {
@@ -159,14 +148,14 @@ module.exports = {
     },
     当前思源块id: {
       async handler(val, oldval) {
-        if (val && val != oldval && this.当前对象数据) {
-          this.当前卡片思源块id = val.replace("((", "").replace("))", "").slice(0, 22);
-          id = this.当前卡片思源块id;
+        if (val) {
+          this.当前思源块id = val.replace("((", "").replace("))", "").slice(0, 22);
+          id = this.当前思源块id;
           console.log(id);
           this.当前反向链接列表 = await this.以id获取反向链接(id);
           this.当前正向链接列表 = await this.以id获取正向链接(id);
-          this.当前对象数据.attrs.def_block = val;
-          await this.$数据库.cards.put(this.当前对象数据);
+
+          this.$set(this.属性对象, "def_block", id);
         } else {
           this.当前反向链接列表 = [];
           this.当前正向链接列表 = [];
@@ -195,15 +184,17 @@ module.exports = {
 
   methods: {
     设定当前标记: function (val) {
-      let 上传数据 = { id: "", styles: {} };
-      上传数据.id = this.对象数据.id;
-      上传数据["styles"].color = val.color;
-      上传数据["styles"].borderColor = val.borderColor;
-      上传数据["styles"].backgroundColor = val.backgroundColor;
-      if (this.对象数据.type == "card") {
+      let 上传数据 = { id: "", attrsproxy: {} };
+      上传数据.id = this.当前对象数据.id;
+      上传数据["attrsproxy"].color = val.color;
+      上传数据["attrsproxy"].borderColor = val.borderColor;
+      上传数据["attrsproxy"].backgroundColor = val.backgroundColor;
+      上传数据["attrsproxy"].def_block = val.def_block;
+
+      if (this.当前对象数据.type == "card") {
         this.$事件总线.$emit("保存卡片", 上传数据);
       }
-      if (this.对象数据.type == "link") {
+      if (this.当前对象数据.type == "link") {
         this.$事件总线.$emit("保存链接", 上传数据);
       }
     },

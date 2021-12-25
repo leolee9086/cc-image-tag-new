@@ -89,9 +89,11 @@ Vue.prototype.$根据属性生成卡片=function(属性对象){
       borderColor:"black",
     }
   }
-  for (属性名 in 属性对象){
-    let 属性值 =  属性对象[属性名]
-    空标签[属性名]= 属性值
+  for (属性名 in 空标签){
+    属性对象[属性名]?空标签[属性名]=属性对象[属性名]:null
+  }
+  for (属性名 in  属性对象){
+    空标签[属性名]?null:空标签.attrs[属性名]=属性对象[属性名]
   }
   return 空标签
 }
