@@ -7,8 +7,8 @@
       marker-mid="url(#markerArrowFrom)"
       marker-start="url(#markerArrowFrom)"
       marker-end="url(#markerArrowTo)"
-      :stroke="链接['attrs']['borderColor'] || 'black'"
-      :storke-width="链接['attrs']['path_width'] || 1"
+      :stroke="链接['attrs']['path_color'] || 链接['attrs']['borderColor'] || 'black'"
+      :stroke-width="链接['attrs']['path_width'] || 1"
       fill="transparent"
     ></path>
     <path
@@ -53,6 +53,7 @@ module.exports = {
       起点: {},
       终点: {},
       中点: {},
+      路径类型: "",
     };
   },
   watch: {
@@ -62,6 +63,8 @@ module.exports = {
           return null;
         }
         this.链接 = val;
+        this.路径类型 = val.attrs.path_type;
+        console.log(this.路径类型);
       },
       deep: true,
       immediate: true,
@@ -162,13 +165,13 @@ module.exports = {
       this.起点 = 路径线段.起点;
       this.终点 = 路径线段.终点;
       if (路径线段) {
-        let 路径类型 = this.链接.type;
-        switch (路径类型) {
+        switch (this.路径类型) {
           case "折线": {
             this.路径 = this.生成折线路径(路径线段);
             this.链接.attrs.path = this.路径.d;
             this.链接.attrs.top = this.路径.mid.y;
             this.链接.attrs.left = this.路径.mid.x;
+            break;
           }
 
           case "简单曲线": {
@@ -176,6 +179,7 @@ module.exports = {
             this.链接.attrs.path = this.路径.d;
             this.链接.attrs.top = this.路径.mid.y;
             this.链接.attrs.left = this.路径.mid.x;
+            break;
           }
           default: {
             this.路径 = this.生成直线路径(路径线段);
@@ -244,7 +248,7 @@ module.exports = {
         起始节点.y + Math.sign(路径矢量.y) * 100
       } ${结束节点.x - Math.sign(路径矢量.x) * 100} ${
         结束节点.y - Math.sign(路径矢量.y) * 100
-      } ${结束节点.x} ${结束节点.y} 
+      } ${结束节点.x} ${结束节点.y}
             `;
       return { d: define, mid: midpoint };
     },

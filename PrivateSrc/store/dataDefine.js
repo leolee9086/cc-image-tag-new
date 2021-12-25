@@ -122,7 +122,7 @@ Vue.prototype.$根据属性生成链接=function(属性对象){
       offsety:0,
       from_id:"",
       to_id:"",
-      path_width:"",
+      path_width:1,
       path_color:"",
       width:100,
       height:100,

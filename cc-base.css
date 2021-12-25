@@ -46,6 +46,10 @@
   border-color:var(--b3-theme-primary);
   background-color:var(--b3-theme-primary-light)
 }
+.el-drawer__body{
+  padding:30px;
+  overflow:scroll;
+}
 .layout{
  z-index:1;
  width:100%;

@@ -22,7 +22,6 @@
             title="反向链接"
             :count="当前反向链接列表['linkRefsCount']"
           ></cc-block-list>
-          <el-divider></el-divider>
 
           <cc-block-list
             :blocklist="当前反向链接列表['backmentions']"
@@ -65,13 +64,35 @@
         </el-collapse-item>
         <el-collapse-item title="节点样式">
           <strong slot="title">节点样式</strong>
-          <cc-csscons-font
-            :思源伺服ip="思源伺服ip"
-            apitoken=""
-            v-model="属性对象"
-            :自定义颜色数组="自定义颜色数组"
-          >
-          </cc-csscons-font>
+          <el-tabs>
+            <el-tab-pane label="背景色" name="背景色">
+              <cc-color-pane v-model="属性对象.backgroundColor" :显示web命名颜色="true">
+              </cc-color-pane>
+            </el-tab-pane>
+            <el-tab-pane label="边框色" name="边框色">
+              <cc-color-pane v-model="属性对象.borderColor" :显示web命名颜色="true">
+              </cc-color-pane>
+            </el-tab-pane>
+            <el-tab-pane label="文字色" name="文字色">
+              <cc-color-pane v-model="属性对象.color" :显示web命名颜色="true">
+              </cc-color-pane>
+            </el-tab-pane>
+          </el-tabs>
+        </el-collapse-item>
+        <el-collapse-item title="连接线样式" v-if="当前数据类型 == 'link'">
+          <strong slot="title">连接线样式</strong>
+          <el-slider
+            v-model="属性对象.path_width"
+            @change="属性对象.path_width = $event"
+          ></el-slider>
+          <el-select v-model="属性对象.path_type">
+            <el-option
+              v-for="(item, i) in [`直线`, `折线`, '简单曲线']"
+              :label="item"
+              :value="item"
+            >
+            </el-option>
+          </el-select>
         </el-collapse-item>
       </el-collapse>
     </el-row>
@@ -98,6 +119,7 @@ module.exports = {
       工具栏左侧位置: 100,
       属性对象: {},
       自定义颜色数组: [],
+      当前数据类型: "",
     };
   },
   mounted() {},
@@ -118,6 +140,7 @@ module.exports = {
         if (val && val != oldval) {
           this.当前对象数据 = await this.$数据库.links.get(this.链接数据id);
           this.属性对象 = this.当前对象数据.attrs;
+          this.属性对象.path_width = this.属性对象.path_width || 1;
           this.当前对象名称 = this.当前对象数据.name;
           this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.当前对象数据.id}&baseid=${this.$baseid}&table=cards`;
         }
@@ -126,22 +149,32 @@ module.exports = {
     当前对象数据: {
       handler: async function (val, oldval) {
         console.log("当前数据", val);
+        if (!val) {
+          return null;
+        }
+        this.当前数据类型 = val.type;
+        this.当前思源块id = val.attrs.def_block;
         if (val.type == "card") {
-          this.当前思源块id = val.attrs.def_block;
           this.当前图上正向链接列表 = await this.$数据库.links
             .filter((value) => {
-              if (value.attrs.from_id == val) {
-                return true;
+              if (value.attrs) {
+                if (value.attrs.from_id == val) {
+                  return true;
+                }
               }
             })
             .toArray();
           this.当前图上反向链接列表 = await this.$数据库.links
             .filter((value) => {
-              if (value.attrs.to_id == val) {
-                return true;
+              if (value.attrs) {
+                if (value.attrs.to_id == val) {
+                  return true;
+                }
               }
             })
             .toArray();
+        }
+        if (val.type == "card") {
         }
       },
       deep: true,
@@ -190,6 +223,8 @@ module.exports = {
       上传数据["attrsproxy"].borderColor = val.borderColor;
       上传数据["attrsproxy"].backgroundColor = val.backgroundColor;
       上传数据["attrsproxy"].def_block = val.def_block;
+      上传数据["attrsproxy"].path_width = val.path_width;
+      上传数据["attrsproxy"].path_type = val.path_type;
 
       if (this.当前对象数据.type == "card") {
         this.$事件总线.$emit("保存卡片", 上传数据);
