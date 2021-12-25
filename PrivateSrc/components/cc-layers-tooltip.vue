@@ -24,7 +24,7 @@ module.exports={
     },
     methods:{
       开始显示提示($event){
-          console.log("显示提示")
+        //  console.log("显示提示")
           this.当前提示内容=$event
           this.显示提示=true
       },

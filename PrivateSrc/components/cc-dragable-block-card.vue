@@ -204,7 +204,7 @@ module.exports = {
     },
     激活(val) {
       if (val) {
-        console.log(this.卡片数据);
+     //   console.log(this.卡片数据);
         this.卡片数据 = this.$更新数据时间戳(this.卡片数据);
         this.$事件总线.$emit("激活卡片", this.卡片数据.id);
         this.边框宽度 = 3;
