@@ -5,6 +5,7 @@ const 窗口状态对象 = {
   currentCardid: "",
   lastviewcentter: "",
   等待连接卡片id: "",
+  缩放倍数:1
 };
 
 const 事务列表 = {
@@ -107,7 +108,6 @@ const 事务列表 = {
 
   添加卡片: async function (卡片数据) {
     await this.$数据库.cards.put(卡片数据);
-    this.$事件总线.$emit("上传当前画板文件数据到思源")
   },
 
   保存卡片: async function (传入数据) {
@@ -118,11 +118,9 @@ const 事务列表 = {
         原始数据.attrs[属性名] = 传入数据.attrsproxy[属性名];
       }
       await this.$数据库.cards.put(原始数据);
-      this.$事件总线.$emit("上传当前画板文件数据到思源")
 
     } else if (传入数据.id) {
       await this.$数据库.cards.put(传入数据);
-      this.$事件总线.$emit("上传当前画板文件数据到思源")
 
     }
 
@@ -133,13 +131,11 @@ const 事务列表 = {
     await  this.$数据库.links.filter(
       data=>{if (data.attrs.from_id==id||data.attrs.to_id==id){return true}}
     ).delete()
-    this.$事件总线.$emit("上传当前画板文件数据到思源")
 
   },
   删除链接: async function (链接数据) {
     let id = 链接数据.id || 链接数据;
     await this.$数据库.links.delete(id);
-    this.$事件总线.$emit("上传当前画板文件数据到思源")
 
   },
   保存链接: async function (传入数据) {
@@ -150,10 +146,8 @@ const 事务列表 = {
         原始数据["attrs"][属性名] = 传入数据["attrsproxy"][属性名];
       }
       await this.$数据库.links.put(原始数据);
-      this.$事件总线.$emit("上传当前画板文件数据到思源")
     } else if (传入数据.id) {
       await this.$数据库.links.put(传入数据);
-      this.$事件总线.$emit("上传当前画板文件数据到思源")
     }  
   },
   定位至卡片: async function (卡片数据) {
@@ -189,7 +183,6 @@ const 事务列表 = {
     let 新链接 = this.$根据属性生成链接(属性对象);
     console.log(新链接)
     await this.$数据库.links.put(新链接);
-    this.$事件总线.$emit("上传当前画板文件数据到思源")
 
   },
   开始连接: function (data) {

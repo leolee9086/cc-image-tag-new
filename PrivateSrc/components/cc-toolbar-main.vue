@@ -19,26 +19,34 @@
           <el-input v-model="当前画板命名" size="mini">
             <span slot="prepend">画板命名</span>
           </el-input>
-
-          <el-button
-            size="mini"
-            class="el-icon-time"
-            @click="显示历史面板 = !显示历史面板"
-            >查看历史版本</el-button
-          >
-          <el-upload
-            class="upload-demo"
-            accept=".cctag"
-            :http-request="导入旧版JSON数据"
-            :action="`http://${思源伺服ip}/api/asset/upload`"
-            :headers="{ Authorization: 'Token' + apitoken }"
-            :flile-list="JSON文件列表"
-            :multiple="false"
-          >
-            <el-button slot="trigger" size="mini" class="el-icon-upload"
-              >导入旧版文件</el-button
+          <el-row :gutter="20" type="flex" justify="space-between">
+            <el-col :span="12">
+              <el-button
+                size="mini"
+                class="el-icon-time"
+                @click="显示历史面板 = !显示历史面板"
+                >查看历史版本</el-button
+              >
+            </el-col>
+            <el-col :span="12">
+              <el-upload
+                class="upload-demo"
+                accept=".cctag"
+                :http-request="导入旧版JSON数据"
+                :action="`http://${思源伺服ip}/api/asset/upload`"
+                :headers="{ Authorization: 'Token' + apitoken }"
+                :flile-list="JSON文件列表"
+                :multiple="false"
+              >
+                <el-button slot="trigger" size="mini" class="el-icon-upload"
+                  >导入旧版文件</el-button
+                >
+              </el-upload></el-col
             >
-          </el-upload>
+          </el-row>
+          <el-tooltip content="保存时间间隔,单位为秒">
+            <el-slider v-model="保存时间间隔"></el-slider>
+          </el-tooltip>
           <div slot="reference" class="el-icon-setting"></div>
         </el-popover>
         <el-popover trigger="click">
@@ -94,7 +102,39 @@
         <div class="el-icon-help" @click="聚焦到卡片(对象数据)"></div>
 
         <span class="el-icon-browser" @click="$窗口内打开超链接(画板超链接)"></span>
-        <span class="el-icon-picture"></span>
+        <el-popover :width="300">
+          <el-row>
+            <el-col :span="12">
+              <cc-assets-selector
+                v-model="背景图片源"
+                :apitoken="apitoken"
+                :思源伺服ip="思源伺服ip"
+                :k="背景图片格式"
+              ></cc-assets-selector>
+            </el-col>
+            <el-col :span="12">
+              <el-select v-model="背景图片格式" size="mini" allow-create filterable>
+                <el-option v-for="格式 in 图片格式列表" :label="格式" :value="格式">
+                </el-option>
+              </el-select>
+            </el-col>
+          </el-row>
+
+          <el-input v-model="背景图片源" size="mini"></el-input>
+          <el-input-number
+            size="mini"
+            v-if="背景图像模式 == '填充'"
+            v-model="背景图像缩放倍数"
+          ></el-input-number>
+          <el-switch
+            v-model="背景图像模式"
+            active-text="填充"
+            inactive-text="重复"
+            active-value="填充"
+            inactive-value="重复"
+          ></el-switch>
+          <span slot="reference" class="el-icon-picture"></span>
+        </el-popover>
       </el-col>
       <strong style="font-size: small">{{ 当前画板命名 }}</strong>
       <span style="font-size: small" v-if="属性对象"
@@ -158,12 +198,35 @@ module.exports = {
       文件历史列表: [],
       当前对象名称: "",
       JSON文件列表: [],
+      保存时间间隔: 5,
+      timer: {},
+      保存计数: 1,
+      图片格式列表: ["jpg", "png", "jpeg", "svg"],
+      背景图片格式: "jpg",
+      背景图片源: "",
+      背景图像缩放倍数: 1,
+      背景图像模式: "填充",
     };
   },
   async mounted() {
-    let 画板命名 = (await this.$数据库.metadata.get("name")) || "未命名";
-    console.log(画板命名);
-    this.当前画板命名 = 画板命名.value || 画板命名;
+    this.当前画板命名 = (await this.$数据库.metadata.get("name")).value || "未命名";
+    try {
+      this.背景图片源 = (await this.$数据库.metadata.get("backgroundImage")).value || "";
+    } catch (e) {
+      this.$数据库.metadata.put({ key: "backgroundImage", value: "" });
+    }
+    try {
+      this.背景图像缩放倍数 =
+        (await this.$数据库.metadata.get("backgroundscale")).value || 1;
+    } catch (e) {
+      this.$数据库.metadata.put({ key: "backgroundscale", value: 1 });
+    }
+    try {
+      this.背景图像模式 =
+        (await this.$数据库.metadata.get("backgroundtype")).value || "填充";
+    } catch (e) {
+      this.$数据库.metadata.put({ key: "backgroundtype", value: "填充" });
+    }
     this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}`;
     this.画板列表 = await this.$画板元数据库.boards.toArray();
     console.log(this.画板列表);
@@ -174,8 +237,28 @@ module.exports = {
       console.log(error);
       alert("加载挂件块数据失败,注意手动保存数据");
     }
+    this.timer = setInterval(() => {
+      this.保存计数 = this.保存计数 + 1;
+    }, 1000);
   },
   watch: {
+    背景图像模式: function (val) {
+      this.$事件总线.$emit("改变背景图像模式", val);
+      this.$数据库.metadata.put({ key: "backgroundtype", value: val });
+    },
+    背景图像缩放倍数: function (val) {
+      this.$事件总线.$emit("缩放背景", val);
+      this.$数据库.metadata.put({ key: "backgroundscale", value: val });
+    },
+    背景图片源: function (val) {
+      this.$数据库.metadata.put({ key: "backgroundImage", value: val });
+    },
+    保存计数(val) {
+      if (val >= this.保存时间间隔) {
+        this.保存数据();
+        this.保存计数 = 1;
+      }
+    },
     当前画板命名: {
       handler: async function (val, oldval) {
         this.$事件总线.$emit("修改画板元数据", { key: "name", value: val });
@@ -215,9 +298,13 @@ module.exports = {
     },
   },
   methods: {
+    保存数据: async function () {
+      await this.保存历史();
+
+      this.$事件总线.$emit("上传当前画板文件数据到思源");
+    },
     覆盖导入JSON数据: async function (data) {
       let that = this;
-      await that.保存历史();
       await that.$数据库.links.clear();
       await that.$数据库.cards.clear();
       console.log("aaa", data.file);
@@ -471,7 +558,7 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
       }, 500);
     },
     添加卡片: function () {
-      let 卡片数据 = this.$根据属性生成卡片();
+      let 卡片数据 = this.$根据属性生成卡片({});
       (卡片数据.attrs.top =
         (window.pageYOffset + window.innerHeight / 2 - 50) / this.$当前窗口状态.缩放倍数),
         (卡片数据.attrs.left =

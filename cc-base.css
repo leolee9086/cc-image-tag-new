@@ -19,19 +19,22 @@
   text-align:center;
   padding-bottom:3px
 }
+
 .cc-card-toolbar{
   position:absolute;
   top:-30px;
   width:200px;
 }
-.cc-node-content{
-}
+
 .cc-card-body.not-folded{
   position:absolute;
   overflow:hidden;
   padding:10px;
   box-shadow: 0 2px 6px 0 rgba(16, 42, 75, 0.493);
   border-radius:5px
+}
+.cc-card-body.cc-link{
+  border-radius: 30px;
 }
 /*工具栏和面板样式*/
 .drawer-button-container{
@@ -49,6 +52,7 @@
 .el-drawer__body{
   padding:30px;
   overflow:scroll;
+  overflow-x: hidden;
 }
 .layout{
  z-index:1;

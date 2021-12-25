@@ -118,7 +118,7 @@
 <script>
 module.exports = {
   name: "cc-block-card",
-  props: ["value", "index", "移除标签", "数据源id"],
+  props: ["value", "index", "移除标签", "数据源id", "当前窗口状态"],
   components: componentsList,
   model: { prop: "value", event: "change" },
   data() {
@@ -134,6 +134,7 @@ module.exports = {
       height: "",
       hide: "",
       显示控制柄: true,
+      边框宽度: 1,
     };
   },
   beforeMount() {
@@ -206,10 +207,12 @@ module.exports = {
         console.log(this.卡片数据);
         this.卡片数据 = this.$更新数据时间戳(this.卡片数据);
         this.$事件总线.$emit("激活卡片", this.卡片数据.id);
+        this.边框宽度 = 3;
       } else {
         this.卡片数据 = this.$更新数据时间戳(this.卡片数据);
         this.$事件总线.$emit("反激活卡片", this.卡片数据.id);
         this.正在编辑 = false;
+        this.边框宽度 = 1;
       }
     },
     正在编辑(val) {
@@ -218,11 +221,7 @@ module.exports = {
       }
     },
   },
-  computed: {
-    边框宽度() {
-      return this.$当前窗口状态["current_cardid"] ? 3 : 1;
-    },
-  },
+  computed: {},
   methods: {
     生成html: async function () {
       this.预览HTML = await Vditor.md2html(this.卡片数据.markdown);

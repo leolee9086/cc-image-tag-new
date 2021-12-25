@@ -5,7 +5,6 @@
         height:${窗口大小.height}px;`"
   >
     <div>
-      <cc-layers-background class="layer"></cc-layers-background>
       <cc-layers-toolbar
         class="layer"
         :窗口大小="窗口大小"
@@ -25,6 +24,7 @@
     ></cc-layers-cards>
 
     <cc-layers-graph class="layer" :窗口大小="窗口大小"></cc-layers-graph>
+    <cc-layers-background class="layer" :窗口大小="窗口大小"> </cc-layers-background>
   </div>
 </template>
 <script>
@@ -62,6 +62,7 @@ module.exports = {
       挂件自身元素: "",
       思源伺服ip: "",
       当前鼠标坐标: { x: "", y: "" },
+      当前窗口状态: "",
     };
   },
   watch: {
