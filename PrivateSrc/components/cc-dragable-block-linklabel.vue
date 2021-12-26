@@ -129,6 +129,8 @@ module.exports = {
       height: "",
       hide: "",
       显示控制柄: true,
+      思源HTML: "",
+      def_block:""
     };
   },
   beforeMount() {
@@ -150,6 +152,7 @@ module.exports = {
           return null;
         }
         this.链接数据 = val;
+        this.链接数据.type = "link";
       },
       deep: true,
       immediate: true,
@@ -167,6 +170,8 @@ module.exports = {
       handler: async function (val, oldval) {
         //    console.log(val);
         this.folded = val.attrs.folded;
+                this.def_block = val.attrs.def_block;
+
         this.生成html();
       },
       deep: true,
@@ -214,6 +219,15 @@ module.exports = {
     生成html: async function () {
       this.预览HTML = await Vditor.md2html(this.链接数据.markdown);
       this.保存链接();
+      if (this.def_block) {
+        let 思源块内容 = await 以id获取文档内容(window.location.host, "", this.def_block);
+        思源块内容.data.content
+          ? (this.思源HTML = 思源块内容.data.content.replace(
+              'contenteditable="true"',
+              'contenteditable="false"'
+            ))
+          : (this.思源HTML = "获取思源块内容失败");
+      }
     },
 
     删除() {
