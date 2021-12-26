@@ -152,11 +152,18 @@
         <el-timeline-item
           v-for="(版本, 序号) in 文件历史列表"
           :key="序号"
-          :timestamp="版本.timestamp"
+          :timestamp="`${版本.timestamp.slice(0, 4)}年${版本.timestamp.slice(
+            4,
+            6
+          )}月${版本.timestamp.slice(6, 8)}日${版本.timestamp.slice(
+            8,
+            10
+          )}时${版本.timestamp.slice(10, 12)}分${版本.timestamp.slice(12, 14)}秒 `"
           placement="top"
         >
           <el-card>
             <strong>{{ 版本.metadata[版本.metadata.length - 1]["value"] }}</strong>
+
             <div>
               卡片数量:{{ 版本.cards.length }} 链接数量:{{ 版本.links.length }}
               <el-tooltip content="删除这个版本">
