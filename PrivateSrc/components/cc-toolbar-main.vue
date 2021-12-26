@@ -593,12 +593,21 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
 
       let 卡片数组 = 文件数据["cards"];
       let 链接数组 = 文件数据["links"];
-      for (i in 卡片数组) {
-        await this.$数据库.cards.put(卡片数组[i]);
+      let metadata = 文件数据["metadata"];
+      if (卡片数组) {
+        for (i in 卡片数组) {
+          await this.$数据库.cards.put(卡片数组[i]);
+        }
       }
-
-      for (i in 链接数组) {
-        await this.$数据库.links.put(链接数组[i]);
+      if (链接数组) {
+        for (i in 链接数组) {
+          await this.$数据库.links.put(链接数组[i]);
+        }
+      }
+      if (metadata) {
+        for (i in metadata) {
+          await this.$数据库.metadata.put(metadata[i]);
+        }
       }
       //     console.log("加载完成");
     },

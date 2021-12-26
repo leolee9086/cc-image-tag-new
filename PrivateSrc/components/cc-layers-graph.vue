@@ -60,8 +60,9 @@
           marker-mid="url(#markerArrowFrom)"
           marker-start="url(#markerArrowFrom)"
           marker-end="url(#markerArrowTo)"
-          :stroke="'black'"
-          :stroke-width="1"
+          :stroke="'darkblue'"
+          :stroke-width="2"
+          stroke-dasharray="15, 10, 5, 10, 15"
           fill="transparent"
         ></path>
       </svg>
