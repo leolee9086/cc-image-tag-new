@@ -45,10 +45,20 @@
             >
           </el-row>
           <el-tooltip content="保存时间间隔,单位为秒">
-            <el-slider :min="1" :max="60" v-model="保存时间间隔"></el-slider>
+            <el-input-number
+              size="mini"
+              :min="1"
+              :max="600"
+              v-model="保存时间间隔"
+            ></el-input-number>
           </el-tooltip>
           <el-tooltip content="历史版本数量限制,调整之后会按照时间顺序删除超限旧版本">
-            <el-slider :min="5" :max="30" v-model="历史版本数量上限"></el-slider>
+            <el-input-number
+              size="mini"
+              :min="5"
+              :max="30"
+              v-model="历史版本数量上限"
+            ></el-input-number>
           </el-tooltip>
           <div slot="reference" class="el-icon-setting"></div>
         </el-popover>
@@ -67,6 +77,7 @@
           </el-select>
           <div slot="reference" class="el-icon-folder"></div>
         </el-popover>
+        <span class="el-icon-download" @click="下载当前版本()"></span>
         <el-popover trigger="click">
           <el-upload
             class="upload-demo"
@@ -321,8 +332,8 @@ module.exports = {
     },
     覆盖导入JSON数据: async function (data) {
       let that = this;
-      await that.$数据库.links.clear();
-      await that.$数据库.cards.clear();
+      await this.清空画板();
+
       // console.log("aaa", data.file);
       var reader = new FileReader();
       reader.onload = function (evt) {
@@ -342,8 +353,8 @@ module.exports = {
     导入旧版JSON数据: async function (data) {
       let that = this;
       await that.保存历史();
-      await that.$数据库.links.clear();
-      await that.$数据库.cards.clear();
+      await this.清空画板();
+
       // console.log("aaa", data.file);
       var reader = new FileReader(data.file);
       reader.onload = function (evt) {
@@ -380,12 +391,17 @@ module.exports = {
       //   console.log(JSON数据);
       let cards = JSON数据.cards;
       let links = JSON数据.links;
+      let metadata = JSON数据.metadata;
+
       try {
         for (i in cards) {
           await this.$数据库.cards.add(cards[i]);
         }
         for (i in links) {
           await this.$数据库.links.add(links[i]);
+        }
+        for (i in metadata) {
+          await this.$数据库.metadata.add(metadata[i]);
         }
       } catch (e) {
         alert("导入出错", e);
@@ -395,10 +411,14 @@ module.exports = {
       await this.$数据库.history.delete(版本数据.id);
       this.文件历史列表 = await this.$数据库.history.toArray();
     },
-    应用版本数据: async function (版本数据) {
-      await this.保存历史();
+    清空画板: async function () {
       await this.$数据库.cards.clear();
       await this.$数据库.links.clear();
+      await this.$数据库.metadata.clear();
+    },
+    应用版本数据: async function (版本数据) {
+      await this.保存历史();
+      await this.清空画板();
       let historycards = 版本数据.cards;
       for (i in historycards) {
         try {
@@ -415,12 +435,54 @@ module.exports = {
           //  console.log(historylinks[j], j, e);
         }
       }
+      let historymeta = 版本数据.metadata;
+      for (j in historymeta) {
+        try {
+          await this.$数据库.metadata.add(historymeta[j]);
+        } catch (e) {
+          //  console.log(historylinks[j], j, e);
+        }
+      }
     },
-    导出版本数据: async function () {
-      let that = this;
+    下载当前版本: async function () {
       let JSON数据 = {};
-      await that.$数据库.cards.toArray((array) => (JSON数据.cards = array));
-      await that.$数据库.links.toArray((array) => (JSON数据.links = array));
+      JSON数据.cards = await this.$数据库.cards.toArray();
+      JSON数据.links = await this.$数据库.links.toArray();
+      JSON数据.metadata = await this.$数据库.metadata.toArray();
+      await this.导出版本数据(JSON数据);
+    },
+    导出版本markdown: async function (版本数据) {
+      let that = this;
+      let cards = {};
+      let links = {};
+      cards = 版本数据.cards;
+      links = 版本数据.links;
+      let zip = new JSZip();
+      for (i in cards) {
+        try {
+          let yaml = this.生成yaml(cards[i]);
+          let markdown = yaml + cards[i]["markdown"];
+          zip.file(`${"卡片" + i + cards[i]["name"]}.md`, markdown);
+        } catch (e) {
+          //   console.log(i, links[i]["id"], e);
+        }
+      }
+      for (i in links) {
+        try {
+          let yaml = this.生成yaml(links[i]);
+          let markdown = yaml + links[i]["markdown"];
+          zip.file(`${"关系" + i + links[i]["name"]}.md`, markdown);
+        } catch (e) {
+          //   console.log(i, links[i]["id"], e);
+        }
+      }
+      zip.generateAsync({ type: "blob" }).then((content) => {
+        that.保存(content, `${that.当前画板命名}-${that.当前画板id}.zip`);
+      });
+    },
+    导出版本数据: async function (版本数据) {
+      let that = this;
+      let JSON数据 = 版本数据;
       let 文件名 = `${this.当前画板命名}.cccards`;
       let 文件数据 = this.$从数据生成文件(JSON数据, "application/json", 文件名);
       this.保存(文件数据, 文件名);
@@ -460,36 +522,7 @@ module.exports = {
       URL.revokeObjectURL(url);
       // console.log(blob)
     },
-    导出版本markdown: async function () {
-      let that = this;
-      let cards = {};
-      let links = {};
 
-      cards = await this.$数据库.cards.toArray();
-      links = await this.$数据库.links.toArray();
-      let zip = new JSZip();
-      for (i in cards) {
-        try {
-          let yaml = this.生成yaml(cards[i]);
-          let markdown = yaml + cards[i]["markdown"];
-          zip.file(`${"卡片" + i + cards[i]["name"]}.md`, markdown);
-        } catch (e) {
-          //   console.log(i, links[i]["id"], e);
-        }
-      }
-      for (i in links) {
-        try {
-          let yaml = this.生成yaml(links[i]);
-          let markdown = yaml + links[i]["markdown"];
-          zip.file(`${"关系" + i + links[i]["name"]}.md`, markdown);
-        } catch (e) {
-          //   console.log(i, links[i]["id"], e);
-        }
-      }
-      zip.generateAsync({ type: "blob" }).then((content) => {
-        that.保存(content, `${that.当前画板命名}-${that.当前画板id}.zip`);
-      });
-    },
     生成yaml: function (对象数据) {
       let yaml = `---
 id:"${对象数据.id}"

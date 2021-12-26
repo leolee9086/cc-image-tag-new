@@ -23,7 +23,11 @@
       :当前鼠标坐标="当前鼠标坐标"
     ></cc-layers-cards>
 
-    <cc-layers-graph class="layer" :窗口大小="窗口大小"></cc-layers-graph>
+    <cc-layers-graph
+      class="layer"
+      :当前鼠标坐标="当前鼠标坐标"
+      :窗口大小="窗口大小"
+    ></cc-layers-graph>
     <cc-layers-background class="layer" :窗口大小="窗口大小"> </cc-layers-background>
   </div>
 </template>

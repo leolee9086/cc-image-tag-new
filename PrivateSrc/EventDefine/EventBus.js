@@ -15,6 +15,7 @@ const 事务列表 = {
     let JSON数据 = {};
     await that.$数据库.cards.toArray((array) => (JSON数据.cards = array));
     await that.$数据库.links.toArray((array) => (JSON数据.links = array));
+    await that.$数据库.metadata.toArray((array) => (JSON数据.metadata = array));
     let 文件名 = `data-${this.$baseid}.cccards`;
     let 文件数据 = this.$从数据生成文件(JSON数据, "application/json", 文件名);
     let data = new FormData();
@@ -183,7 +184,7 @@ const 事务列表 = {
     let 新链接 = this.$根据属性生成链接(属性对象);
     console.log(新链接)
     await this.$数据库.links.put(新链接);
-
+    this.$事件总线.$emit("结束连接")
   },
   开始连接: function (data) {
     console.log("开始链接");

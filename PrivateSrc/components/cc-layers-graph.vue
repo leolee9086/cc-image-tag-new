@@ -53,6 +53,17 @@
           :link="链接数组[i]"
           :key="link.id + 'path'"
         />
+        <path
+          v-if="显示虚拟连接"
+          @click=""
+          v-bind:d="虚拟连接路径"
+          marker-mid="url(#markerArrowFrom)"
+          marker-start="url(#markerArrowFrom)"
+          marker-end="url(#markerArrowTo)"
+          :stroke="'black'"
+          :stroke-width="1"
+          fill="transparent"
+        ></path>
       </svg>
 
       <div
@@ -73,7 +84,7 @@
 <script>
 module.exports = {
   name: "cc-layer-graph",
-  props: ["窗口大小"],
+  props: ["窗口大小", "当前鼠标坐标"],
   components: {
     "cc-color-pane": "url:/widgets/cc-baselib/components/cc-color-pane.vue",
     "cc-graph-link-path": "url:../components/cc-graph-link-path.vue",
@@ -81,13 +92,15 @@ module.exports = {
   },
   data() {
     return {
-      显示虚拟连接: "",
+      显示虚拟连接: false,
       卡片数组: [],
       链接数组: [],
       卡片获取器: {},
       卡片订阅器: {},
       链接获取器: {},
       链接订阅器: {},
+      虚拟连接起点: {},
+      虚拟连接路径: "",
     };
   },
   mounted() {
@@ -97,13 +110,28 @@ module.exports = {
         this.链接数组 = result;
       },
     });
-    this.$事件总线.$on("开始连接", this.生成虚拟连接);
+    this.$事件总线.$on("开始连接", (event) => this.生成虚拟连接(event));
+    this.$事件总线.$on("结束连接", () => (this.显示虚拟连接 = false));
+  },
+  watch: {
+    当前鼠标坐标: {
+      handler(val) {
+        if (val && this.显示虚拟连接) {
+          this.虚拟连接路径 = `
+            M ${this.虚拟连接起点.x} ${this.虚拟连接起点.y}
+            L ${(val.x + window.pageXOffset) * this.$当前窗口状态.缩放倍数} ${
+            (val.y + window.pageYOffset) * this.$当前窗口状态.缩放倍数
+          }
+        `;
+        }
+      },
+      deep: true,
+    },
   },
   methods: {
-    生成虚拟连接() {
-      this.虚拟连接 = {};
-      let 虚拟连接 = this.虚拟连接;
-      虚拟连接.from_id = this.$数据库.get;
+    生成虚拟连接($event) {
+      this.虚拟连接起点 = { x: $event.attrs.left, y: $event.attrs.top };
+      this.显示虚拟连接 = true;
     },
   },
 };

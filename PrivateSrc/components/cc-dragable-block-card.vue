@@ -61,7 +61,11 @@
         <span style="float: right">{{ index }}</span>
         <span class="el-icon-delete" v-on:click="删除()"></span>
         <span class="el-icon-share" @click="开始连接()"></span>
-        <span class="el-icon-edit" v-if="!正在编辑" @click="正在编辑 = true"></span>
+        <span
+          class="el-icon-edit"
+          v-if="!正在编辑 && !思源HTML"
+          @click="正在编辑 = true"
+        ></span>
         <span class="el-icon-check" v-if="正在编辑" @click="正在编辑 = false"></span>
         <span
           class="el-icon-focus"
@@ -85,30 +89,30 @@
           `"
       >
         <div>
-          <div>
-            <span class="el-icon-siyuan" v-if="卡片数据.attrs.def_block"></span>
+          <span class="el-icon-siyuan" v-if="卡片数据.attrs.def_block"></span>
 
-            <strong>{{ 卡片数据.name }}</strong>
-          </div>
-          <div class="cc-node-content">
-            <div :style="`color:${卡片数据.attrs.color};`">
-              <cc-link-siyuan
-                v-if="卡片数据.attrs.def_block"
-                :style="`color:${卡片数据.attrs.color};`"
-                :锚文本="`引用自${
-                  卡片数据.attrs.def_block_name || 卡片数据.attrs.def_block
-                }`"
-                :链接id="卡片数据.attrs.def_block"
-              ></cc-link-siyuan>
-            </div>
-            <cc-vditor-vue
-              v-model="卡片数据.markdown"
-              v-if="正在编辑"
-              @html-change="预览HTML = $event"
-              :toolbarconfig="{ hide: false }"
-            ></cc-vditor-vue>
-            <div v-if="!正在编辑" v-html="预览HTML"></div>
-          </div>
+          <strong>{{ 卡片数据.name }}</strong>
+        </div>
+        <cc-link-siyuan
+          v-if="卡片数据.attrs.def_block"
+          :style="`color:${卡片数据.attrs.color};`"
+          :锚文本="`引用自${卡片数据.attrs.def_block_name || 卡片数据.attrs.def_block}`"
+          :链接id="卡片数据.attrs.def_block"
+        ></cc-link-siyuan>
+        <div class="cc-card-content">
+          <div :style="`color:${卡片数据.attrs.color};`"></div>
+          <cc-vditor-vue
+            v-model="卡片数据.markdown"
+            v-if="正在编辑"
+            @html-change="预览HTML = $event"
+            :toolbarconfig="{ hide: false }"
+          ></cc-vditor-vue>
+          <div v-if="!正在编辑 && !思源HTML" v-html="预览HTML"></div>
+          <div
+            class="protyle-wysiwyg protyle-wysiwyg--attr"
+            v-if="思源HTML"
+            v-html="思源HTML"
+          ></div>
         </div>
       </div>
     </div>
@@ -135,6 +139,8 @@ module.exports = {
       hide: "",
       显示控制柄: true,
       边框宽度: 1,
+      思源HTML: "",
+      def_block: "",
     };
   },
   beforeMount() {
@@ -175,7 +181,7 @@ module.exports = {
     卡片数据: {
       handler: async function (val, oldval) {
         this.folded = val.attrs.folded;
-
+        this.def_block = val.attrs.def_block;
         this.生成html();
       },
       deep: true,
@@ -204,7 +210,7 @@ module.exports = {
     },
     激活(val) {
       if (val) {
-     //   console.log(this.卡片数据);
+        //   console.log(this.卡片数据);
         this.卡片数据 = this.$更新数据时间戳(this.卡片数据);
         this.$事件总线.$emit("激活卡片", this.卡片数据.id);
         this.边框宽度 = 3;
@@ -225,6 +231,15 @@ module.exports = {
   methods: {
     生成html: async function () {
       this.预览HTML = await Vditor.md2html(this.卡片数据.markdown);
+      if (this.def_block) {
+        let 思源块内容 = await 以id获取文档内容(window.location.host, "", this.def_block);
+        思源块内容.data.content
+          ? (this.思源HTML = 思源块内容.data.content.replace(
+              'contenteditable="true"',
+              'contenteditable="false"'
+            ))
+          : (this.思源HTML = "获取思源块内容失败");
+      }
     },
     开始连接() {
       //console.log("开始连接");

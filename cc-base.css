@@ -238,3 +238,11 @@ html,body,#app{
   width:100vw;
   height:100vw
 }
+html{
+  overflow:scroll !important;
+}
+
+.cc-card-content{
+  max-height: calc(100% - 10px);
+  overflow:scroll !important
+}

@@ -87,15 +87,14 @@
 
           <strong>{{ 链接数据.name }}</strong>
         </div>
+        <cc-link-siyuan
+          v-if="链接数据.attrs.def_block"
+          :style="`color:${链接数据.attrs.color};`"
+          :锚文本="`引用自${链接数据.attrs.def_block}`"
+          :链接id="链接数据.attrs.def_block"
+        ></cc-link-siyuan>
         <div class="cc-card-content">
-          <div :style="`color:${链接数据.attrs.color};`">
-            <cc-link-siyuan
-              v-if="链接数据.attrs.def_block"
-              :style="`color:${链接数据.attrs.color};`"
-              :锚文本="`引用自${链接数据.attrs.def_block}`"
-              :链接id="链接数据.attrs.def_block"
-            ></cc-link-siyuan>
-          </div>
+          <div :style="`color:${链接数据.attrs.color};`"></div>
           <cc-vditor-vue
             v-model="链接数据.markdown"
             v-if="正在编辑"
@@ -130,7 +129,7 @@ module.exports = {
       hide: "",
       显示控制柄: true,
       思源HTML: "",
-      def_block:""
+      def_block: "",
     };
   },
   beforeMount() {
@@ -170,7 +169,7 @@ module.exports = {
       handler: async function (val, oldval) {
         //    console.log(val);
         this.folded = val.attrs.folded;
-                this.def_block = val.attrs.def_block;
+        this.def_block = val.attrs.def_block;
 
         this.生成html();
       },
