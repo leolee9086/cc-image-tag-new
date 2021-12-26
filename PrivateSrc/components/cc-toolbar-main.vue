@@ -45,7 +45,10 @@
             >
           </el-row>
           <el-tooltip content="保存时间间隔,单位为秒">
-            <el-slider v-model="保存时间间隔"></el-slider>
+            <el-slider :min="1" :max="60" v-model="保存时间间隔"></el-slider>
+          </el-tooltip>
+          <el-tooltip content="历史版本数量限制,调整之后会按照时间顺序删除超限旧版本">
+            <el-slider :min="5" :max="30" v-model="历史版本数量上限"></el-slider>
           </el-tooltip>
           <div slot="reference" class="el-icon-setting"></div>
         </el-popover>
@@ -199,6 +202,7 @@ module.exports = {
       当前对象名称: "",
       JSON文件列表: [],
       保存时间间隔: 5,
+      历史版本数量上限: 10,
       timer: {},
       保存计数: 1,
       图片格式列表: ["jpg", "png", "jpeg", "svg"],
@@ -209,7 +213,12 @@ module.exports = {
     };
   },
   async mounted() {
-    this.当前画板命名 = (await this.$数据库.metadata.get("name")).value || "未命名";
+    try {
+      this.当前画板命名 = (await this.$数据库.metadata.get("name")).value || "未命名";
+    } catch (e) {
+      this.$数据库.metadata.put({ key: "name", value: "未命名" });
+    }
+
     try {
       this.背景图片源 = (await this.$数据库.metadata.get("backgroundImage")).value || "";
     } catch (e) {
@@ -229,12 +238,12 @@ module.exports = {
     }
     this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}`;
     this.画板列表 = await this.$画板元数据库.boards.toArray();
-    console.log(this.画板列表);
+    // console.log(this.画板列表);
     try {
       await this.保存历史();
       await this.从思源块加载数据(this.$baseid);
     } catch (error) {
-      console.log(error);
+      //  console.log(error);
       alert("加载挂件块数据失败,注意手动保存数据");
     }
     this.timer = setInterval(() => {
@@ -292,7 +301,7 @@ module.exports = {
     搜索结果id: {
       handler: async function (val, oldval) {
         if (val) {
-          console.log(val);
+          // console.log(val);
         }
       },
     },
@@ -307,11 +316,11 @@ module.exports = {
       let that = this;
       await that.$数据库.links.clear();
       await that.$数据库.cards.clear();
-      console.log("aaa", data.file);
+      // console.log("aaa", data.file);
       var reader = new FileReader();
       reader.onload = function (evt) {
         that.增量导入JSON数据(JSON.parse(evt.target.result));
-        console.log(evt.target.result);
+        //  console.log(evt.target.result);
       };
 
       reader
@@ -320,7 +329,7 @@ module.exports = {
           that.增量导入JSON数据(JSON.parse(result));
         })
         .catch((err) => {
-          console.log(err);
+          //   console.log(err);
         });
     },
     导入旧版JSON数据: async function (data) {
@@ -328,11 +337,11 @@ module.exports = {
       await that.保存历史();
       await that.$数据库.links.clear();
       await that.$数据库.cards.clear();
-      console.log("aaa", data.file);
+      // console.log("aaa", data.file);
       var reader = new FileReader(data.file);
       reader.onload = function (evt) {
         that.解析旧版JSON数据(JSON.parse(evt.target.result));
-        console.log(evt.target.result);
+        //  console.log(evt.target.result);
       };
 
       reader
@@ -341,15 +350,15 @@ module.exports = {
           that.解析旧版JSON数据(JSON.parse(result));
         })
         .catch((err) => {
-          console.log(err);
+          //  console.log(err);
         });
     },
     解析旧版JSON数据: async function (旧版JSON数据) {
-      console.log(旧版JSON数据);
+      //   console.log(旧版JSON数据);
       for (标记序号 in 旧版JSON数据.tagarray) {
         let 标记 = 旧版JSON数据.tagarray[标记序号];
         let 空标签 = this.$根据属性生成卡片();
-        console.log(空标签);
+        //   console.log(空标签);
         空标签.name = 标记.anchor;
         空标签.attrs.backgroundColor = 标记.backgroundColor;
         空标签.attrs.borderColor = 标记.borderColor;
@@ -361,7 +370,7 @@ module.exports = {
       }
     },
     增量导入JSON数据: async function (JSON数据) {
-      console.log(JSON数据);
+      //   console.log(JSON数据);
       let cards = JSON数据.cards;
       let links = JSON数据.links;
       try {
@@ -388,7 +397,7 @@ module.exports = {
         try {
           await this.$数据库.cards.add(historycards[i]);
         } catch (e) {
-          console.log(historycards[i], i, e);
+          //    console.log(historycards[i], i, e);
         }
       }
       let historylinks = 版本数据.links;
@@ -396,7 +405,7 @@ module.exports = {
         try {
           await this.$数据库.links.add(historylinks[j]);
         } catch (e) {
-          console.log(historylinks[j], j, e);
+          //  console.log(historylinks[j], j, e);
         }
       }
     },
@@ -458,7 +467,7 @@ module.exports = {
           let markdown = yaml + cards[i]["markdown"];
           zip.file(`${"卡片" + i + cards[i]["name"]}.md`, markdown);
         } catch (e) {
-          console.log(i, links[i]["id"], e);
+          //   console.log(i, links[i]["id"], e);
         }
       }
       for (i in links) {
@@ -467,7 +476,7 @@ module.exports = {
           let markdown = yaml + links[i]["markdown"];
           zip.file(`${"关系" + i + links[i]["name"]}.md`, markdown);
         } catch (e) {
-          console.log(i, links[i]["id"], e);
+          //   console.log(i, links[i]["id"], e);
         }
       }
       zip.generateAsync({ type: "blob" }).then((content) => {
@@ -505,6 +514,16 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
       data.metadata = await this.$数据库.metadata.toArray();
       data.states = await this.$数据库.states.toArray();
       data.timestamp = this.$用Lute生成时间戳();
+      let 历史版本数量 = this.文件历史列表.length;
+      console.log(历史版本数量);
+      console.log(this.历史版本数量上限);
+      if (历史版本数量 > this.历史版本数量上限) {
+        await this.$数据库.history
+          .orderBy("id")
+          .reverse()
+          .offset(this.历史版本数量上限 - 1)
+          .delete();
+      }
       await this.$数据库.history.put(data);
       this.文件历史列表 = await this.$数据库.history.toArray();
     },
@@ -520,14 +539,14 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
           `assets/data-${this.挂件自身元素.getAttribute("data-node-id")}.cccards`;
       }
       let url = "http://" + this.思源伺服ip + "/" + filepath;
-      console.log(url);
+      //  console.log(url);
       await axios.get(url).then((res) => {
         文件数据 = res.data;
         if (文件数据["cardarray"]) {
           try {
             this.图片缩放倍数 = parseFloat(文件数据.resize).toFixed(2);
           } catch (e) {
-            console.log(e);
+            //    console.log(e);
           }
         }
       });
@@ -541,7 +560,7 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
       for (i in 链接数组) {
         await this.$数据库.links.put(链接数组[i]);
       }
-      console.log("加载完成");
+      //     console.log("加载完成");
     },
     聚焦到卡片: function (对象数据) {
       this.$事件总线.$emit("窗口缩放", 1);
@@ -625,7 +644,7 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
         let 链接列表 = await this.$数据库.cards.toArray();
         this.搜索结果列表 = 卡片列表.concat(链接列表);
       }
-      console.log("搜索结果", this.搜索结果列表);
+      //    console.log("搜索结果", this.搜索结果列表);
     },
   },
   computed: {},

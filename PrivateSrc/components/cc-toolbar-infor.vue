@@ -95,14 +95,14 @@
           <strong slot="title">连接线样式</strong>
 
           <el-row>
-            <el-col :span="18">
+            <el-col :span="15">
               <el-slider
                 v-model="属性对象.path_width"
                 @change="属性对象.path_width = $event"
               ></el-slider>
             </el-col>
-            <el-col :span="3">
-              <el-select v-model="属性对象.path_type">
+            <el-col :span="9">
+              <el-select v-model="属性对象.path_type" size="mini">
                 <el-option
                   v-for="(item, i) in [`直线`, `折线`, '简单曲线']"
                   :label="item"
@@ -111,9 +111,9 @@
                 </el-option>
               </el-select>
             </el-col>
-            <cc-color-pane v-model="属性对象.path_color" :显示web命名颜色="true">
-            </cc-color-pane>
           </el-row>
+          <cc-color-pane v-model="属性对象.path_color" :显示web命名颜色="true">
+          </cc-color-pane>
         </el-collapse-item>
       </el-collapse>
     </el-row>

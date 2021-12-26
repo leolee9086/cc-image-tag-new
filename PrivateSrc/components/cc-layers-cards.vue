@@ -89,7 +89,7 @@ module.exports = {
         var item = clipboardData.items[i];
         if (item.kind === "string" && item.type == "text/plain") {
           item.getAsString((str) => {
-            console.log(str);
+            // console.log(str);
             this.解析剪贴板内容(str + "");
           });
         }
@@ -104,9 +104,9 @@ module.exports = {
         left: (window.pageXOffset + 当前鼠标坐标.x) / this.$当前窗口状态.缩放倍数,
       });
       let id = 剪贴板数据.replace("((", "").replace("))", "").slice(0, 22);
-      console.log(id);
+      // console.log(id);
       let 思源块属性 = await 以id获取思源块信息(思源伺服ip, apitoken, id);
-      console.log(思源块属性);
+      //  console.log(思源块属性);
 
       if (思源块属性["id"]) {
         空标签["attrs"]["def_block"] = 思源块属性["id"];
@@ -115,11 +115,11 @@ module.exports = {
         空标签.markdown = 剪贴板数据;
       }
 
-      console.log(空标签);
+      //  console.log(空标签);
       await this.$数据库.cards.put(空标签);
     },
     添加卡片: function ($event) {
-      console.log($event.target);
+      //  console.log($event.target);
       if ($event.target.className != "cardscontainer layer") {
         return null;
       }

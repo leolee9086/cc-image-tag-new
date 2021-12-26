@@ -61,14 +61,14 @@ module.exports = {
           that.当前卡片数据id = "";
           that.当前链接数据id = "";
         }
-        console.log("当前卡片", that.当前卡片数据id);
-        console.log("当前链接", that.当前链接数据id);
+        //  console.log("当前卡片", that.当前卡片数据id);
+        //  console.log("当前链接", that.当前链接数据id);
       },
     },
     当前链接数据id: {
       handler: function (val) {
         if (val) {
-          console.log(val);
+          // console.log(val);
           this.数据获取器 = liveQuery(() => this.$数据库.links.get(val)).subscribe({
             next: (result) => {
               result ? (this.当前数据 = result) : null;
@@ -80,7 +80,7 @@ module.exports = {
     当前卡片数据id: {
       handler: function (val) {
         if (val) {
-          console.log(val);
+          // console.log(val);
 
           this.数据获取器 = liveQuery(() => this.$数据库.cards.get(val)).subscribe({
             next: (result) => {

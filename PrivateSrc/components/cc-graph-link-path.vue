@@ -64,7 +64,7 @@ module.exports = {
         }
         this.链接 = val;
         this.路径类型 = val.attrs.path_type;
-        console.log(this.路径类型);
+        // console.log(this.路径类型);
       },
       deep: true,
       immediate: true,
@@ -109,7 +109,7 @@ module.exports = {
       }
     },
     测试连接() {
-      console.log(this.link);
+      //  console.log(this.link);
     },
     矢量加(矢量1, 矢量2) {
       return { x: 矢量1.x + 矢量2.x, y: 矢量1.y + 矢量2.y };
