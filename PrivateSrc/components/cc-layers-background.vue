@@ -8,7 +8,7 @@
     width: ${窗口大小.width / $当前窗口状态.缩放倍数}px; 
     height: ${窗口大小.height / $当前窗口状态.缩放倍数}px;
     transform-origin:0% 0%; 
-    z-index:1`"
+    z-index:-1`"
   >
     <div
       v-if="图像模式 == '重复'"

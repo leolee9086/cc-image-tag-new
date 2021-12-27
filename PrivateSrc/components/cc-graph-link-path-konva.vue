@@ -1,38 +1,21 @@
 <template>
-  <g>
-    <path
-      v-if="链接['attrs']"
-      @click="测试连接()"
-      v-bind:d="路径.d || ''"
-      marker-mid="url(#markerArrowFrom)"
-      marker-start="url(#markerArrowFrom)"
-      marker-end="url(#markerArrowTo)"
-      :stroke="链接['attrs']['path_color'] || 链接['attrs']['borderColor'] || 'black'"
-      :stroke-width="链接['attrs']['path_width'] || 1"
-      fill="transparent"
-    ></path>
-    <path
-      v-if="显示引线 && 引线路径"
-      @click="测试连接()"
-      v-bind:d="引线路径.d || ''"
-      marker-end="url(#markerArrowTo)"
-      :stroke="链接['attrs']['borderColor'] || 'black'"
-      :storke-width="链接['attrs']['path_width'] || 1"
-      fill="transparent"
-    ></path>
-    <circle :cx="起点.x || 0" :cy="起点.y || 0" :r="2"> </circle>
-    <circle :cx="终点.x || 0" :cy="终点.y || 0" :r="2"> </circle>
-  </g>
+  <v-group>
+    <v-path v-if="链接['attrs']" :config="链接设定"></v-path>
+    <v-path v-if="链接['attrs'] && 显示引线" :config="引线设定"></v-path>
+  </v-group>
 </template>
 <script>
 module.exports = {
-  name: "cc-graph-link-path",
-  props: ["link", "虚拟起始标记", "虚拟结束标记"],
+  name: "cc-graph-link-path-konva",
+  props: ["link", "画布原点", "虚拟起始标记", "虚拟结束标记"],
   mounted() {
     this.链接 = JSON.parse(JSON.stringify(this.link));
     this.监听 = true;
     this.$事件总线.$on("保存卡片", (event) => this.判断id(event));
+
     this.$事件总线.$on("保存链接", (event) => this.判断id(event));
+    this.$事件总线.$on("窗口缩放", (event) => (this.缩放倍数 = event));
+
     this.计算路径();
   },
   beforeDestroy() {
@@ -54,16 +37,60 @@ module.exports = {
       终点: {},
       中点: {},
       路径类型: "",
+      缩放倍数: this.$当前窗口状态.缩放倍数,
+      真实画布原点: "",
     };
   },
+  computed: {
+    链接设定: function () {
+      return {
+        offsetX: this.真实画布原点.x / this.缩放倍数,
+        offsetY: this.真实画布原点.y / this.缩放倍数,
+        data: this.路径.d,
+        stroke:
+          this.链接["attrs"]["path_color"] ||
+          this.链接["attrs"]["borderColor"] ||
+          "black",
+        strokeWidth: this.链接["attrs"]["path_width"] || 1,
+        fill: "transparent",
+        scaleX: this.缩放倍数,
+        scaleY: this.缩放倍数,
+      };
+    },
+    引线设定: function () {
+      let 引线 = {
+        offsetX: this.真实画布原点.x / this.缩放倍数,
+        offsetY: this.真实画布原点.y / this.缩放倍数,
+        data: this.引线路径.d,
+        stroke:
+          this.链接["attrs"]["path_color"] ||
+          this.链接["attrs"]["borderColor"] ||
+          "black",
+        strokeWidth: this.链接["attrs"]["path_width"] || 1,
+        fill: "transparent",
+        scaleX: this.缩放倍数,
+        scaleY: this.缩放倍数,
+      };
+      console.log(引线);
+      return 引线;
+    },
+  },
   watch: {
+    画布原点: {
+      handler: function (val) {
+        this.真实画布原点 = val;
+      },
+      deep: true,
+    },
     link: {
-      handler: function (val, oldval) {
+      handler: async function (val, oldval) {
         if (JSON.stringify(val) == JSON.stringify(oldval)) {
           return null;
         }
         this.链接 = val;
         this.路径类型 = val.attrs.path_type;
+        this.计算路径();
+
         // console.log(this.路径类型);
       },
       deep: true,
@@ -95,16 +122,12 @@ module.exports = {
         return null;
       }
       if ($event.id == attrs.from_id) {
-        that.代理起始标记 = $event;
         that.计算路径();
       }
       if ($event.id == attrs.to_id) {
-        that.代理结束标记 = $event;
         that.计算路径();
       }
-      if ($event.id == that.链接.id) {
-        that.代理起始标记 = await that.$数据库.cards.get(that.链接.attrs.from_id);
-        that.代理结束标记 = await that.$数据库.cards.get(that.链接.attrs.to_id);
+      if ($event.id == this.链接.attrs.id) {
         that.计算路径();
       }
     },
@@ -130,6 +153,9 @@ module.exports = {
       return { x: 标量 * 矢量["x"], y: 标量 * 矢量["y"] };
     },
     计算路径: async function () {
+      this.代理起始标记 = await this.$数据库.cards.get(this.链接.attrs.from_id);
+      this.代理结束标记 = await this.$数据库.cards.get(this.链接.attrs.to_id);
+
       if (!this.代理起始标记 || !this.代理结束标记) {
         return null;
       }

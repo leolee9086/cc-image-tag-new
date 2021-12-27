@@ -24,10 +24,20 @@
     ></cc-layers-cards>
 
     <cc-layers-graph
+      v-if="$当前窗口状态.使用svg"
       class="layer"
       :当前鼠标坐标="当前鼠标坐标"
       :窗口大小="窗口大小"
+      :画布原点="画布原点"
     ></cc-layers-graph>
+    <cc-layers-konva-graph
+      v-if="!$当前窗口状态.使用svg"
+      class="layer"
+      :当前鼠标坐标="当前鼠标坐标"
+      :窗口大小="窗口大小"
+      :画布原点="画布原点"
+    >
+    </cc-layers-konva-graph>
     <cc-layers-background class="layer" :窗口大小="窗口大小"> </cc-layers-background>
   </div>
 </template>
@@ -39,7 +49,12 @@ module.exports = {
   mounted: async function () {
     this.初始窗口大小 = { H: window.innerHeight, W: window.innerWidth };
     window.addEventListener("mousewheel", this.计算比例);
+    window.addEventListener("mousewheel", this.计算坐标);
     window.addEventListener("mousemove", this.计算坐标);
+    window.addEventListener("mousemove", this.计算比例);
+    window.addEventListener("scroll", this.计算坐标);
+    window.addEventListener("scroll", this.计算比例);
+
     this.主界面 = window.parent.document;
     console.log(this.主界面);
     this.思源伺服ip = window.location.host;
@@ -67,6 +82,7 @@ module.exports = {
       思源伺服ip: "",
       当前鼠标坐标: { x: "", y: "" },
       当前窗口状态: "",
+      画布原点: "",
     };
   },
   watch: {
@@ -101,6 +117,7 @@ module.exports = {
         width: window.pageXOffset + $event.clientX + window.innerWidth,
         height: window.pageYOffset + $event.clientY + window.innerHeight,
       };
+      this.画布原点 = { x: window.pageXOffset, y: window.pageYOffset };
     },
     保存数据: async function () {
       this.$事件总线.$emit("上传数据到思源", this.数据源id);

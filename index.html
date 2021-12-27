@@ -20,6 +20,9 @@
   <script src="/stage/protyle/js/lute/lute.min.js" id="vditorLuteScript"></script>
   <script src="/widgets/cc-baselib/static/vditor/index.min.js"></script>
   <script src="/widgets/cc-baselib/static/dexie.min.js"></script>
+  <script src='https://unpkg.com/konva/konva.js'></script>
+  <!--2. Link VueKonva Javascript -->
+  <script src='https://unpkg.com/vue-konva/umd/vue-konva.min.js'></script>
 
   
   <link id="baseStyle" rel="stylesheet" type="text/css" href="base.a64383f35f3d0b478d33fromsiyuan.css">
@@ -55,7 +58,8 @@
     "cc-layers-toolbar",
     "cc-layers-cards",
     "cc-layers-graph",
-    "cc-layers-tooltip"
+    "cc-layers-tooltip",
+    "cc-layers-konva-graph"
   ]
   应用组件列表.forEach(组件名=>
     Vue.component(组件名,`url:/widgets/cc-image-tag-new/PrivateSrc/components/${组件名}.vue`)

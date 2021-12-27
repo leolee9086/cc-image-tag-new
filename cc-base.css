@@ -246,3 +246,7 @@ html{
   max-height: calc(100% - 10px);
   overflow:scroll !important
 }
+
+.cc-graph{
+position: fixed !important;
+}

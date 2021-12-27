@@ -62,7 +62,11 @@
       <div v-if="激活" class="cc-card-toolbar">
         <span style="float: right">{{ index }}</span>
         <span class="el-icon-delete" v-on:click="删除()"></span>
-        <span class="el-icon-edit" v-if="!正在编辑" @click="正在编辑 = true"></span>
+        <span
+          class="el-icon-edit"
+          v-if="!正在编辑 && !思源HTML"
+          @click="正在编辑 = true"
+        ></span>
         <span class="el-icon-check" v-if="正在编辑" @click="正在编辑 = false"></span>
         <span class="el-icon-refresh" v-on:click="转化为卡片()"></span>
         <el-tooltip content="新窗口打开编辑">
@@ -101,7 +105,12 @@
             @html-change="预览HTML = $event"
             :toolbarconfig="{ hide: false }"
           ></cc-vditor-vue>
-          <div v-if="!正在编辑" v-html="预览HTML"></div>
+          <div v-if="!正在编辑 && !思源HTML" v-html="预览HTML"></div>
+          <div
+            class="protyle-wysiwyg protyle-wysiwyg--attr"
+            v-if="思源HTML"
+            v-html="思源HTML"
+          ></div>
         </div>
       </div>
     </div>
