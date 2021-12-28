@@ -93,6 +93,7 @@
         </el-collapse-item>
         <el-collapse-item title="连接线样式" v-if="当前数据类型 == 'link'">
           <strong slot="title">连接线样式</strong>
+          <div>线型</div>
 
           <el-row>
             <el-col :span="15">
@@ -112,6 +113,68 @@
               </el-select>
             </el-col>
           </el-row>
+          <el-row>
+            <div>起点标记样式</div>
+            <el-row>
+              <el-col :span="12">
+                <el-image :src="属性对象.from_anchor_image"></el-image>
+              </el-col>
+              <el-col :span="12">
+                <el-input-number
+                  size="mini"
+                  v-model="属性对象.from_anchor_size"
+                ></el-input-number>
+                <cc-assets-selector
+                  v-model="属性对象.from_anchor_image"
+                  :apitoken="apitoken"
+                  :思源伺服ip="思源伺服ip"
+                  :k="起点图片格式"
+                ></cc-assets-selector>
+                <el-select v-model="起点图片格式" size="mini" allow-create filterable>
+                  <el-option v-for="格式 in 图片格式列表" :label="格式" :value="格式">
+                  </el-option>
+                </el-select>
+                <el-input v-model="属性对象.from_anchor_image" size="mini"></el-input>
+                <el-checkbox
+                  v-model="起点自动旋转"
+                  @change="属性对象.from_anchor_rotate = $event"
+                  :inactive-value="0"
+                  :active-value="1"
+                ></el-checkbox>
+              </el-col>
+            </el-row>
+            <el-divider></el-divider>
+            <div>终点标记样式</div>
+            <el-row>
+              <el-col :span="12">
+                <el-image :src="属性对象.to_anchor_image"></el-image>
+              </el-col>
+              <el-col :span="12">
+                <el-input-number
+                  size="mini"
+                  v-model="属性对象.to_anchor_size"
+                ></el-input-number>
+                <cc-assets-selector
+                  v-model="属性对象.to_anchor_image"
+                  :apitoken="apitoken"
+                  :思源伺服ip="思源伺服ip"
+                  :k="起点图片格式"
+                ></cc-assets-selector>
+                <el-select v-model="起点图片格式" size="mini" allow-create filterable>
+                  <el-option v-for="格式 in 图片格式列表" :label="格式" :value="格式">
+                  </el-option>
+                </el-select>
+                <el-input v-model="属性对象.to_anchor_image" size="mini"></el-input>
+                <el-checkbox
+                  v-model="终点自动旋转"
+                  @change="属性对象.to_anchor_rotate = $event"
+                  :inactive-value="0"
+                  :active-value="1"
+                ></el-checkbox>
+              </el-col>
+            </el-row>
+          </el-row>
+          <el-divider></el-divider>
           <cc-color-pane v-model="属性对象.path_color" :显示web命名颜色="true">
           </cc-color-pane>
         </el-collapse-item>
@@ -141,6 +204,11 @@ module.exports = {
       属性对象: {},
       自定义颜色数组: [],
       当前数据类型: "",
+      起点图片格式: "",
+      终点图片格式: "",
+      图片格式列表: ["jpg", "png", "jpeg", "svg"],
+      起点自动旋转: false,
+      终点自动旋转: false,
     };
   },
   mounted() {},
@@ -247,6 +315,12 @@ module.exports = {
       上传数据["attrsproxy"].path_width = val.path_width;
       上传数据["attrsproxy"].path_type = val.path_type;
       上传数据["attrsproxy"].path_color = val.path_color;
+      上传数据["attrsproxy"].from_anchor_size = val.from_anchor_size;
+      上传数据["attrsproxy"].to_anchor_size = val.to_anchor_size;
+      上传数据["attrsproxy"].from_anchor_image = val.from_anchor_image;
+      上传数据["attrsproxy"].to_anchor_image = val.to_anchor_image;
+      上传数据["attrsproxy"].from_anchor_rotate = val.from_anchor_rotate;
+      上传数据["attrsproxy"].to_anchor_rotate = val.to_anchor_rotate;
 
       if (this.当前对象数据.type == "card") {
         this.$事件总线.$emit("保存卡片", 上传数据);
