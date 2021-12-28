@@ -1,5 +1,7 @@
 <template>
   <v-group>
+    <v-image v-if="链接['attrs'] && 起始节点图片元素" :config="起始节点设定"> </v-image>
+
     <v-path v-if="链接['attrs']" :config="链接设定"></v-path>
     <v-path v-if="链接['attrs'] && 显示引线" :config="引线设定"></v-path>
   </v-group>
@@ -8,14 +10,16 @@
 module.exports = {
   name: "cc-graph-link-path-konva",
   props: ["link", "画布原点", "虚拟起始标记", "虚拟结束标记"],
-  mounted() {
+  async mounted() {
     this.链接 = JSON.parse(JSON.stringify(this.link));
     this.监听 = true;
     this.$事件总线.$on("保存卡片", (event) => this.判断id(event));
-
     this.$事件总线.$on("保存链接", (event) => this.判断id(event));
     this.$事件总线.$on("窗口缩放", (event) => (this.缩放倍数 = event));
+    this.代理起始标记 = await this.$数据库.cards.get(this.链接.attrs.from_id);
+    this.代理结束标记 = await this.$数据库.cards.get(this.链接.attrs.to_id);
 
+    this.加载起点图片();
     this.计算路径();
   },
   beforeDestroy() {
@@ -39,13 +43,62 @@ module.exports = {
       路径类型: "",
       缩放倍数: this.$当前窗口状态.缩放倍数,
       真实画布原点: "",
+      起始节点图片: "./PrivateSrc/icon/arrow1.png",
+      起始节点图片元素: null,
+      起点标记大小: 30,
     };
   },
   computed: {
+    起始节点偏移: function () {
+      let obj = {};
+      let 方向矢量 = { x: this.终点.x - this.起点.x, y: this.终点.y - this.起点.y };
+      let 单位方向矢量 = this.单位矢量(方向矢量);
+
+      obj = this.矢量乘标量(单位方向矢量, -this.起点标记大小 * 0.618);
+      let 角度 = this.计算角度(单位方向矢量);
+      let 类型 = this.路径类型;
+      obj.rotation = 角度;
+
+      return obj;
+    },
+    起始节点标记: function () {
+      let offsetX = this.真实画布原点.x / this.缩放倍数 || 0;
+      let offsetY = this.真实画布原点.y / this.缩放倍数 || 0;
+
+      return {
+        x: this.起点.x - offsetX - this.起始节点偏移.x,
+        y: this.起点.y - offsetY - this.起始节点偏移.y,
+        offsetX: this.起点标记大小 / 2,
+        offsetY: this.起点标记大小 / 2,
+        width: this.起点标记大小,
+        height: this.起点标记大小,
+        fill: "red",
+        stroke: "black",
+        strokeWidth: 1,
+        image: this.起始节点图片元素,
+        z_index: 20,
+      };
+    },
+    起始节点设定: function () {
+      let offsetX = this.真实画布原点.x / this.缩放倍数 || 0;
+      let offsetY = this.真实画布原点.y / this.缩放倍数 || 0;
+
+      return {
+        x: this.起点.x - offsetX - this.起始节点偏移.x || 0,
+        y: this.起点.y - offsetY - this.起始节点偏移.y || 0,
+        offsetX: this.起点标记大小 / 2,
+        offsetY: this.起点标记大小 / 2,
+        width: this.起点标记大小,
+        height: this.起点标记大小,
+
+        image: this.起始节点图片元素,
+        rotation: this.起始节点偏移.rotation || 0,
+      };
+    },
     链接设定: function () {
       return {
-        offsetX: this.真实画布原点.x / this.缩放倍数,
-        offsetY: this.真实画布原点.y / this.缩放倍数,
+        offsetX: this.真实画布原点.x / this.缩放倍数 || 0,
+        offsetY: this.真实画布原点.y / this.缩放倍数 || 0,
         data: this.路径.d,
         stroke:
           this.链接["attrs"]["path_color"] ||
@@ -55,12 +108,13 @@ module.exports = {
         fill: "transparent",
         scaleX: this.缩放倍数,
         scaleY: this.缩放倍数,
+        z: 1,
       };
     },
     引线设定: function () {
       let 引线 = {
-        offsetX: this.真实画布原点.x / this.缩放倍数,
-        offsetY: this.真实画布原点.y / this.缩放倍数,
+        offsetX: this.真实画布原点.x / this.缩放倍数 || 0,
+        offsetY: this.真实画布原点.y / this.缩放倍数 || 0,
         data: this.引线路径.d,
         stroke:
           this.链接["attrs"]["path_color"] ||
@@ -71,7 +125,6 @@ module.exports = {
         scaleX: this.缩放倍数,
         scaleY: this.缩放倍数,
       };
-      console.log(引线);
       return 引线;
     },
   },
@@ -89,6 +142,9 @@ module.exports = {
         }
         this.链接 = val;
         this.路径类型 = val.attrs.path_type;
+        this.起点标记大小 =
+          val.attrs.from_anchor_size || val.attrs.path_width * 5 || this.起点标记大小;
+        this.起点标记图片 = val.attrs.from_anchor_image || this.起点标记图片;
         this.计算路径();
 
         // console.log(this.路径类型);
@@ -109,6 +165,68 @@ module.exports = {
     },
   },
   methods: {
+    计算角度: function (角度向量) {
+      let 象限 = this.象限判断(角度向量);
+      let 角度 = (360 * Math.atan(角度向量.y / 角度向量.x)) / (2 * Math.PI);
+      switch (象限) {
+        case "第一象限":
+          角度向量.x = 角度向量.x;
+          角度向量.y = 角度向量.y;
+          break;
+        case "第二象限":
+          角度向量.x = -角度向量.x;
+          角度向量.y = -角度向量.y;
+          break;
+        case "第三象限":
+          角度向量.x = -角度向量.x;
+          角度向量.y = -角度向量.y;
+          break;
+        case "第四象限":
+          角度向量.x = 角度向量.x;
+          角度向量.y = 角度向量.y;
+          break;
+      }
+      switch (象限) {
+        case "第一象限":
+          角度 = 180 + 角度;
+          break;
+        case "第四象限":
+          角度 = 180 + 角度;
+          break;
+        case "第三象限":
+          角度 = 360 + 角度;
+          break;
+      }
+
+      return 角度;
+    },
+    象限判断(位移向量) {
+      let x = 位移向量["x"];
+      let y = 位移向量["y"];
+      let 象限 = "第一象限";
+      if (x > 0 && y > 0) {
+        象限 = "第四象限";
+      }
+      if (x > 0 && y < 0) {
+        象限 = "第一象限";
+      }
+      if (x < 0 && y < 0) {
+        象限 = "第二象限";
+      }
+      if (x < 0 && y > 0) {
+        象限 = "第三象限";
+      }
+      return 象限;
+    },
+    加载起点图片: async function () {
+      console.log(this.起点);
+      let image = new window.Image();
+      image.src = this.起始节点图片;
+      image.onload = () => {
+        // set image only when it is loaded
+        this.起始节点图片元素 = image;
+      };
+    },
     判断id: async function ($event) {
       let that = this;
       if (!this.监听) {
@@ -122,17 +240,35 @@ module.exports = {
         return null;
       }
       if ($event.id == attrs.from_id) {
+        that.代理起始标记 = $event;
+
         that.计算路径();
       }
       if ($event.id == attrs.to_id) {
+        that.代理结束标记 = $event;
+
         that.计算路径();
       }
       if ($event.id == this.链接.attrs.id) {
+        this.代理起始标记 = await this.$数据库.cards.get(this.链接.attrs.from_id);
+        this.代理结束标记 = await this.$数据库.cards.get(this.链接.attrs.to_id);
+
         that.计算路径();
       }
     },
     测试连接() {
       //  console.log(this.link);
+    },
+    矢量模(矢量) {
+      let x = 矢量.x;
+      let y = 矢量.y;
+      return Math.sqrt(x * x + y * y);
+    },
+    单位矢量(矢量) {
+      let x = 矢量.x;
+      let y = 矢量.y;
+      let 矢量模 = this.矢量模(矢量);
+      return { x: x / 矢量模, y: y / 矢量模 };
     },
     矢量加(矢量1, 矢量2) {
       return { x: 矢量1.x + 矢量2.x, y: 矢量1.y + 矢量2.y };
@@ -153,9 +289,6 @@ module.exports = {
       return { x: 标量 * 矢量["x"], y: 标量 * 矢量["y"] };
     },
     计算路径: async function () {
-      this.代理起始标记 = await this.$数据库.cards.get(this.链接.attrs.from_id);
-      this.代理结束标记 = await this.$数据库.cards.get(this.链接.attrs.to_id);
-
       if (!this.代理起始标记 || !this.代理结束标记) {
         return null;
       }
@@ -331,6 +464,8 @@ module.exports = {
     矩形与矢量交点(矩形, 矢量) {
       let 矩形中心 = this.计算中心(矩形);
       //    console.log(矩形中心);
+      let 交点 = { x: 0, y: 0 };
+
       x偏移 = Math.abs(((矩形.height / 2) * 矢量.x) / 矢量.y);
       y偏移 = Math.abs(((矩形.width / 2) * 矢量.y) / 矢量.x);
       if (Math.abs(y偏移) > Math.abs(矩形.height / 2)) {
@@ -341,7 +476,6 @@ module.exports = {
         x偏移 = 矩形.width / 2;
       }
       //别问我为什么不用math.sign  反正不要用
-      let 交点 = { x: 0, y: 0 };
       if (矢量.x > 0) {
         交点.x = 矩形中心.x + x偏移;
       } else {

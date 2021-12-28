@@ -96,15 +96,18 @@ module.exports = {
       }
       if ($event.id == attrs.from_id) {
         that.代理起始标记 = $event;
+
         that.计算路径();
       }
       if ($event.id == attrs.to_id) {
         that.代理结束标记 = $event;
+
         that.计算路径();
       }
       if ($event.id == that.链接.id) {
         that.代理起始标记 = await that.$数据库.cards.get(that.链接.attrs.from_id);
         that.代理结束标记 = await that.$数据库.cards.get(that.链接.attrs.to_id);
+
         that.计算路径();
       }
     },

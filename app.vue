@@ -48,12 +48,9 @@ module.exports = {
   beformounted: async function () {},
   mounted: async function () {
     this.初始窗口大小 = { H: window.innerHeight, W: window.innerWidth };
-    window.addEventListener("mousewheel", this.计算比例);
     window.addEventListener("mousewheel", this.计算坐标);
     window.addEventListener("mousemove", this.计算坐标);
-    window.addEventListener("mousemove", this.计算比例);
     window.addEventListener("scroll", this.计算坐标);
-    window.addEventListener("scroll", this.计算比例);
 
     this.主界面 = window.parent.document;
     console.log(this.主界面);
@@ -113,10 +110,12 @@ module.exports = {
       if (this.保存计数器 >= 100) {
         this.保存计数器 = 1;
       }
-      this.窗口大小 = {
-        width: window.pageXOffset + $event.clientX + window.innerWidth,
-        height: window.pageYOffset + $event.clientY + window.innerHeight,
-      };
+      if ($event.clientX) {
+        this.窗口大小 = {
+          width: window.pageXOffset + $event.clientX + window.innerWidth,
+          height: window.pageYOffset + $event.clientY + window.innerHeight,
+        };
+      }
       this.画布原点 = { x: window.pageXOffset, y: window.pageYOffset };
     },
     保存数据: async function () {

@@ -1,9 +1,21 @@
 <template>
   <v-stage class="cc-graph" ref="stage" :config="configKonva">
-    <v-layer ref="layer-cards">
+    <v-layer ref="layer-links">
+      <v-image
+        :config="{
+          x: 100,
+          y: 100,
+          width: 1000,
+          height: 1000,
+          image: 起始节点图片元素,
+        }"
+      >
+      </v-image>
+
       <cc-graph-link-path-konva
         v-for="(link, i) in 链接数组"
         :link="link"
+        :卡片数组="卡片数组"
         :画布原点="画布原点"
       ></cc-graph-link-path-konva>
     </v-layer>
@@ -31,8 +43,10 @@ module.exports = {
         width: window.innerWidth,
         height: window.innerHeight,
       },
+      起始节点图片元素: null,
     };
   },
+
   mounted() {
     this.链接获取器 = liveQuery(() => this.$数据库.links.toArray());
     this.链接订阅器 = this.链接获取器.subscribe({
@@ -40,9 +54,16 @@ module.exports = {
         this.链接数组 = result;
       },
     });
+    this.卡片获取器 = liveQuery(() => this.$数据库.cards.toArray());
+    this.卡片订阅器 = this.卡片获取器.subscribe({
+      next: (result) => {
+        this.卡片数组 = result;
+      },
+    });
     this.$事件总线.$on("开始连接", (event) => this.生成虚拟连接(event));
     this.$事件总线.$on("结束连接", () => (this.显示虚拟连接 = false));
   },
+
   watch: {
     当前鼠标坐标: {
       handler(val) {
