@@ -250,3 +250,6 @@ html{
 .cc-graph{
 position: fixed !important;
 }
+.toolbar.toolbar-view{
+background-color: transparent;
+}

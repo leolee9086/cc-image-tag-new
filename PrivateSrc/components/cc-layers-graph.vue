@@ -90,7 +90,6 @@ module.exports = {
     "cc-color-pane": "url:/widgets/cc-baselib/components/cc-color-pane.vue",
     "cc-graph-link-path": "url:../components/cc-graph-link-path.vue",
     "cc-dragable-block-linklabel": "url:../components/cc-dragable-block-linklabel.vue",
-    "cc-layers-konva-graph": "url:../components/cc-layers-konva-graph.vue",
   },
   data() {
     return {

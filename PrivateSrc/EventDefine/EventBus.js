@@ -5,7 +5,8 @@ const 窗口状态对象 = {
   currentCardid: "",
   lastviewcentter: "",
   等待连接卡片id: "",
-  缩放倍数:1
+  缩放倍数:1,
+  使用svg:false,
 };
 
 const 事务列表 = {

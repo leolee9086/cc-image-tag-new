@@ -163,7 +163,15 @@ module.exports = {
         if (JSON.stringify(val) == JSON.stringify(oldval)) {
           return null;
         }
+
         this.卡片数据 = val;
+        if (this.卡片数据 && this.卡片数据.attrs.top < 0) {
+          this.卡片数据.top = 0;
+        }
+        if (this.卡片数据 && this.卡片数据.attrs.left < 0) {
+          this.卡片数据.left = 0;
+        }
+
         this.卡片数据.type = "card";
       },
       deep: true,
@@ -182,6 +190,7 @@ module.exports = {
       handler: async function (val, oldval) {
         this.folded = val.attrs.folded;
         this.def_block = val.attrs.def_block;
+
         this.生成html();
       },
       deep: true,
@@ -294,6 +303,12 @@ module.exports = {
       this.hide = true;
       let 卡片数据 = this.卡片数据;
       let $当前窗口状态 = this.$当前窗口状态;
+      if (this.卡片数据 && this.卡片数据.attrs.top < 0) {
+        this.卡片数据.top = 0;
+      }
+      if (this.卡片数据 && this.卡片数据.attrs.left < 0) {
+        this.卡片数据.left = 0;
+      }
       if (
         window.pageYOffset >
           (卡片数据.attrs.top + 卡片数据.attrs.height) * $当前窗口状态.缩放倍数 ||
@@ -301,8 +316,10 @@ module.exports = {
           卡片数据.attrs.top * $当前窗口状态.缩放倍数 ||
         window.pageXOffset >
           (卡片数据.attrs.left + 卡片数据.attrs.width) * $当前窗口状态.缩放倍数 ||
-        window.pageXOffset + window.innerWidth <
-          卡片数据.attrs.left * $当前窗口状态.缩放倍数
+        (window.pageXOffset + window.innerWidth <
+          卡片数据.attrs.left * $当前窗口状态.缩放倍数 &&
+          卡片数据.attrs.left > 0 &&
+          卡片数据.top > 0)
       ) {
         // 不可见标记数组.push(标记);
         this.hide = true;

@@ -1,21 +1,10 @@
 <template>
   <v-stage class="cc-graph" ref="stage" :config="configKonva">
     <v-layer ref="layer-links">
-      <v-image
-        :config="{
-          x: 100,
-          y: 100,
-          width: 1000,
-          height: 1000,
-          image: 起始节点图片元素,
-        }"
-      >
-      </v-image>
-
       <cc-graph-link-path-konva
         v-for="(link, i) in 链接数组"
         :link="link"
-        :卡片数组="卡片数组"
+        :key="链接数组[i].id + 'label'"
         :画布原点="画布原点"
       ></cc-graph-link-path-konva>
     </v-layer>
@@ -43,7 +32,6 @@ module.exports = {
         width: window.innerWidth,
         height: window.innerHeight,
       },
-      起始节点图片元素: null,
     };
   },
 

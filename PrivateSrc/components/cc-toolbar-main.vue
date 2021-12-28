@@ -16,9 +16,18 @@
     <el-row>
       <el-col :span="8">
         <el-popover trigger="click">
-          <el-input v-model="当前画板命名" size="mini">
-            <span slot="prepend">画板命名</span>
-          </el-input>
+          <el-row>
+            <el-col :span="21">
+              <el-input v-model="当前画板命名" size="mini">
+                <span slot="prepend">画板命名</span>
+              </el-input>
+            </el-col>
+            <el-col :span="3">
+              <el-tooltip content="是否使用svg渲染,默认为否">
+                <el-checkbox size="mini" v-model="使用svg渲染"></el-checkbox>
+              </el-tooltip>
+            </el-col>
+          </el-row>
           <el-row :gutter="20" type="flex" justify="space-between">
             <el-col :span="12">
               <el-button
@@ -60,6 +69,7 @@
               v-model="历史版本数量上限"
             ></el-input-number>
           </el-tooltip>
+
           <div slot="reference" class="el-icon-setting"></div>
         </el-popover>
         <el-popover trigger="click">
@@ -228,6 +238,7 @@ module.exports = {
       背景图片源: "",
       背景图像缩放倍数: 1,
       背景图像模式: "填充",
+      使用svg渲染: false,
     };
   },
   async mounted() {
@@ -269,6 +280,9 @@ module.exports = {
     }, 1000);
   },
   watch: {
+    使用svg渲染: function (val) {
+      this.$当前窗口状态.使用svg = val;
+    },
     背景图像模式: function (val) {
       this.$事件总线.$emit("改变背景图像模式", val);
       this.$数据库.metadata.put({ key: "backgroundtype", value: val });
