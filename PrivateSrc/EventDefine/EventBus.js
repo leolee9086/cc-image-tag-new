@@ -17,6 +17,9 @@ const 事务列表 = {
     await that.$数据库.cards.toArray((array) => (JSON数据.cards = array));
     await that.$数据库.links.toArray((array) => (JSON数据.links = array));
     await that.$数据库.metadata.toArray((array) => (JSON数据.metadata = array));
+    await that.$数据库.cardpresets.toArray((array) => (JSON数据.cardpresets = array));
+    await that.$数据库.linkpresets.toArray((array) => (JSON数据.linkpresets = array));
+
     let 文件名 = `data-${this.$baseid}.cccards`;
     let 文件数据 = this.$从数据生成文件(JSON数据, "application/json", 文件名);
     let data = new FormData();
@@ -113,12 +116,15 @@ const 事务列表 = {
   },
 
   保存卡片: async function (传入数据) {
-    //console.log(传入数据)
+    console.log(传入数据)
     if (传入数据.attrsproxy) {
       let 原始数据 = await this.$数据库.cards.get(传入数据.id);
+      原始数据.subtype = 传入数据.subtype||"属于";
+
       for (属性名 in 传入数据.attrsproxy) {
-        原始数据.attrs[属性名] = 传入数据.attrsproxy[属性名];
+        原始数据.attrs[属性名] = 传入数据.attrsproxy[属性名]
       }
+
       await this.$数据库.cards.put(原始数据);
 
     } else if (传入数据.id) {
@@ -144,9 +150,13 @@ const 事务列表 = {
 
     if (传入数据.attrsproxy) {
       let 原始数据 = await this.$数据库.links.get(传入数据.id);
+      原始数据.subtype = 传入数据.subtype||"属于";
+
       for (属性名 in 传入数据.attrsproxy) {
         原始数据["attrs"][属性名] = 传入数据["attrsproxy"][属性名];
+
       }
+
       await this.$数据库.links.put(原始数据);
     } else if (传入数据.id) {
       await this.$数据库.links.put(传入数据);
@@ -178,6 +188,7 @@ const 事务列表 = {
   连接卡片:async function(卡片数组){
     let 起始卡片 =  卡片数组[0]
     let 结束卡片 = 卡片数组[1]
+    if (起始卡片.type==结束卡片.type){
     let 属性对象 = {
       from_id: 起始卡片.id||起始卡片,
       to_id: 结束卡片.id||结束卡片,
@@ -185,7 +196,7 @@ const 事务列表 = {
     let 新链接 = this.$根据属性生成链接(属性对象);
     console.log(新链接)
     await this.$数据库.links.put(新链接);
-    this.$事件总线.$emit("结束连接")
+    this.$事件总线.$emit("结束连接")}
   },
   开始连接: function (data) {
     console.log("开始链接");
@@ -195,6 +206,11 @@ const 事务列表 = {
   窗口缩放: function (缩放倍数) {
     console.log(缩放倍数);
     this.$当前窗口状态.缩放倍数 = 缩放倍数;
+  },
+  点击画板空白处: function(){
+    this.$当前窗口状态.current_cardid=""
+    this.$当前窗口状态.current_linkid=""
+    console.log("啊啊啊")
   },
   修改画板元数据: function (属性对象, 画板id) {
     this.$数据库.metadata.put(属性对象);

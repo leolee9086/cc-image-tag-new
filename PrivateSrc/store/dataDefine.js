@@ -14,19 +14,76 @@ else{
   Vue.prototype.$baseid= Vue.prototype.$挂件自身元素().getAttribute("data-node-id")
 }
 const 数据库 = new Dexie(Vue.prototype.$baseid);
-数据库.version(1).stores({
+数据库.version(2).stores({
   cards: 'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs', 
   links:'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs',
   states:"++id,current_cardid,current_linkid,viewcenter",
   metadata:"key,value",
-  history:"++id,data"
+  history:"++id,data",
+  cardpresets:"id,&name,attrs",
+  linkpresets:"id,&name,attrs",
 });
 
 const 画板元数据库 = new Dexie("cc_whiteboardfiles");
-画板元数据库.version(1).stores({
+画板元数据库.version(4).stores({
   boards: 'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs', 
+  
 });
 画板元数据库.open()
+const 默认链接预设={
+  attrs:{
+  backgroundColor: "byref",
+  borderColor: "byref",
+  color: "byref",
+  def_block: "byref",
+  from_anchor_image: "byref",
+  from_anchor_rotate: "byref",
+  from_anchor_rotate_offset: "byref",
+  from_anchor_size: "byref",
+  mid_anchor_image: "byref",
+  mid_anchor_rotate: "byref",
+  mid_anchor_rotate_offset: "byref",
+  mid_anchor_size: "byref",
+  path_color: "byref",
+  path_type: "byref",
+  path_width: "byref",
+  to_anchor_image: "byref",
+  to_anchor_rotate: "byref",
+  to_anchor_rotate_offset: "byref",
+  to_anchor_size: "byref",
+},
+id:"20211230113017-0vgkowg",
+name:"属于"
+}
+
+const 默认卡片预设={
+  attrs:{
+  backgroundColor: "byref",
+  borderColor: "byref",
+  color: "byref",
+  def_block: "byref",
+  from_anchor_image: "byref",
+  from_anchor_rotate: "byref",
+  from_anchor_rotate_offset: "byref",
+  from_anchor_size: "byref",
+  mid_anchor_image: "byref",
+  mid_anchor_rotate: "byref",
+  mid_anchor_rotate_offset: "byref",
+  mid_anchor_size: "byref",
+  path_color: "byref",
+  path_type: "byref",
+  path_width: "byref",
+  to_anchor_image: "byref",
+  to_anchor_rotate: "byref",
+  to_anchor_rotate_offset: "byref",
+  to_anchor_size: "byref",
+},
+id:"20211230111132-wbdnm23"	,
+name:"一般概念"
+} 
+
+数据库.linkpresets.put(默认链接预设)
+数据库.cardpresets.put(默认卡片预设)
 
 Vue.prototype.$数据库 =  数据库
 Vue.prototype.$画板元数据库 =  画板元数据库
@@ -73,7 +130,7 @@ Vue.prototype.$根据属性生成卡片=function(属性对象){
     markdown:"此处输入内容",
     length:"",
     type:"card",
-    subtype:"",
+    subtype:"一般概念",
     ial:{ },
     sort:"",
     created:Vue.prototype.$用Lute生成时间戳(),
@@ -112,17 +169,17 @@ Vue.prototype.$根据属性生成链接=function(属性对象){
     markdown:"此处输入内容",
     length:"",
     type:"link",
-    subtype:"",
+    subtype:"属于",
     ial:{ },
     sort:"",
-    created:"",
+    created:Vue.prototype.$用Lute生成时间戳(),
     updated:Vue.prototype.$用Lute生成时间戳(),
     attrs:{
       offsetx:0,
       offsety:0,
       from_id:"",
       to_id:"",
-      path_width:1,
+      path_width:5,
       path_color:"",
       width:100,
       height:100,
@@ -131,6 +188,7 @@ Vue.prototype.$根据属性生成链接=function(属性对象){
       backgroundColor:"lightblue",
       color:"black",
       borderColor:"black",
+      mid_anchor_rotate:true
     }
   }
   for (属性名 in 空标签){

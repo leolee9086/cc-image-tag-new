@@ -64,6 +64,10 @@ module.exports = {
         }
         this.链接 = val;
         this.路径类型 = val.attrs.path_type;
+        this.链接.type = "link";
+
+        this.链接.subtype = val.subtype || "属于";
+
         // console.log(this.路径类型);
       },
       deep: true,

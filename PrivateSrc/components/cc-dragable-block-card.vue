@@ -18,7 +18,12 @@
     class-name-handle="resizer"
     class-name="cc-card-container"
   >
-    <div :data-node-id="卡片数据.id" class="cc-card-main">
+    <div
+      :data-node-id="卡片数据.id"
+      type="card"
+      :subtype="卡片数据.subtype"
+      class="cc-card-main"
+    >
       <el-popover
         popper-class="tagpoper"
         trigger="hover"
@@ -173,6 +178,8 @@ module.exports = {
         }
 
         this.卡片数据.type = "card";
+
+        this.卡片数据.subtype = val.subtype || "一般概念";
       },
       deep: true,
       immediate: true,

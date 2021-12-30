@@ -2,6 +2,7 @@
   <div
     @dblclick="添加卡片($event)"
     v-on:paste="黏贴内容($event)"
+    @click="点击画板($event)"
     class="cardscontainer"
     :style="` 
         position:absolute;
@@ -79,6 +80,12 @@ module.exports = {
   },
   computed: {},
   methods: {
+    点击画板: function ($event) {
+      console.log($event.target);
+      $event.target.getAttribute("class") == "cardscontainer layer"
+        ? this.$事件总线.$emit("点击画板空白处")
+        : null;
+    },
     黏贴内容: function ($event) {
       let clipboardData = $event.clipboardData;
 

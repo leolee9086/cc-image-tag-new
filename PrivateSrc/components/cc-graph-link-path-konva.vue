@@ -5,6 +5,7 @@
     <v-image v-if="链接['attrs'] && 结束节点图片元素" :config="结束节点设定"> </v-image>
 
     <v-image v-if="链接['attrs'] && 起始节点图片元素" :config="起始节点设定"> </v-image>
+    <v-image v-if="链接['attrs'] && 中间节点图片元素" :config="中间节点设定"> </v-image>
   </v-group>
 </template>
 <script>
@@ -22,6 +23,7 @@ module.exports = {
 
     this.加载节点图片(this.起始节点图片, "起始节点图片元素");
     this.加载节点图片(this.结束节点图片, "结束节点图片元素");
+    this.加载节点图片(this.中间节点图片, "中间节点图片元素");
 
     this.计算路径();
   },
@@ -51,11 +53,19 @@ module.exports = {
       起始节点图片元素: null,
       起点标记大小: 30,
       起点标记自动旋转: true,
+      起始标记角度偏移: 0,
 
       结束节点图片元素: null,
       结束节点图片: "./PrivateSrc/icon/arrow1.png",
       终点标记大小: 30,
       终点标记自动旋转: true,
+      结束标记角度偏移: 90,
+
+      中间节点图片元素: null,
+      中间节点图片: "./PrivateSrc/icon/arrow1.png",
+      中间标记大小: 30,
+      中间标记自动旋转: true,
+      中间标记角度偏移: 0,
     };
   },
   computed: {
@@ -67,17 +77,40 @@ module.exports = {
           this.起点,
           this.代理结束标记.attrs,
           this.终点标记大小,
-          this.终点标记自动旋转
+          this.终点标记自动旋转,
+          10
         );
       }
       return obj;
     },
     起始节点偏移: function () {
       let obj = {};
-
-      obj.x = 0 - (this.结束节点偏移.x * this.起点标记大小) / this.终点标记大小;
-      obj.y = 0 - (this.结束节点偏移.y * this.起点标记大小) / this.终点标记大小;
-      obj.rotation = this.结束节点偏移.rotation + 180;
+      if (this.代理起始标记.attrs) {
+        obj = this.计算节点标志偏移(
+          this.起点,
+          this.终点,
+          this.代理起始标记.attrs,
+          this.起点标记大小,
+          this.起点标记自动旋转,
+          10
+        );
+      }
+      return obj;
+    },
+    中间节点偏移: function () {
+      let obj = {};
+      if (this.代理起始标记.attrs) {
+        obj.x = 0;
+        obj.y = 0;
+        obj.rotation = this.计算节点标志偏移(
+          this.起点,
+          this.终点,
+          this.代理起始标记.attrs,
+          this.起点标记大小,
+          this.中间标记自动旋转,
+          10
+        ).rotation;
+      }
       return obj;
     },
     起始节点设定: function () {
@@ -86,17 +119,23 @@ module.exports = {
         this.真实画布原点.x -
         this.起始节点偏移.x * this.缩放倍数;
 
-      let offsetY = this.真实画布原点.y || 0;
+      let realY =
+        this.起点.y * this.缩放倍数 -
+        this.真实画布原点.y -
+        this.起始节点偏移.y * this.缩放倍数;
+
       return {
-        x: realX,
-        y: this.起点.y * this.缩放倍数 - offsetY - this.起始节点偏移.y * this.缩放倍数,
-        offsetX: (this.起点标记大小 / 2) * this.缩放倍数,
-        offsetY: (this.起点标记大小 / 2) * this.缩放倍数,
+        x: realX || 0,
+        y: realY || 0,
+        offsetX: (this.起点标记大小 / 2) * this.缩放倍数 || 0,
+        offsetY: (this.起点标记大小 / 2) * this.缩放倍数 || 0,
         width: this.起点标记大小 * this.缩放倍数,
         height: this.起点标记大小 * this.缩放倍数,
 
         image: this.起始节点图片元素,
-        rotation: this.起始节点偏移.rotation,
+        rotation:
+          this.起始节点偏移.rotation + this.起始标记角度偏移 ||
+          this.起始节点偏移.rotation,
       };
     },
     结束节点设定: function () {
@@ -105,19 +144,48 @@ module.exports = {
         this.真实画布原点.x -
         this.结束节点偏移.x * this.缩放倍数;
       if (!realX) {
-        console.log(this.终点.x, this.缩放倍数, this.真实画布原点.x, this.结束节点偏移.x);
+        //  console.log(this.终点.x, this.缩放倍数, this.真实画布原点.x, this.结束节点偏移.x);
       }
       let offsetY = this.真实画布原点.y;
       // console.log(this.终点标记大小, this.起点标记大小);
       return {
-        x: realX,
-        y: this.终点.y * this.缩放倍数 - offsetY - this.结束节点偏移.y * this.缩放倍数,
-        offsetX: (this.终点标记大小 / 2) * this.缩放倍数,
-        offsetY: (this.终点标记大小 / 2) * this.缩放倍数,
+        x: realX || 0,
+        y:
+          this.终点.y * this.缩放倍数 - offsetY - this.结束节点偏移.y * this.缩放倍数 ||
+          0,
+        offsetX: (this.终点标记大小 / 2) * this.缩放倍数 || 0,
+        offsetY: (this.终点标记大小 / 2) * this.缩放倍数 || 0,
         width: this.终点标记大小 * this.缩放倍数,
         height: this.终点标记大小 * this.缩放倍数,
         image: this.结束节点图片元素,
-        rotation: this.结束节点偏移.rotation,
+        rotation:
+          this.结束节点偏移.rotation + this.结束标记角度偏移 ||
+          this.结束节点偏移.rotation,
+      };
+    },
+    中间节点设定: function () {
+      let realX =
+        this.中点.x * this.缩放倍数 -
+        this.真实画布原点.x -
+        this.中间节点偏移.x * this.缩放倍数;
+      if (!realX) {
+        //  console.log(this.终点.x, this.缩放倍数, this.真实画布原点.x, this.结束节点偏移.x);
+      }
+      let offsetY = this.真实画布原点.y;
+      // console.log(this.终点标记大小, this.起点标记大小);
+      return {
+        x: realX || 0,
+        y:
+          this.中点.y * this.缩放倍数 - offsetY - this.中间节点偏移.y * this.缩放倍数 ||
+          0,
+        offsetX: (this.中间标记大小 / 2) * this.缩放倍数 || 0,
+        offsetY: (this.中间标记大小 / 2) * this.缩放倍数 || 0,
+        width: this.中间标记大小 * this.缩放倍数,
+        height: this.中间标记大小 * this.缩放倍数,
+        image: this.中间节点图片元素,
+        rotation:
+          this.中间节点偏移.rotation + this.中间标记角度偏移 ||
+          this.中间节点偏移.rotation,
       };
     },
     链接设定: function () {
@@ -155,13 +223,17 @@ module.exports = {
   watch: {
     起始节点图片: {
       handler: function (val) {
-        console.log(val);
         this.加载节点图片(val, "起始节点图片元素");
       },
     },
     结束节点图片: {
       handler: function (val) {
         this.加载节点图片(val, "结束节点图片元素");
+      },
+    },
+    中间节点图片: {
+      handler: function (val) {
+        this.加载节点图片(val, "中间节点图片元素");
       },
     },
     画布原点: {
@@ -175,17 +247,30 @@ module.exports = {
         if (JSON.stringify(val) == JSON.stringify(oldval)) {
           return null;
         }
-        console.log(val.attrs);
+        //console.log(val.attrs);
         this.链接 = val;
+        this.链接.type = "link";
+        this.链接.subtype = val.subtype || "属于";
+
         this.路径类型 = val.attrs.path_type;
         this.起点标记大小 =
           val.attrs.from_anchor_size || val.attrs.path_width / 0.382 || this.起点标记大小;
         this.终点标记大小 =
           val.attrs.to_anchor_size || val.attrs.path_width / 0.382 || this.终点标记大小;
+        this.中间标记大小 =
+          val.attrs.mid_anchor_size || val.attrs.path_width / 0.382 || this.中间标记大小;
+
         this.起始节点图片 = val.attrs.from_anchor_image || this.起始节点图片;
         this.结束节点图片 = val.attrs.to_anchor_image || this.结束节点图片;
+        this.中间节点图片 = val.attrs.mid_anchor_image || this.中间节点图片;
+
         this.起点标记自动旋转 = val.attrs.from_anchor_rotate;
         this.终点标记自动旋转 = val.attrs.to_anchor_rotate;
+        this.中间标记自动旋转 = val.attrs.mid_anchor_rotate;
+
+        this.起始标记角度偏移 = val.attrs.from_anchor_rotate_offset || 0;
+        this.结束标记角度偏移 = val.attrs.to_anchor_rotate_offset || 180;
+        this.中间标记角度偏移 = val.attrs.mid_anchor_rotate_offset || 0;
 
         this.计算路径();
 
@@ -207,25 +292,37 @@ module.exports = {
     },
   },
   methods: {
-    计算节点标志偏移: function (起点坐标, 终点坐标, 矩形, 标记大小, 是否自动旋转) {
+    计算节点标志偏移: function (
+      起点坐标,
+      终点坐标,
+      矩形,
+      标记大小,
+      是否自动旋转,
+      计算容差
+    ) {
       let obj = {};
       let 角度 = 0;
-      // console.log(矩形);
-      if (Math.abs(起点坐标.y - 矩形.top) < 1) {
+
+      if (起点坐标.y <= 矩形.top + 计算容差) {
         角度 = 0;
-        obj = { x: 0, y: 标记大小 / 2 };
+        obj.x = 0;
+        obj.y = 标记大小 / 2;
       }
 
-      if (Math.abs(起点坐标.x - 矩形.left - 矩形.width) < 1) {
+      if (起点坐标.x >= 矩形.left + 矩形.width - 计算容差) {
         角度 = 90;
-        obj = { x: 0 - 标记大小 / 2, y: 0 };
+        obj.x = 0 - 标记大小 / 2;
+        obj.y = 0;
       }
-      if (Math.abs(起点坐标.x - 矩形.left) < 1) {
+      if (起点坐标.x <= 矩形.left + 计算容差) {
         角度 = 270;
-        obj = { x: 标记大小 / 2, y: 0 };
+        obj.x = 标记大小 / 2;
+        obj.y = 0;
       }
-      if (Math.abs(起点坐标.y - 矩形.top - 矩形.height) < 1) {
-        obj = { x: 0, y: 0 - 标记大小 / 2 };
+
+      if (起点坐标.y >= 矩形.top + 矩形.height - 计算容差) {
+        obj.x = 0;
+        obj.y = 0 - 标记大小 / 2;
         角度 = 180;
       }
       obj.rotation = 角度;
@@ -237,6 +334,7 @@ module.exports = {
         角度 = this.计算角度(单位方向矢量);
         obj.rotation = 角度 - 90;
       }
+
       return obj;
     },
     计算角度: function (角度向量) {
@@ -313,12 +411,19 @@ module.exports = {
         return null;
       }
       if ($event.id == attrs.from_id) {
+        this.代理起始标记 = await this.$数据库.cards.get(this.链接.attrs.from_id);
+
         that.计算路径();
       }
       if ($event.id == attrs.to_id) {
+        this.代理结束标记 = await this.$数据库.cards.get(this.链接.attrs.to_id);
+
         that.计算路径();
       }
       if ($event.id == this.链接.attrs.id) {
+        this.代理起始标记 = await this.$数据库.cards.get(this.链接.attrs.from_id);
+        this.代理结束标记 = await this.$数据库.cards.get(this.链接.attrs.to_id);
+
         that.计算路径();
       }
     },
@@ -355,11 +460,6 @@ module.exports = {
       return { x: 标量 * 矢量["x"], y: 标量 * 矢量["y"] };
     },
     计算路径: async function () {
-      this.代理起始标记 =
-        (await this.$数据库.cards.get(this.链接.attrs.from_id)) || this.代理起始标记;
-      this.代理结束标记 =
-        (await this.$数据库.cards.get(this.链接.attrs.to_id)) || this.代理结束标记;
-
       if (!this.代理起始标记 || !this.代理结束标记) {
         return null;
       }
@@ -399,6 +499,8 @@ module.exports = {
             this.链接.attrs.path = this.路径.d;
             this.链接.attrs.top = this.路径.mid.y;
             this.链接.attrs.left = this.路径.mid.x;
+            this.中点 = this.路径.mid;
+
             break;
           }
 
@@ -407,6 +509,8 @@ module.exports = {
             this.链接.attrs.path = this.路径.d;
             this.链接.attrs.top = this.路径.mid.y;
             this.链接.attrs.left = this.路径.mid.x;
+            this.中点 = this.路径.mid;
+
             break;
           }
           default: {
@@ -414,6 +518,7 @@ module.exports = {
             this.链接.attrs.path = this.路径.d;
             this.链接.attrs.top = this.路径.mid.y;
             this.链接.attrs.left = this.路径.mid.x;
+            this.中点 = this.路径.mid;
           }
         }
         this.链接 = this.$更新数据时间戳(this.链接);
@@ -523,12 +628,13 @@ module.exports = {
         let 结束中心 = this.计算中心(代理结束标记);
         let 方向矢量 = this.矢量减(结束中心, 起始中心);
         if (方向矢量.x === 0) {
-          方向矢量.x = 0.0001;
+          方向矢量.x = 0.00000000001;
         }
         if (方向矢量.y === 0) {
-          方向矢量.y = 0.0001;
+          方向矢量.y = 0.00000000001;
         }
         let 反转方向矢量 = this.矢量乘标量(方向矢量, -1);
+        方向矢量 = this.矢量乘标量(方向矢量, 1);
         let 起始节点 = this.矩形与矢量交点(代理起始标记, 方向矢量);
         let 结束节点 = this.矩形与矢量交点(代理结束标记, 反转方向矢量);
         let 路径线段 = { 起点: 起始节点, 终点: 结束节点 };

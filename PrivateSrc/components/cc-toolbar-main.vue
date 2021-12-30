@@ -406,6 +406,8 @@ module.exports = {
       let cards = JSON数据.cards;
       let links = JSON数据.links;
       let metadata = JSON数据.metadata;
+      let cardpresets = JSON数据.cardpresets;
+      let linkpresets = JSON数据.linkpresets;
 
       try {
         for (i in cards) {
@@ -416,6 +418,12 @@ module.exports = {
         }
         for (i in metadata) {
           await this.$数据库.metadata.add(metadata[i]);
+        }
+        for (i in linkpresets) {
+          await this.$数据库.linkpresets.add(linkpresets[i]);
+        }
+        for (i in cardpresets) {
+          await this.$数据库.cardpresets.add(cardpresets[i]);
         }
       } catch (e) {
         alert("导入出错", e);
@@ -429,6 +437,8 @@ module.exports = {
       await this.$数据库.cards.clear();
       await this.$数据库.links.clear();
       await this.$数据库.metadata.clear();
+      await this.$数据库.cardpresets.clear();
+      await this.$数据库.linkpresets.clear();
     },
     应用版本数据: async function (版本数据) {
       await this.保存历史();
@@ -457,12 +467,31 @@ module.exports = {
           //  console.log(historylinks[j], j, e);
         }
       }
+      let historycardpresets = 版本数据.cardpresets;
+      for (j in historycardpresets) {
+        try {
+          await this.$数据库.cardpresets.add(historycardpresets[j]);
+        } catch (e) {
+          //  console.log(historylinks[j], j, e);
+        }
+      }
+      let historylinkpresets = 版本数据.linkpresets;
+      for (j in historylinkpresets) {
+        try {
+          await this.$数据库.linkpresets.add(historylinkpresets[j]);
+        } catch (e) {
+          //  console.log(historylinks[j], j, e);
+        }
+      }
     },
     下载当前版本: async function () {
       let JSON数据 = {};
       JSON数据.cards = await this.$数据库.cards.toArray();
       JSON数据.links = await this.$数据库.links.toArray();
       JSON数据.metadata = await this.$数据库.metadata.toArray();
+      JSON数据.cardpresets = await this.$数据库.cardpresets.toArray();
+      JSON数据.linkpresets = await this.$数据库.linkpresets.toArray();
+
       await this.导出版本数据(JSON数据);
     },
     导出版本markdown: async function (版本数据) {
@@ -567,6 +596,8 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
       data.links = await this.$数据库.links.toArray();
       data.metadata = await this.$数据库.metadata.toArray();
       data.states = await this.$数据库.states.toArray();
+      data.linkpresets = await this.$数据库.linkpresets.toArray();
+      data.cardpresets = await this.$数据库.cardpresets.toArray();
       data.timestamp = this.$用Lute生成时间戳();
       let 历史版本数量 = this.文件历史列表.length;
       console.log(历史版本数量);
@@ -608,6 +639,8 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
       let 卡片数组 = 文件数据["cards"];
       let 链接数组 = 文件数据["links"];
       let metadata = 文件数据["metadata"];
+      let 卡片预设 = 文件数据["cardpresets"];
+      let 链接预设 = 文件数据["linkpresets"];
       if (卡片数组) {
         for (i in 卡片数组) {
           await this.$数据库.cards.put(卡片数组[i]);
@@ -621,6 +654,16 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
       if (metadata) {
         for (i in metadata) {
           await this.$数据库.metadata.put(metadata[i]);
+        }
+      }
+      if (卡片预设) {
+        for (i in 卡片预设) {
+          await this.$数据库.cardpresets.put(metadata[i]);
+        }
+      }
+      if (链接预设) {
+        for (i in 链接预设) {
+          await this.$数据库.linkpresets.put(metadata[i]);
         }
       }
       //     console.log("加载完成");

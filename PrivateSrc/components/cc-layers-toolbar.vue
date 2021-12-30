@@ -1,7 +1,7 @@
 <template>
   <div class="layout">
     <div class="drawer-button-container">
-      <el-button @click="显示详情面板 = !显示详情面板" circle icon="el-icon-edit">
+      <el-button @click="显示详情面板 = !显示详情面板" circle icon="el-icon-share">
       </el-button>
     </div>
     <cc-toolbar-main
