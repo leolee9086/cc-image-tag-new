@@ -3,7 +3,6 @@
     <v-path v-if="链接['attrs']" :config="链接设定"></v-path>
     <v-path v-if="链接['attrs'] && 显示引线" :config="引线设定"></v-path>
     <v-image v-if="链接['attrs'] && 结束节点图片元素" :config="结束节点设定"> </v-image>
-
     <v-image v-if="链接['attrs'] && 起始节点图片元素" :config="起始节点设定"> </v-image>
     <v-image v-if="链接['attrs'] && 中间节点图片元素" :config="中间节点设定"> </v-image>
   </v-group>
@@ -15,11 +14,17 @@ module.exports = {
   async mounted() {
     this.链接 = JSON.parse(JSON.stringify(this.link));
     this.监听 = true;
+
     this.$事件总线.$on("保存卡片", (event) => this.判断id(event));
     this.$事件总线.$on("保存链接", (event) => this.判断id(event));
     this.$事件总线.$on("窗口缩放", (event) => (this.缩放倍数 = event));
-    this.代理起始标记 = await this.$数据库.cards.get(this.链接.attrs.from_id);
-    this.代理结束标记 = await this.$数据库.cards.get(this.链接.attrs.to_id);
+
+    this.代理起始标记 =
+      (await this.$数据库.cards.get(this.链接.attrs.from_id)) ||
+      (await this.$数据库.links.get(this.链接.attrs.from_id));
+    this.代理结束标记 =
+      (await this.$数据库.cards.get(this.链接.attrs.to_id)) ||
+      (await this.$数据库.links.get(this.链接.attrs.to_id));
 
     this.加载节点图片(this.起始节点图片, "起始节点图片元素");
     this.加载节点图片(this.结束节点图片, "结束节点图片元素");
@@ -411,18 +416,26 @@ module.exports = {
         return null;
       }
       if ($event.id == attrs.from_id) {
-        this.代理起始标记 = await this.$数据库.cards.get(this.链接.attrs.from_id);
+        this.代理起始标记 =
+          (await this.$数据库.cards.get(this.链接.attrs.from_id)) ||
+          this.$数据库.links.get(this.链接.attrs.from_id);
 
         that.计算路径();
       }
       if ($event.id == attrs.to_id) {
-        this.代理结束标记 = await this.$数据库.cards.get(this.链接.attrs.to_id);
+        this.代理结束标记 =
+          (await this.$数据库.cards.get(this.链接.attrs.to_id)) ||
+          (await this.$数据库.links.get(this.链接.attrs.to_id));
 
         that.计算路径();
       }
       if ($event.id == this.链接.attrs.id) {
-        this.代理起始标记 = await this.$数据库.cards.get(this.链接.attrs.from_id);
-        this.代理结束标记 = await this.$数据库.cards.get(this.链接.attrs.to_id);
+        this.代理起始标记 =
+          (await this.$数据库.cards.get(this.链接.attrs.from_id)) ||
+          (await this.$数据库.links.get(this.链接.attrs.from_id));
+        this.代理结束标记 =
+          (await this.$数据库.cards.get(this.链接.attrs.to_id)) ||
+          (await this.$数据库.links.get(this.链接.attrs.from_id));
 
         that.计算路径();
       }
@@ -481,12 +494,12 @@ module.exports = {
         }
       }
       if (代理起始标记.folded) {
-        代理起始标记.width = 10;
-        代理起始标记.height = 10;
+        代理起始标记.width = 100;
+        代理起始标记.height = 30;
       }
       if (代理结束标记.folded) {
-        代理结束标记.width = 10;
-        代理结束标记.height = 10;
+        代理结束标记.width = 100;
+        代理结束标记.height = 30;
       }
       let 路径线段 = this.计算路径线段(代理起始标记, 代理结束标记);
       this.起点 = 路径线段.起点.x ? 路径线段.起点 : this.起点;
@@ -545,6 +558,10 @@ module.exports = {
         width: 引线链接.attrs.width,
         height: 引线链接.attrs.height,
       };
+      if (链接.attrs.folded) {
+        真实矩形.width = 100;
+        真实矩形.height = 30;
+      }
       let 引线起点 = this.矩形与矢量交点(真实矩形, 引线矢量);
 
       let 引线线段 = { 起点: 引线起点, 终点: 引线终点 };
@@ -644,10 +661,18 @@ module.exports = {
       }
     },
     计算中心(代理标记) {
-      let 中心 = {
-        x: 代理标记.left + (1 / 2) * 代理标记.width,
-        y: 代理标记.top + (1 / 2) * 代理标记.height,
-      };
+      let 中心 = {};
+      if (代理标记.offsetx + "" != "undefined" && 代理标记.offsetx + "" != "NAN") {
+        中心 = {
+          x: 代理标记.left + (1 / 2) * 代理标记.width + 代理标记.offsetx,
+          y: 代理标记.top + (1 / 2) * 代理标记.height + 代理标记.offsety,
+        };
+      } else {
+        中心 = {
+          x: 代理标记.left + (1 / 2) * 代理标记.width,
+          y: 代理标记.top + (1 / 2) * 代理标记.height,
+        };
+      }
       return 中心;
     },
     矩形与矢量交点(矩形, 矢量) {

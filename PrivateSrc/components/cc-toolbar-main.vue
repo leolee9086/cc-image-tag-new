@@ -14,159 +14,181 @@
     "
   >
     <el-row>
-      <el-col :span="8">
-        <el-popover trigger="click">
-          <el-row>
-            <el-col :span="21">
-              <el-input v-model="当前画板命名" size="mini">
-                <span slot="prepend">画板命名</span>
-              </el-input>
-            </el-col>
-            <el-col :span="3">
-              <el-tooltip content="是否使用svg渲染,默认为否">
-                <el-checkbox size="mini" v-model="使用svg渲染"></el-checkbox>
-              </el-tooltip>
-            </el-col>
-          </el-row>
-          <el-row :gutter="20" type="flex" justify="space-between">
-            <el-col :span="12">
-              <el-button
-                size="mini"
-                class="el-icon-time"
-                @click="显示历史面板 = !显示历史面板"
-                >查看历史版本</el-button
-              >
-            </el-col>
-            <el-col :span="12">
-              <el-upload
-                class="upload-demo"
-                accept=".cctag"
-                :http-request="导入旧版JSON数据"
-                :action="`http://${思源伺服ip}/api/asset/upload`"
-                :headers="{ Authorization: 'Token' + apitoken }"
-                :flile-list="JSON文件列表"
-                :multiple="false"
-              >
-                <el-button slot="trigger" size="mini" class="el-icon-upload"
-                  >导入旧版文件</el-button
+      <el-col :span="21">
+        <el-col :span="8">
+          <el-popover trigger="click">
+            <el-row>
+              <el-col :span="21">
+                <el-input v-model="当前画板命名" size="mini">
+                  <span slot="prepend">画板命名</span>
+                </el-input>
+              </el-col>
+              <el-col :span="3">
+                <el-tooltip content="是否使用svg渲染,默认为否">
+                  <el-checkbox size="mini" v-model="使用svg渲染"></el-checkbox>
+                </el-tooltip>
+              </el-col>
+            </el-row>
+            <el-row :gutter="20" type="flex" justify="space-between">
+              <el-col :span="12">
+                <el-button
+                  size="mini"
+                  class="el-icon-time"
+                  @click="显示历史面板 = !显示历史面板"
+                  >查看历史版本</el-button
                 >
-              </el-upload></el-col
-            >
-          </el-row>
-          <el-tooltip content="保存时间间隔,单位为秒">
-            <el-input-number
-              size="mini"
-              :min="1"
-              :max="600"
-              v-model="保存时间间隔"
-            ></el-input-number>
-          </el-tooltip>
-          <el-tooltip content="历史版本数量限制,调整之后会按照时间顺序删除超限旧版本">
-            <el-input-number
-              size="mini"
-              :min="5"
-              :max="30"
-              v-model="历史版本数量上限"
-            ></el-input-number>
-          </el-tooltip>
+              </el-col>
+              <el-col :span="12">
+                <el-upload
+                  class="upload-demo"
+                  accept=".cctag"
+                  :http-request="导入旧版JSON数据"
+                  :action="`http://${思源伺服ip}/api/asset/upload`"
+                  :headers="{ Authorization: 'Token' + apitoken }"
+                  :flile-list="JSON文件列表"
+                  :multiple="false"
+                >
+                  <el-button slot="trigger" size="mini" class="el-icon-upload"
+                    >导入旧版文件</el-button
+                  >
+                </el-upload></el-col
+              >
+            </el-row>
+            <el-tooltip content="保存时间间隔,单位为秒">
+              <el-input-number
+                size="mini"
+                :min="1"
+                :max="600"
+                v-model="保存时间间隔"
+              ></el-input-number>
+            </el-tooltip>
+            <el-tooltip content="历史版本数量限制,调整之后会按照时间顺序删除超限旧版本">
+              <el-input-number
+                size="mini"
+                :min="5"
+                :max="30"
+                v-model="历史版本数量上限"
+              ></el-input-number>
+            </el-tooltip>
 
-          <div slot="reference" class="el-icon-setting"></div>
-        </el-popover>
-        <el-popover trigger="click">
-          <span>打开画板</span>
-          <el-select v-model="当前画板id" size="mini">
-            <el-option
-              v-for="(item, i) in this.画板列表"
-              :label="item.name || item.id"
-              :value="item.id"
+            <div slot="reference" class="el-icon-setting"></div>
+          </el-popover>
+          <el-popover trigger="click">
+            <span>打开画板</span>
+            <el-select v-model="当前画板id" size="mini">
+              <el-option
+                v-for="(item, i) in this.画板列表"
+                :label="item.name || item.id"
+                :value="item.id"
+              >
+                <el-tooltip trigger="hover" :content="item.id" placement="top-start">
+                  <span>{{ item.name }}</span>
+                </el-tooltip>
+              </el-option>
+            </el-select>
+            <div slot="reference" class="el-icon-folder"></div>
+          </el-popover>
+          <span class="el-icon-download" @click="下载当前版本()"></span>
+          <el-popover trigger="click">
+            <el-upload
+              class="upload-demo"
+              drag
+              accept=".cccards"
+              :http-request="覆盖导入JSON数据"
+              :action="`http://${思源伺服ip}/api/asset/upload`"
+              :headers="{ Authorization: 'Token' + apitoken }"
+              :flile-list="JSON文件列表"
+              :multiple="false"
             >
-              <el-tooltip trigger="hover" :content="item.id" placement="top-start">
-                <span>{{ item.name }}</span>
-              </el-tooltip>
-            </el-option>
-          </el-select>
-          <div slot="reference" class="el-icon-folder"></div>
-        </el-popover>
-        <span class="el-icon-download" @click="下载当前版本()"></span>
-        <el-popover trigger="click">
-          <el-upload
-            class="upload-demo"
-            drag
-            accept=".cccards"
-            :http-request="覆盖导入JSON数据"
-            :action="`http://${思源伺服ip}/api/asset/upload`"
-            :headers="{ Authorization: 'Token' + apitoken }"
-            :flile-list="JSON文件列表"
-            :multiple="false"
-          >
-            <i class="el-icon-upload"></i>
-            <div class="el-upload__text">
-              将文件拖到此处，或
-              <em>点击上传</em>
+              <i class="el-icon-upload"></i>
+              <div class="el-upload__text">
+                将文件拖到此处，或
+                <em>点击上传</em>
+              </div>
+              <div class="el-upload__tip" slot="tip">只能上传cccards|cctags文件</div>
+            </el-upload>
+
+            <div slot="reference" class="el-icon-upload"></div>
+          </el-popover>
+
+          <el-popover trigger="click" placement="top" :height="500">
+            <el-input v-model="搜索关键词" @input="搜索()" size="mini"></el-input>
+            <div v-for="(item, i) in 搜索结果列表">
+              <el-link :value="item.id" @click="聚焦到卡片(item)">
+                <span>{{ `id:${item.id}` }}</span>
+                <span>{{ `${item.markdown.slice(0, 22) || 无内容}` }}</span>
+              </el-link>
             </div>
-            <div class="el-upload__tip" slot="tip">只能上传cccards|cctags文件</div>
-          </el-upload>
+            <div slot="reference" @focus="搜索()" class="el-icon-zoom-in"></div>
+          </el-popover>
 
-          <div slot="reference" class="el-icon-upload"></div>
-        </el-popover>
+          <span class="el-icon-plus" @click="添加卡片()"></span>
 
-        <el-popover trigger="click" placement="top" :height="500">
-          <el-input v-model="搜索关键词" @input="搜索()" size="mini"></el-input>
-          <div v-for="(item, i) in 搜索结果列表">
-            <el-link :value="item.id" @click="聚焦到卡片(item)">
-              <span>{{ `id:${item.id}` }}</span>
-              <span>{{ `${item.markdown.slice(0, 22) || 无内容}` }}</span>
-            </el-link>
-          </div>
-          <div slot="reference" @focus="搜索()" class="el-icon-zoom-in"></div>
-        </el-popover>
+          <div class="el-icon-help" @click="聚焦到卡片(对象数据)"></div>
 
-        <span class="el-icon-plus" @click="添加卡片()"></span>
+          <span class="el-icon-browser" @click="$窗口内打开超链接(画板超链接)"></span>
+          <el-popover :width="300">
+            <el-row>
+              <el-col :span="12">
+                <cc-assets-selector
+                  v-model="背景图片源"
+                  :apitoken="apitoken"
+                  :思源伺服ip="思源伺服ip"
+                  :k="背景图片格式"
+                ></cc-assets-selector>
+              </el-col>
+              <el-col :span="12">
+                <el-select v-model="背景图片格式" size="mini" allow-create filterable>
+                  <el-option v-for="格式 in 图片格式列表" :label="格式" :value="格式">
+                  </el-option>
+                </el-select>
+              </el-col>
+            </el-row>
 
-        <div class="el-icon-help" @click="聚焦到卡片(对象数据)"></div>
-
-        <span class="el-icon-browser" @click="$窗口内打开超链接(画板超链接)"></span>
-        <el-popover :width="300">
-          <el-row>
-            <el-col :span="12">
-              <cc-assets-selector
-                v-model="背景图片源"
-                :apitoken="apitoken"
-                :思源伺服ip="思源伺服ip"
-                :k="背景图片格式"
-              ></cc-assets-selector>
-            </el-col>
-            <el-col :span="12">
-              <el-select v-model="背景图片格式" size="mini" allow-create filterable>
-                <el-option v-for="格式 in 图片格式列表" :label="格式" :value="格式">
-                </el-option>
-              </el-select>
-            </el-col>
-          </el-row>
-
-          <el-input v-model="背景图片源" size="mini"></el-input>
-          <el-input-number
-            size="mini"
-            v-if="背景图像模式 == '填充'"
-            v-model="背景图像缩放倍数"
-          ></el-input-number>
-          <el-switch
-            v-model="背景图像模式"
-            active-text="填充"
-            inactive-text="重复"
-            active-value="填充"
-            inactive-value="重复"
-          ></el-switch>
-          <span slot="reference" class="el-icon-picture"></span>
-        </el-popover>
+            <el-input v-model="背景图片源" size="mini"></el-input>
+            <el-input-number
+              size="mini"
+              v-if="背景图像模式 == '填充'"
+              v-model="背景图像缩放倍数"
+            ></el-input-number>
+            <el-switch
+              v-model="背景图像模式"
+              active-text="填充"
+              inactive-text="重复"
+              active-value="填充"
+              inactive-value="重复"
+            ></el-switch>
+            <span slot="reference" class="el-icon-picture"></span>
+          </el-popover>
+        </el-col>
+        <strong style="font-size: small">{{ 当前画板命名 }}</strong>
+        <span style="font-size: small" v-if="属性对象"
+          >当前元素坐标 x:{{ parseInt(属性对象.left) }}y{{ parseInt(属性对象.top) }}</span
+        >
+        <el-row type="flex" justify="space-between">
+          <el-col :span="21">
+            <el-input v-model="当前对象名称" size="mini" @input="修改对象名称()">
+              <span slot="prepend">名称</span>
+            </el-input>
+          </el-col>
+        </el-row>
       </el-col>
-      <strong style="font-size: small">{{ 当前画板命名 }}</strong>
-      <span style="font-size: small" v-if="属性对象"
-        >当前元素坐标 x:{{ parseInt(属性对象.left) }}y{{ parseInt(属性对象.top) }}</span
-      >
-      <el-input v-model="当前对象名称" size="mini" @input="修改对象名称()">
-        <span slot="prepend">名称</span>
-      </el-input>
+      <el-col :span="3">
+        <el-tooltip content="折叠时是否显示类型">
+          <el-switch
+            size="mini"
+            @change="$当前窗口状态.showsubtype = $event"
+            v-model="折叠时显示名称"
+          ></el-switch>
+        </el-tooltip>
+        <el-tooltip content="折叠时是否显示名称">
+          <el-switch
+            @change="$当前窗口状态.showname = $event"
+            size="mini"
+            v-model="折叠时显示类别"
+          ></el-switch>
+        </el-tooltip>
+      </el-col>
     </el-row>
     <el-drawer :modal="false" title="历史版本" :visible.sync="显示历史面板">
       <el-timeline>
@@ -239,6 +261,8 @@ module.exports = {
       背景图像缩放倍数: 1,
       背景图像模式: "填充",
       使用svg渲染: false,
+      折叠时显示名称: true,
+      折叠时显示类别: true,
     };
   },
   async mounted() {
@@ -272,7 +296,7 @@ module.exports = {
       await this.保存历史();
       await this.从思源块加载数据(this.$baseid);
     } catch (error) {
-      //  console.log(error);
+      console.log(error);
       alert("加载挂件块数据失败,注意手动保存数据");
     }
     this.timer = setInterval(() => {
@@ -600,8 +624,8 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
       data.cardpresets = await this.$数据库.cardpresets.toArray();
       data.timestamp = this.$用Lute生成时间戳();
       let 历史版本数量 = this.文件历史列表.length;
-      console.log(历史版本数量);
-      console.log(this.历史版本数量上限);
+      // console.log(历史版本数量);
+      //console.log(this.历史版本数量上限);
       if (历史版本数量 > this.历史版本数量上限) {
         await this.$数据库.history
           .orderBy("id")
@@ -658,12 +682,12 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
       }
       if (卡片预设) {
         for (i in 卡片预设) {
-          await this.$数据库.cardpresets.put(metadata[i]);
+          await this.$数据库.cardpresets.put(卡片预设[i]);
         }
       }
       if (链接预设) {
         for (i in 链接预设) {
-          await this.$数据库.linkpresets.put(metadata[i]);
+          await this.$数据库.linkpresets.put(链接预设[i]);
         }
       }
       //     console.log("加载完成");
@@ -694,6 +718,8 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
     设定当前标记: function () {
       let 上传数据 = { id: "", attrsproxy: {} };
       上传数据.id = this.对象数据.id;
+      上传数据.type = this.对象数据.type;
+
       上传数据["attrsproxy"].color = this.属性对象.color;
       上传数据["attrsproxy"].borderColor = this.属性对象.borderColor;
       上传数据["attrsproxy"].backgroundColor = this.属性对象.backgroundColor;

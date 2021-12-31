@@ -313,12 +313,6 @@ module.exports = {
         this.hide = false;
       }
     },
-    转化为卡片: function () {
-      let 新数据 = JSON.parse(JSON.stringify(this.链接数据));
-
-      this.$事件总线.$emit("链接转化为卡片", 新数据);
-      this.删除();
-    },
   },
 };
 </script>

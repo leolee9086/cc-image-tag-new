@@ -8,9 +8,8 @@
         position:absolute;
         top:0px;
         left:0px;
-        width: ${窗口大小.width / $当前窗口状态.缩放倍数}px; 
-        height: ${窗口大小.height / $当前窗口状态.缩放倍数}px;
-        transform:scale(${$当前窗口状态.缩放倍数});
+        width: ${窗口大小.width}px; 
+        height: ${窗口大小.height}px;
         transform-origin:0% 0%;
         z-index:200`"
   >
@@ -22,10 +21,11 @@
       :key="卡片数组[i]['id']"
       v-model="卡片数组[i]"
       :index="i"
+      数据类型="card"
       @activated="当前激活标签id = i"
-      :窗口缩放倍数="窗口缩放倍数"
+      :窗口缩放倍数="$当前窗口状态.缩放倍数"
     ></cc-dragable-block-card>
-    <cc-dragable-block-linklabel
+    <cc-dragable-block-card
       :ref="item.id"
       :data-node-id="item.id"
       v-for="(item, i) in 链接数组"
@@ -33,9 +33,10 @@
       v-model="链接数组[i]"
       :index="i"
       @activated="当前激活链接id = i"
-      style="z-index: 200"
+      style="z-index: 202"
+      数据类型="link"
       :窗口缩放倍数="$当前窗口状态.缩放倍数"
-    ></cc-dragable-block-linklabel>
+    ></cc-dragable-block-card>
   </div>
 </template>
 <script>

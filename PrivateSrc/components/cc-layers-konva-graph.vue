@@ -7,6 +7,7 @@
         :key="链接数组[i].id + 'label'"
         :画布原点="画布原点"
       ></cc-graph-link-path-konva>
+      <v-arrow v-if="显示虚拟连接" :config="虚拟连接设定"></v-arrow>
     </v-layer>
   </v-stage>
 </template>
@@ -51,18 +52,30 @@ module.exports = {
     this.$事件总线.$on("开始连接", (event) => this.生成虚拟连接(event));
     this.$事件总线.$on("结束连接", () => (this.显示虚拟连接 = false));
   },
-
+  computed: {
+    虚拟连接设定: function () {
+      let 真实起点x = this.虚拟连接起点.x * this.$当前窗口状态.缩放倍数 - this.画布原点.x;
+      let 真实起点y = this.虚拟连接起点.y * this.$当前窗口状态.缩放倍数 - this.画布原点.y;
+      return {
+        points: [
+          真实起点x,
+          真实起点y,
+          this.当前鼠标坐标.x || 0,
+          this.当前鼠标坐标.y || 0,
+        ],
+        pointerLength: 20,
+        pointerWidth: 20,
+        fill: "darkblue",
+        stroke: "darkblue",
+        strokeWidth: 4,
+        scale: this.$当前窗口状态.缩放倍数 || 1,
+        dash: [15, 10, 5, 10, 15],
+      };
+    },
+  },
   watch: {
     当前鼠标坐标: {
       handler(val) {
-        if (val && this.显示虚拟连接) {
-          this.虚拟连接路径 = `
-            M ${this.虚拟连接起点.x} ${this.虚拟连接起点.y}
-            L ${(val.x + window.pageXOffset) / this.$当前窗口状态.缩放倍数} ${
-            (val.y + window.pageYOffset) / this.$当前窗口状态.缩放倍数
-          }
-        `;
-        }
         this.configKonva = {
           width: window.innerWidth,
           height: window.innerHeight,
@@ -73,7 +86,10 @@ module.exports = {
   },
   methods: {
     生成虚拟连接($event) {
-      this.虚拟连接起点 = { x: $event.attrs.left, y: $event.attrs.top };
+      this.虚拟连接起点 = {
+        x: $event.attrs.left,
+        y: $event.attrs.top,
+      };
       this.显示虚拟连接 = true;
     },
   },

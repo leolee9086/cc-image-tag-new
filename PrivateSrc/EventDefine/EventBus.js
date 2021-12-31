@@ -7,6 +7,8 @@ const 窗口状态对象 = {
   等待连接卡片id: "",
   缩放倍数:1,
   使用svg:false,
+  showname:true,
+  showsubtype:true
 };
 
 const 事务列表 = {
@@ -99,14 +101,16 @@ const 事务列表 = {
     }
   },
   链接转化为卡片:async function(链接数据){
-    try{await this.$数据库.delete(链接数据.id)}catch(e){}
+   await this.$数据库.links.delete(链接数据.id)
     let 新数据 = JSON.parse(JSON.stringify(链接数据))
-    新数据.type="link"
+    新数据.type="card"
+    新数据.subtype="一般概念"
+
     await this.$数据库.cards.put(新数据)
     let from_id = 新数据.attrs["from_id"]
     let to_id = 新数据.attrs["to_id"]
-    this.$事件总线.$emit("连接卡片",[from_id,新数据])
-    this.$事件总线.$emit("连接卡片",[新数据,to_id])
+    this.$事件总线.$emit("连接卡片",[from_id,新数据.id])
+    this.$事件总线.$emit("连接卡片",[新数据.id,to_id])
     
   },
  
@@ -114,24 +118,31 @@ const 事务列表 = {
   添加卡片: async function (卡片数据) {
     await this.$数据库.cards.put(卡片数据);
   },
-
+  保存数据:async function (传入数据){
+   传入数据.type=="card"? this.$事件总线.$emit("保存卡片"):this.$事件总线.$emit("保存链接")
+  },
   保存卡片: async function (传入数据) {
-    console.log(传入数据)
+    let 数据表名  = 传入数据.type+"s"
+    //console.log(数据表名)
     if (传入数据.attrsproxy) {
-      let 原始数据 = await this.$数据库.cards.get(传入数据.id);
+      let 原始数据 = await this.$数据库[数据表名].get(传入数据.id);
       原始数据.subtype = 传入数据.subtype||"属于";
 
       for (属性名 in 传入数据.attrsproxy) {
         原始数据.attrs[属性名] = 传入数据.attrsproxy[属性名]
       }
 
-      await this.$数据库.cards.put(原始数据);
+      await this.$数据库[数据表名].put(原始数据);
 
     } else if (传入数据.id) {
-      await this.$数据库.cards.put(传入数据);
+      await this.$数据库[数据表名].put(传入数据);
 
     }
 
+  },
+  删除数据:async function (传入数据){
+    传入数据.type=="card"?this.$事件总线.$emit("删除卡片",传入数据):
+    this.$事件总线.$emit("删除链接",传入数据)
   },
   删除卡片: async function (卡片数据) {
     let id = 卡片数据.id || 卡片数据;
@@ -154,9 +165,7 @@ const 事务列表 = {
 
       for (属性名 in 传入数据.attrsproxy) {
         原始数据["attrs"][属性名] = 传入数据["attrsproxy"][属性名];
-
       }
-
       await this.$数据库.links.put(原始数据);
     } else if (传入数据.id) {
       await this.$数据库.links.put(传入数据);
@@ -170,47 +179,58 @@ const 事务列表 = {
           (目标卡片数据.attrs.top+目标卡片数据.attrs.width/2)*this.$当前窗口状态.缩放倍数 - window.innerHeight / 2
         );
   },
-  激活卡片: async function (id) {
+  激活数据:  function(数据){
+    let 数据类型 = 数据.type
+   // console.log(数据类型)
+    数据类型 == "card" ?this.$事件总线.$emit("激活卡片",数据):this.$事件总线.$emit("激活链接",数据)
+  },
+  激活卡片: async function (数据) {
     this.$当前窗口状态.current_linkid = ""
-
-    this.$当前窗口状态.current_cardid = id;
+    this.$当前窗口状态.current_cardid = 数据.id;
     if (this.$当前窗口状态.等待连接卡片id) {
-      this.$事件总线.$emit("连接卡片",[this.$当前窗口状态.等待连接卡片id,id])
+      this.$事件总线.$emit("连接卡片",[this.$当前窗口状态.等待连接卡片id,数据.id])
       this.$当前窗口状态.等待连接卡片id = null;
     }
     await this.$数据库.states.put(this.$当前窗口状态);
   },
-  激活链接:async function (id){
+  激活链接:async function (数据){
     this.$当前窗口状态.current_cardid = ""
-    this.$当前窗口状态.current_linkid = id;
+    this.$当前窗口状态.current_linkid = 数据.id;
+    if (this.$当前窗口状态.等待连接卡片id) {
+      this.$事件总线.$emit("连接卡片",[this.$当前窗口状态.等待连接卡片id,数据.id])
+      this.$当前窗口状态.等待连接卡片id = null;
+    }
     await this.$数据库.states.put(this.$当前窗口状态);
   },
   连接卡片:async function(卡片数组){
-    let 起始卡片 =  卡片数组[0]
-    let 结束卡片 = 卡片数组[1]
-    if (起始卡片.type==结束卡片.type){
+    let 起始卡片id =  卡片数组[0]
+    let 结束卡片id = 卡片数组[1]
+    let 起始卡片 =await this.$数据库.cards.get(起始卡片id)||await this.$数据库.links.get(起始卡片id)
+    let 结束卡片 =await this.$数据库.cards.get(结束卡片id)||await this.$数据库.links.get(结束卡片id)
+
+    if (起始卡片id!=结束卡片id&&起始卡片&&结束卡片){
     let 属性对象 = {
-      from_id: 起始卡片.id||起始卡片,
-      to_id: 结束卡片.id||结束卡片,
+      from_id: 起始卡片id||起始卡片,
+      to_id: 结束卡片id||结束卡片,
     };
     let 新链接 = this.$根据属性生成链接(属性对象);
-    console.log(新链接)
+   // console.log(新链接)
     await this.$数据库.links.put(新链接);
     this.$事件总线.$emit("结束连接")}
   },
   开始连接: function (data) {
-    console.log("开始链接");
+   // console.log("开始链接");
     this.$当前窗口状态.等待连接卡片id = data.id;
   },
   显示提示: function (提示内容) {},
   窗口缩放: function (缩放倍数) {
-    console.log(缩放倍数);
+   // console.log(缩放倍数);
     this.$当前窗口状态.缩放倍数 = 缩放倍数;
   },
   点击画板空白处: function(){
     this.$当前窗口状态.current_cardid=""
     this.$当前窗口状态.current_linkid=""
-    console.log("啊啊啊")
+  //  console.log("啊啊啊")
   },
   修改画板元数据: function (属性对象, 画板id) {
     this.$数据库.metadata.put(属性对象);

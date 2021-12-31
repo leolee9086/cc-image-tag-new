@@ -9,13 +9,11 @@
 
 .cc-card-body.folded{
   position: absolute;  
-  width:15px;
   height:15px;
   min-width:15px;
   min-height:15px;
-  max-width:15px;
   max-height:15px;
-  border-radius:100%;
+  border-radius:7.5px;
   text-align:center;
   padding-bottom:3px
 }
@@ -32,6 +30,9 @@
   padding:10px;
   box-shadow: 0 2px 6px 0 rgba(16, 42, 75, 0.493);
   border-radius:5px
+}
+.not-folded .subtypetag{
+  float:right
 }
 .cc-card-body.cc-link{
   border-radius: 30px;

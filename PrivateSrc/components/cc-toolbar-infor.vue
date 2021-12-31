@@ -441,10 +441,10 @@ module.exports = {
     预设: {
       handler: function (val, oldval) {
         if (val && val.attrs) {
-          console.log(val);
+          // console.log(val);
           this.属性列表.forEach((属性名) => {
             if (!(val.attrs[属性名] === "byref") && !(val.attrs[属性名] === undefined)) {
-              console.log(val.attrs[属性名]);
+              //console.log(val.attrs[属性名]);
 
               this.属性对象[属性名] = val.attrs[属性名];
             }
@@ -508,7 +508,6 @@ module.exports = {
           this.当前对象数据 = await this.$数据库.links.get(this.链接数据id);
           this.属性对象 = JSON.parse(JSON.stringify(this.当前对象数据.attrs));
           this.属性对象.id = this.当前对象数据.id;
-
           this.属性对象.path_width = this.属性对象.path_width || 1;
           this.当前对象名称 = this.当前对象数据.name;
           this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.当前对象数据.id}&baseid=${this.$baseid}&table=cards`;
@@ -522,6 +521,7 @@ module.exports = {
           return null;
         }
         this.当前数据类型 = val.type;
+        //  console.log(this.当前数据类型);
         this.当前思源块id = val.attrs.def_block;
         this.预设名 = val.subtype;
         await this.获取预设();
@@ -555,7 +555,7 @@ module.exports = {
         if (val) {
           this.当前思源块id = val.replace("((", "").replace("))", "").slice(0, 22);
           id = this.当前思源块id;
-          console.log(id);
+          //  console.log(id);
           this.当前反向链接列表 = await this.以id获取反向链接(id);
           this.当前正向链接列表 = await this.以id获取正向链接(id);
 
@@ -579,7 +579,7 @@ module.exports = {
     },
     属性对象: {
       handler: function (val, oldval) {
-        console.log(val);
+        // console.log(val.id, oldval.id);
         let flag = false;
         if (val.id == oldval.id) {
           flag = true;
@@ -676,10 +676,10 @@ module.exports = {
       }
       if (this.当前对象数据.type == "link") {
         await this.$数据库.linkpresets.put(预设项目);
-        console.log(this.预设列表);
+        // console.log(this.预设列表);
       }
       if (this.当前对象数据.type == "card") {
-        console.log(this.预设列表);
+        //  console.log(this.预设列表);
 
         await this.$数据库.cardpresets.put(预设项目);
       }
@@ -712,10 +712,10 @@ module.exports = {
       }
       if (this.当前对象数据.type == "link") {
         await this.$数据库.linkpresets.put(预设项目);
-        console.log(this.预设列表);
+        //console.log(this.预设列表);
       }
       if (this.当前对象数据.type == "card") {
-        console.log(this.预设列表);
+        // console.log(this.预设列表);
 
         await this.$数据库.cardpresets.put(预设项目);
       }
@@ -727,10 +727,10 @@ module.exports = {
     获取预设: async function () {
       if (this.当前对象数据.type == "link") {
         this.预设列表 = await this.$数据库.linkpresets.toArray();
-        console.log(this.预设列表);
+        //  console.log(this.预设列表);
       }
       if (this.当前对象数据.type == "card") {
-        console.log(this.预设列表);
+        //  console.log(this.预设列表);
 
         this.预设列表 = await this.$数据库.cardpresets.toArray();
       }
@@ -778,7 +778,7 @@ module.exports = {
           await this.$数据库.linkpresets.put(新预设);
           this.重命名计数 = 1;
         } catch (e) {
-          console.log(e);
+          //  console.log(e);
           this.新预设名 = this.新预设名 + this.$用Lute生成时间戳();
           this.重命名计数 = this.重命名计数 + 1;
           this.新建预设();
@@ -789,7 +789,7 @@ module.exports = {
           await this.$数据库.cardpresets.put(新预设);
           this.重命名计数 = 1;
         } catch (e) {
-          console.log(e);
+          //  console.log(e);
 
           this.新预设名 = this.新预设名 + this.$用Lute生成时间戳();
           this.重命名计数 = this.重命名计数 + 1;
@@ -801,12 +801,15 @@ module.exports = {
     设定当前标记: function (val, flag) {
       let 上传数据 = { id: "", subtype: this.预设.name, attrsproxy: {} };
       上传数据.id = this.当前对象数据.id;
+      上传数据.type = this.当前对象数据.type;
+
       let 属性列表 = this.属性列表;
 
       for (序号 in 属性列表) {
         let 属性名 = 属性列表[序号];
         上传数据["attrsproxy"][属性名] = val[属性名];
         if (this.预设.attrs && flag) {
+          //  console.log(this.预设.attrs);
           if (this.预设.attrs[属性名] != "byref") {
             this.变更预设值(属性名);
           }
@@ -829,7 +832,7 @@ module.exports = {
     },
     以id获取反向链接: async function (id) {
       let that = this;
-      console.log("aaa", this.$思源伺服ip);
+      // console.log("aaa", this.$思源伺服ip);
       if (id) {
         let 原始反向链接列表 = await 以id获取反向链接(that.思源伺服ip, this.apitoken, id);
         return 原始反向链接列表["data"];
@@ -840,7 +843,7 @@ module.exports = {
       let obj = {};
       let sql = `select * from blocks where id in (select def_block_id from refs where block_id = '${id}')`;
       obj = await 以sql向思源请求块数据(this.思源伺服ip, this.apitoken, sql);
-      console.log(obj);
+      // console.log(obj);
       return obj;
     },
   },

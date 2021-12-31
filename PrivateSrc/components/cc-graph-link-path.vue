@@ -107,8 +107,12 @@ module.exports = {
         that.计算路径();
       }
       if ($event.id == that.链接.id) {
-        that.代理起始标记 = await that.$数据库.cards.get(that.链接.attrs.from_id);
-        that.代理结束标记 = await that.$数据库.cards.get(that.链接.attrs.to_id);
+        that.代理起始标记 =
+          (await that.$数据库.cards.get(that.链接.attrs.from_id)) ||
+          (await that.$数据库.links.get(that.链接.attrs.from_id));
+        that.代理结束标记 =
+          (await that.$数据库.cards.get(that.链接.attrs.to_id)) ||
+          (await that.$数据库.links.get(that.链接.attrs.to_id));
         that.计算路径();
       }
     },
@@ -134,9 +138,13 @@ module.exports = {
       return { x: 标量 * 矢量["x"], y: 标量 * 矢量["y"] };
     },
     计算路径: async function () {
-      this.代理起始标记 = await this.$数据库.cards.get(this.链接.attrs.from_id);
-      this.代理结束标记 = await this.$数据库.cards.get(this.链接.attrs.to_id);
-
+      let that = this;
+      that.代理起始标记 =
+        (await that.$数据库.cards.get(that.链接.attrs.from_id)) ||
+        (await that.$数据库.links.get(that.链接.attrs.from_id));
+      that.代理结束标记 =
+        (await that.$数据库.cards.get(that.链接.attrs.to_id)) ||
+        (await that.$数据库.links.get(that.链接.attrs.to_id));
       if (!this.代理起始标记 || !this.代理结束标记) {
         return null;
       }
@@ -303,10 +311,18 @@ module.exports = {
       }
     },
     计算中心(代理标记) {
-      let 中心 = {
-        x: 代理标记.left + (1 / 2) * 代理标记.width,
-        y: 代理标记.top + (1 / 2) * 代理标记.height,
-      };
+      let 中心 = {};
+      if (代理标记.offsetx + "" != "undefined" && 代理标记.offsetx + "" != "NAN") {
+        中心 = {
+          x: 代理标记.left + (1 / 2) * 代理标记.width + 代理标记.offsetx,
+          y: 代理标记.top + (1 / 2) * 代理标记.height + 代理标记.offsety,
+        };
+      } else {
+        中心 = {
+          x: 代理标记.left + (1 / 2) * 代理标记.width,
+          y: 代理标记.top + (1 / 2) * 代理标记.height,
+        };
+      }
       return 中心;
     },
     矩形与矢量交点(矩形, 矢量) {
