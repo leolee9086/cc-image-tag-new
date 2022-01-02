@@ -19,6 +19,7 @@
     class-name="cc-card-container"
   >
     <div
+      @click="鼠标点击($event)"
       :data-node-id="对象数据.id"
       :type="数据类型"
       :subtype="对象数据.subtype"
@@ -316,6 +317,14 @@ module.exports = {
     },
   },
   methods: {
+    鼠标点击($event) {
+      $event.ctrlKey
+        ? this.$事件总线.$emit(
+            "ctrl加鼠标点击卡片",
+            $event.currentTarget.getAttribute("data-node-id")
+          )
+        : null;
+    },
     判断id: async function ($event) {
       let that = this;
       if (!this.监听) {
@@ -375,6 +384,7 @@ module.exports = {
       this.计算坐标(x, y);
 
       this.保存数据();
+      this.$事件总线.$emit("缩放卡片", this.对象数据);
     },
     resizing: function (x, y, width, height) {
       this.计算坐标(x, y);
@@ -382,6 +392,7 @@ module.exports = {
       this.对象数据.attrs.height = height / this.窗口缩放倍数 || 100;
 
       this.保存数据();
+      this.$事件总线.$emit("缩放卡片", this.对象数据);
     },
 
     resizestop: function (x, y, width, height) {

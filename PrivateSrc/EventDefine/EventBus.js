@@ -8,7 +8,8 @@ const 窗口状态对象 = {
   缩放倍数:1,
   使用svg:false,
   showname:true,
-  showsubtype:true
+  showsubtype:true,
+  current_cardid_array:[]
 };
 
 const 事务列表 = {
@@ -78,7 +79,12 @@ const 事务列表 = {
     this.$事件总线.$emit("连接卡片",[新数据.id,to_id])
     
   },
- 
+  ctrl加鼠标点击卡片:function(卡片id){
+    console.log("ctrl加鼠标点击卡片")
+    console.log(卡片id)
+    this.$当前窗口状态.current_cardid_array.push(卡片id)
+    console.log(this.$当前窗口状态.current_cardid_array)
+  },
 
   添加卡片: async function (卡片数据) {
     await this.$数据库.cards.put(卡片数据);
@@ -195,8 +201,8 @@ const 事务列表 = {
   点击画板空白处: function($event){
     console.log($event)
     if (!this.$当前窗口状态.等待连接卡片id){
-    this.$当前窗口状态.current_cardid=""
-    this.$当前窗口状态.current_linkid=""}
+    this.$事件总线.$emit("清理选择")
+    }
     else {
       let 卡片数据 = this.$根据属性生成卡片({
         top: (window.pageYOffset + $event.clientY) / this.$当前窗口状态.缩放倍数,
@@ -205,6 +211,13 @@ const 事务列表 = {
       this.$事件总线.$emit("添加卡片", 卡片数据);
       this.$事件总线.$emit("结束连接");
     }
+  },
+  清理选择:function(){
+    this.$当前窗口状态.current_cardid=""
+    this.$当前窗口状态.current_linkid=""
+    this.$当前窗口状态.current_linkid_array=[]
+    this.$当前窗口状态.current_cardid_array=[]
+
   },
   按下鼠标:function($event){
     if ($event.target.className != "cardscontainer layer") {
