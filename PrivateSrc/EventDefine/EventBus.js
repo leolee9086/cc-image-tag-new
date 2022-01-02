@@ -140,8 +140,8 @@ const 事务列表 = {
     let id = 卡片数据.id || 卡片数据;
     let 目标卡片数据 = await this.$数据库.cards.get(id)||await this.$数据库.links.get(id);
     window.scrollTo(
-          (目标卡片数据.attrs.left+ 目标卡片数据.attrs.width/2)*this.$当前窗口状态.缩放倍数- window.innerWidth / 2,
-          (目标卡片数据.attrs.top+目标卡片数据.attrs.width/2)*this.$当前窗口状态.缩放倍数 - window.innerHeight / 2
+          (目标卡片数据.attrs.left+ 目标卡片数据.attrs.offsetx+目标卡片数据.attrs.width/2)*this.$当前窗口状态.缩放倍数- window.innerWidth / 2,
+          (目标卡片数据.attrs.top+目标卡片数据.attrs.offsety+目标卡片数据.attrs.width/2)*this.$当前窗口状态.缩放倍数 - window.innerHeight / 2
         );
   },
   激活数据:  function(数据){

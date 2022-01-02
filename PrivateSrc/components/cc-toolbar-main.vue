@@ -267,40 +267,44 @@ module.exports = {
   },
   async mounted() {
     try {
-      this.当前画板命名 = (await this.$数据库.metadata.get("name")).value || "未命名";
+      this.当前画板命名 = (await this.$数据库.metadata.get("name")).value;
     } catch (e) {
+      this.当前画板命名 = "未命名";
       this.$数据库.metadata.put({ key: "name", value: "未命名" });
     }
 
     try {
-      this.背景图片源 = (await this.$数据库.metadata.get("backgroundImage")).value || "";
+      this.背景图片源 = (await this.$数据库.metadata.get("backgroundImage")).value;
     } catch (e) {
+      this.背景图片源 = "";
       this.$数据库.metadata.put({ key: "backgroundImage", value: "" });
     }
     try {
-      this.背景图像缩放倍数 =
-        (await this.$数据库.metadata.get("backgroundscale")).value || 1;
+      this.背景图像缩放倍数 = (await this.$数据库.metadata.get("backgroundscale")).value;
     } catch (e) {
+      this.背景图像缩放倍数 = 1;
+
       this.$数据库.metadata.put({ key: "backgroundscale", value: 1 });
     }
     try {
-      this.背景图像模式 =
-        (await this.$数据库.metadata.get("backgroundtype")).value || "填充";
+      this.背景图像模式 = (await this.$数据库.metadata.get("backgroundtype")).value;
     } catch (e) {
+      this.背景图像模式 = "填充";
       this.$数据库.metadata.put({ key: "backgroundtype", value: "填充" });
     }
     try {
       this.保存时间间隔 = (await this.$数据库.metadata.get("autosaveinteger")).value;
     } catch (e) {
       console.log(e);
+      this.保存时间间隔 = 5;
       this.$数据库.metadata.put({ key: "autosaveinteger", value: 5 });
     }
     try {
       this.历史版本数量上限 = (await this.$数据库.metadata.get("maxhistorycount")).value;
     } catch (e) {
       console.log(e);
-
-      this.$数据库.metadata.put({ key: "maxhistorycount", value: 10 });
+      this.历史版本数量上限 = 30;
+      this.$数据库.metadata.put({ key: "maxhistorycount", value: 30 });
     }
     this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}`;
     this.画板列表 = await this.$画板元数据库.boards.toArray();
@@ -728,18 +732,11 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
       //     console.log("加载完成");
     },
     聚焦到卡片: function (对象数据) {
-      this.$事件总线.$emit("窗口缩放", 1);
+      if (this.$当前窗口状态.缩放倍数 < 1) {
+        this.$事件总线.$emit("窗口缩放", 1);
+      } else {
+      }
       this.$事件总线.$emit("定位至卡片", 对象数据);
-      setTimeout(() => {
-        let el = document.querySelector(`[data-node-id='${对象数据.id}']`);
-        let style = el.getAttribute("style");
-        el.setAttribute("style", style + "border:solid 5px lightblue");
-        setTimeout(() => {
-          let el = document.querySelector(`[data-node-id='${对象数据.id}']`);
-
-          el.setAttribute("style", style);
-        }, 500);
-      }, 500);
     },
     添加卡片: function () {
       let 卡片数据 = this.$根据属性生成卡片({});

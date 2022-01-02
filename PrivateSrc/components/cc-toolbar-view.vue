@@ -27,6 +27,9 @@ module.exports = {
       },
     };
   },
+  mounted() {
+    this.$事件总线.$on("窗口缩放", () => ($event) => (this.窗口缩放倍数 = $event * 100));
+  },
   watch: {
     窗口缩放倍数: {
       handler: function (val) {

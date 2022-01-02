@@ -195,8 +195,8 @@ module.exports = {
     },
     链接设定: function () {
       return {
-        offsetX: this.真实画布原点.x / this.缩放倍数,
-        offsetY: this.真实画布原点.y / this.缩放倍数,
+        offsetX: this.真实画布原点.x / this.缩放倍数 || 0,
+        offsetY: this.真实画布原点.y / this.缩放倍数 || 0,
         data: this.路径.d,
         stroke:
           this.链接["attrs"]["path_color"] ||
@@ -210,8 +210,8 @@ module.exports = {
     },
     引线设定: function () {
       let 引线 = {
-        offsetX: this.真实画布原点.x / this.缩放倍数,
-        offsetY: this.真实画布原点.y / this.缩放倍数,
+        offsetX: this.真实画布原点.x / this.缩放倍数 || 0,
+        offsetY: this.真实画布原点.y / this.缩放倍数 || 0,
         data: this.引线路径.d,
         stroke:
           this.链接["attrs"]["path_color"] ||
@@ -250,6 +250,10 @@ module.exports = {
     link: {
       handler: async function (val, oldval) {
         if (JSON.stringify(val) == JSON.stringify(oldval)) {
+          return null;
+        }
+        if (parseInt(val.updated) <= parseInt(this.链接.updated)) {
+          console.log(val.updated, this.链接.updated);
           return null;
         }
         //console.log(val.attrs);
@@ -429,7 +433,11 @@ module.exports = {
 
         that.计算路径();
       }
-      if ($event.id == this.链接.id) {
+      if (
+        $event.id == this.链接.id &&
+        parseInt($event.updated) >= parseInt(this.链接.updated)
+      ) {
+        this.链接 = $event;
         this.代理起始标记 =
           (await this.$数据库.cards.get(this.链接.attrs.from_id)) ||
           (await this.$数据库.links.get(this.链接.attrs.from_id)) ||

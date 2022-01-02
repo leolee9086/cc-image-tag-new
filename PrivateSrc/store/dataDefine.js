@@ -208,6 +208,31 @@ Vue.prototype.$从数据生成文件= function (数据, 文件类型, 文件名)
   return 文件;
 }
 
+Vue.prototype.$卡片预设属性默认值 = {
+  "color":undefined,
+  "borderColor":undefined,
+  "backgroundColor":undefined,
+  "def_block":"byref",
 
+  "path_width":undefined,
+  "path_type":undefined,
+  "path_color":undefined,
+
+  "from_anchor_size":undefined,
+  "to_anchor_size":undefined,
+  "mid_anchor_size":undefined,
+
+  "from_anchor_image":undefined,
+  "to_anchor_image":undefined,
+  "mid_anchor_image":undefined,
+
+  "from_anchor_rotate":undefined,
+  "to_anchor_rotate":undefined,
+  "mid_anchor_rotate":undefined,
+
+  "from_anchor_rotate_offset":undefined,
+  "to_anchor_rotate_offset":undefined,
+  "mid_anchor_rotate_offset":undefined,
+}
 
 

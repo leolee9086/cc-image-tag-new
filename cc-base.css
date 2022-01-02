@@ -32,7 +32,7 @@
   border-radius:5px
 }
 .not-folded .subtypetag{
-  float:right
+ float:right;
 }
 .cc-card-body.cc-link{
   border-radius: 30px;
@@ -247,7 +247,8 @@ html{
 
 .cc-card-content{
   max-height: calc(100% - 10px);
-  overflow:scroll !important
+  overflow:scroll !important;
+  margin:0px;
 }
 
 .cc-graph{

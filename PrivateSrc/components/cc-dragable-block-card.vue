@@ -44,10 +44,12 @@
           color:${对象数据.attrs.color};
           border:solid ${对象数据.attrs.borderColor} 2px;
           max-width:${对象数据.attrs.height * 窗口缩放倍数} px
+          
           `"
           @dblclick="对象数据.attrs.folded = !对象数据.attrs.folded"
         >
           <span>{{ index }}</span>
+
           <span class="subtypetag" v-if="$当前窗口状态.showsubtype">{{
             对象数据.subtype
           }}</span>
@@ -109,11 +111,18 @@
           `"
       >
         <div>
-          <span class="el-icon-siyuan" v-if="对象数据.attrs.def_block"></span>
+          <el-row>
+            <el-col :span="12">
+              <span class="el-icon-siyuan" v-if="对象数据.attrs.def_block"></span>
 
-          <strong>{{ 对象数据.name }}</strong>
-          <span size="mini" class="subtypetag">{{ 对象数据.subtype }}</span>
+              <strong>{{ 对象数据.name }}</strong>
+            </el-col>
+            <el-col :span="12">
+              <span size="mini" class="subtypetag">{{ 对象数据.subtype }}</span>
+            </el-col>
+          </el-row>
         </div>
+        <div></div>
         <cc-link-siyuan
           v-if="对象数据.attrs.def_block"
           :style="`color:${对象数据.attrs.color};`"
@@ -359,13 +368,11 @@ module.exports = {
     },
     dragging: function (x, y) {
       this.计算坐标(x, y);
-      this.对象数据 = this.$更新数据时间戳(this.对象数据);
       this.保存数据();
     },
     dragstop(x, y) {
       this.计算坐标(x, y);
 
-      this.对象数据 = this.$更新数据时间戳(this.对象数据);
       this.保存数据();
     },
     resizing: function (x, y, width, height) {
@@ -373,7 +380,6 @@ module.exports = {
       this.对象数据.attrs.width = width / this.窗口缩放倍数 || 100;
       this.对象数据.attrs.height = height / this.窗口缩放倍数 || 100;
 
-      this.对象数据 = this.$更新数据时间戳(this.对象数据);
       this.保存数据();
     },
 
@@ -382,7 +388,6 @@ module.exports = {
 
       this.对象数据.attrs.width = width / this.窗口缩放倍数 || 100;
       this.对象数据.attrs.height = height / this.窗口缩放倍数 || 100;
-      this.对象数据 = this.$更新数据时间戳(this.对象数据);
       this.保存数据();
     },
     保存数据: function () {

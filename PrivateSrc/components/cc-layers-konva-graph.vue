@@ -11,7 +11,7 @@
     </v-layer>
     <v-layer ref="layer-tips">
       <v-rect
-        v-if="$当前窗口状态.current_linkid || $当前窗口状态.current_cardid"
+        v-if="($当前窗口状态.current_linkid || $当前窗口状态.current_cardid) && 当前数据"
         :config="激活块提示设定"
       >
       </v-rect>
@@ -88,17 +88,21 @@ module.exports = {
       let attrs = this.当前数据.attrs;
       return {
         x:
-          (attrs ? attrs.left + attrs.offsetx - this.画布原点.x : 0 - this.画布原点.x) -
-          5,
+          (attrs
+            ? (attrs.left + attrs.offsetx) * this.$当前窗口状态.缩放倍数 - this.画布原点.x
+            : this.画布原点.x) - 5,
         y:
-          (attrs ? attrs.top + attrs.offsety - this.画布原点.y : 0 - this.画布原点.y) - 5,
+          (attrs
+            ? (attrs.top + attrs.offsety) * this.$当前窗口状态.缩放倍数 - this.画布原点.y
+            : this.画布原点.y) - 5,
         width: (attrs ? attrs.width : null || 100) + 10,
         height: (attrs ? attrs.height : null || 1000) + 10,
         fill: "transparent",
         stroke: "darkblue",
         strokeWidth: 5,
         radius: 5,
-        scale: this.$当前窗口状态.缩放倍数,
+        scaleX: this.$当前窗口状态.缩放倍数,
+        scaleY: this.$当前窗口状态.缩放倍数,
       };
     },
   },
