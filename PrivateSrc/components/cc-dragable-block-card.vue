@@ -174,11 +174,13 @@ module.exports = {
     this.数据超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html/?id=${this.对象数据.id}&baseid=${this.$baseid}&type=${this.数据类型}`;
     this.hide = false;
     this.timer = setInterval(this.计算可见性, 100);
+    this.$事件总线.$on("保存卡片", (event) => this.判断id(event));
+    this.$事件总线.$on("保存链接", (event) => this.判断id(event));
   },
 
   watch: {
     value: {
-      handler: function (val, oldval) {
+      handler: async function (val, oldval) {
         if (JSON.stringify(val) == JSON.stringify(oldval)) {
           return null;
         }
@@ -235,7 +237,6 @@ module.exports = {
       handler: async function (val, oldval) {
         this.folded = val.attrs.folded;
         this.def_block = val.attrs.def_block;
-
         let attrs = this.对象数据.attrs;
         attrs.top + "" == "NAN" ? (attrs.top = 0) : null;
         attrs.left + "" == "NAN" ? (attrs.left = 0) : null;
@@ -306,6 +307,15 @@ module.exports = {
     },
   },
   methods: {
+    判断id: async function ($event) {
+      let that = this;
+      if (!this.监听) {
+        return null;
+      }
+      if ($event.id == this.对象数据.id) {
+        this.对象数据 = $event;
+      }
+    },
     生成html: async function () {
       this.预览HTML = await Vditor.md2html(this.对象数据.markdown);
       if (this.def_block) {
@@ -335,7 +345,7 @@ module.exports = {
     展开链接: function () {
       this.$emit("callbacklink", this.对象数据.attrs.def_block);
     },
-    计算坐标: function (x, y) {
+    计算坐标: async function (x, y) {
       if (this.数据类型 == "card") {
         this.对象数据.attrs.top = y / this.窗口缩放倍数;
         this.对象数据.attrs.left = x / this.窗口缩放倍数;

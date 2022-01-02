@@ -21,6 +21,8 @@
   <script src="/widgets/cc-baselib/static/vditor/index.min.js"></script>
   <script src="/widgets/cc-baselib/static/dexie.min.js"></script>
   <script src='https://unpkg.com/konva/konva.js'></script>
+  <script src="https://unpkg.com/vue-async-computed@3.9.0"></script>
+
   <!--2. Link VueKonva Javascript -->
   <script src='./PrivateSrc/vue-konva.min.js'></script>
 
@@ -53,6 +55,7 @@
   Vue.use(httpVueLoader);
   Vue.use(VueDraggableResizable);
   Vue.use(VueKonva);
+  Vue.use(AsyncComputed)
 
   Vue.component("vue-draggable-resizable", VueDraggableResizable);
   let 应用组件列表  = [

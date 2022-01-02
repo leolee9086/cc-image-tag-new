@@ -152,6 +152,8 @@ html,body,#app{
     background-color: lightyellow;
     transform: scale(1.4);
   }
+
+  
   .el-collapse{
     max-height:100%;
     overflow: hidden;

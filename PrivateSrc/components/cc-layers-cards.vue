@@ -1,6 +1,6 @@
 <template>
   <div
-    @dblclick="添加卡片($event)"
+    @dblclick="双击画板($event)"
     v-on:paste="黏贴内容($event)"
     @click="点击画板($event)"
     class="cardscontainer"
@@ -84,7 +84,7 @@ module.exports = {
     点击画板: function ($event) {
       console.log($event.target);
       $event.target.getAttribute("class") == "cardscontainer layer"
-        ? this.$事件总线.$emit("点击画板空白处")
+        ? this.$事件总线.$emit("点击画板空白处", $event)
         : null;
     },
     黏贴内容: function ($event) {
@@ -126,16 +126,10 @@ module.exports = {
       //  console.log(空标签);
       await this.$数据库.cards.put(空标签);
     },
-    添加卡片: function ($event) {
+    双击画板: function ($event) {
       //  console.log($event.target);
-      if ($event.target.className != "cardscontainer layer") {
-        return null;
-      }
-      let 卡片数据 = this.$根据属性生成卡片({
-        top: (window.pageYOffset + $event.clientY) / this.$当前窗口状态.缩放倍数,
-        left: (window.pageXOffset + $event.clientX) / this.$当前窗口状态.缩放倍数,
-      });
-      this.$事件总线.$emit("添加卡片", 卡片数据);
+
+      this.$事件总线.$emit("双击画板", $event);
     },
   },
 };

@@ -1,8 +1,8 @@
 const 事件总线 = new Vue();
 const 窗口状态对象 = {
-  currentLinkid: "",
+  current_linkid: "",
   editMode: "",
-  currentCardid: "",
+  current_cardid: "",
   lastviewcentter: "",
   等待连接卡片id: "",
   缩放倍数:1,
@@ -64,42 +64,7 @@ const 事务列表 = {
       });
 
   },
-  解析剪贴板内容: async function (str) {
-    let 锚文本 = await 获取思源块链接锚文本(this.思源伺服ip, this.apitokn, str);
-    if (锚文本 != "解析错误") {
-      let 空标签对象 = {
-        def_block: str,
-        anchor: "",
-        top: window.pageYOffset + this.当前鼠标坐标.y,
-        left: window.pageXOffset + this.当前鼠标坐标.x,
-        width: 100,
-        height: 100,
-        backgroundColor: "yellow",
-        borderColor: "red",
-        showhandler: false,
-        color: "balck",
-        folded: false,
-        id: Lute.NewNodeID(),
-      };
-      this.标记数组.push(空标签对象);
-    } else {
-      let 空标签对象 = {
-        def_block: "",
-        anchor: str,
-        top: window.pageYOffset + this.当前鼠标坐标.y,
-        left: window.pageXOffset + this.当前鼠标坐标.x,
-        width: 100,
-        height: 50,
-        backgroundColor: "yellow",
-        borderColor: "red",
-        showhandler: false,
-        color: "balck",
-        folded: false,
-        id: Lute.NewNodeID(),
-      };
-      this.标记数组.push(空标签对象);
-    }
-  },
+  
   链接转化为卡片:async function(链接数据){
    await this.$数据库.links.delete(链接数据.id)
     let 新数据 = JSON.parse(JSON.stringify(链接数据))
@@ -227,10 +192,31 @@ const 事务列表 = {
    // console.log(缩放倍数);
     this.$当前窗口状态.缩放倍数 = 缩放倍数;
   },
-  点击画板空白处: function(){
+  点击画板空白处: function($event){
+    console.log($event)
+    if (!this.$当前窗口状态.等待连接卡片id){
     this.$当前窗口状态.current_cardid=""
-    this.$当前窗口状态.current_linkid=""
-  //  console.log("啊啊啊")
+    this.$当前窗口状态.current_linkid=""}
+    else {
+      let 卡片数据 = this.$根据属性生成卡片({
+        top: (window.pageYOffset + $event.clientY) / this.$当前窗口状态.缩放倍数,
+        left: (window.pageXOffset + $event.clientX) / this.$当前窗口状态.缩放倍数,
+      });
+      this.$事件总线.$emit("添加卡片", 卡片数据);
+      this.$事件总线.$emit("结束连接");
+
+    }
+
+  },
+  双击画板:function($event){
+    if ($event.target.className != "cardscontainer layer") {
+      return null;
+    }
+    let 卡片数据 = this.$根据属性生成卡片({
+      top: (window.pageYOffset + $event.clientY) / this.$当前窗口状态.缩放倍数,
+      left: (window.pageXOffset + $event.clientX) / this.$当前窗口状态.缩放倍数,
+    });
+    this.$事件总线.$emit("添加卡片",卡片数据)
   },
   修改画板元数据: function (属性对象, 画板id) {
     this.$数据库.metadata.put(属性对象);

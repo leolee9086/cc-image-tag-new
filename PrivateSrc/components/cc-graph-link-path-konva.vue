@@ -429,13 +429,15 @@ module.exports = {
 
         that.计算路径();
       }
-      if ($event.id == this.链接.attrs.id) {
+      if ($event.id == this.链接.id) {
         this.代理起始标记 =
           (await this.$数据库.cards.get(this.链接.attrs.from_id)) ||
-          (await this.$数据库.links.get(this.链接.attrs.from_id));
+          (await this.$数据库.links.get(this.链接.attrs.from_id)) ||
+          this.代理起始标记;
         this.代理结束标记 =
           (await this.$数据库.cards.get(this.链接.attrs.to_id)) ||
-          (await this.$数据库.links.get(this.链接.attrs.from_id));
+          (await this.$数据库.links.get(this.链接.attrs.to_id)) ||
+          this.代理结束标记;
 
         that.计算路径();
       }
@@ -545,7 +547,7 @@ module.exports = {
         }
       }
     },
-    计算引线: function (链接) {
+    计算引线: async function (链接) {
       let 引线链接 = JSON.parse(JSON.stringify(链接));
       let 引线终点 = { x: 引线链接.attrs.left, y: 引线链接.attrs.top };
       let 引线矢量 = {

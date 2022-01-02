@@ -289,6 +289,19 @@ module.exports = {
     } catch (e) {
       this.$数据库.metadata.put({ key: "backgroundtype", value: "填充" });
     }
+    try {
+      this.保存时间间隔 = (await this.$数据库.metadata.get("autosaveinteger")).value;
+    } catch (e) {
+      console.log(e);
+      this.$数据库.metadata.put({ key: "autosaveinteger", value: 5 });
+    }
+    try {
+      this.历史版本数量上限 = (await this.$数据库.metadata.get("maxhistorycount")).value;
+    } catch (e) {
+      console.log(e);
+
+      this.$数据库.metadata.put({ key: "maxhistorycount", value: 10 });
+    }
     this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}`;
     this.画板列表 = await this.$画板元数据库.boards.toArray();
     // console.log(this.画板列表);
@@ -304,6 +317,22 @@ module.exports = {
     }, 1000);
   },
   watch: {
+    保存时间间隔: async function (val) {
+      if (val) {
+        await this.$数据库.metadata.put({ key: "autosaveinteger", value: val });
+
+        this.保存数据();
+        this.保存计数 = 1;
+      }
+    },
+    历史版本数量上限: async function (val) {
+      if (val) {
+        await this.$数据库.metadata.put({ key: "maxhistorycount", value: val });
+
+        this.保存数据();
+        this.保存计数 = 1;
+      }
+    },
     使用svg渲染: function (val) {
       this.$当前窗口状态.使用svg = val;
     },

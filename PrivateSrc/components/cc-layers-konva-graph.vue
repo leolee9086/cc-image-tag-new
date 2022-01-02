@@ -9,6 +9,13 @@
       ></cc-graph-link-path-konva>
       <v-arrow v-if="显示虚拟连接" :config="虚拟连接设定"></v-arrow>
     </v-layer>
+    <v-layer ref="layer-tips">
+      <v-rect
+        v-if="$当前窗口状态.current_linkid || $当前窗口状态.current_cardid"
+        :config="激活块提示设定"
+      >
+      </v-rect>
+    </v-layer>
   </v-stage>
 </template>
 <script>
@@ -33,6 +40,10 @@ module.exports = {
         width: window.innerWidth,
         height: window.innerHeight,
       },
+      当前卡片: {},
+      当前链接: {},
+      当前卡片id: this.$当前窗口状态.current_cardid,
+      当前链接id: this.$当前窗口状态.current_linkid,
     };
   },
 
@@ -49,9 +60,11 @@ module.exports = {
         this.卡片数组 = result;
       },
     });
+
     this.$事件总线.$on("开始连接", (event) => this.生成虚拟连接(event));
     this.$事件总线.$on("结束连接", () => (this.显示虚拟连接 = false));
   },
+
   computed: {
     虚拟连接设定: function () {
       let 真实起点x = this.虚拟连接起点.x * this.$当前窗口状态.缩放倍数 - this.画布原点.x;
@@ -72,8 +85,48 @@ module.exports = {
         dash: [15, 10, 5, 10, 15],
       };
     },
+    激活块提示设定: function () {
+      let attrs = this.当前卡片.attrs;
+      console.log(this.当前卡片);
+      return {
+        x: attrs ? attrs.left : 0 - this.画布原点.x,
+        y: attrs ? attrs.top : 0 - this.画布原点.y,
+        width: attrs ? attrs.width : null || 100,
+        height: attrs ? attrs.height : null || 100,
+        fill: "red",
+        stroke: "black",
+        strokeWidth: 5,
+      };
+    },
   },
   watch: {
+    当前卡片id() {
+      console.log(this.当前卡片id);
+      liveQuery(() => this.$数据库.cards.get(this.当前卡片id)).subscribe({
+        next: (result) => {
+          console.log(this.当前卡片id);
+          this.当前卡片 = result;
+        },
+      });
+      liveQuery(() => this.$数据库.links.get(this.当前链接id)).subscribe({
+        next: (result) => {
+          this.当前链接 = result;
+        },
+      });
+    },
+    当前链接id() {
+      liveQuery(() => this.$数据库.cards.get(this.当前卡片id)).subscribe({
+        next: (result) => {
+          console.log(this.当前卡片id);
+          this.当前卡片 = result;
+        },
+      });
+      liveQuery(() => this.$数据库.links.get(this.当前链接id)).subscribe({
+        next: (result) => {
+          this.当前链接 = result;
+        },
+      });
+    },
     当前鼠标坐标: {
       handler(val) {
         this.configKonva = {
