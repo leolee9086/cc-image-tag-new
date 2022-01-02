@@ -735,6 +735,7 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
       if (this.$当前窗口状态.缩放倍数 < 1) {
         this.$事件总线.$emit("窗口缩放", 1);
       } else {
+        this.$事件总线.$emit("窗口缩放", this.$当前窗口状态.缩放倍数);
       }
       this.$事件总线.$emit("定位至卡片", 对象数据);
     },

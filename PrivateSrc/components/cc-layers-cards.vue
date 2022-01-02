@@ -38,6 +38,7 @@
       数据类型="link"
       :窗口缩放倍数="$当前窗口状态.缩放倍数"
     ></cc-dragable-block-card>
+    <cc-dragable-block-combo style="z-index: 600"> </cc-dragable-block-combo>
   </div>
 </template>
 <script>
@@ -47,6 +48,7 @@ module.exports = {
   components: {
     "cc-dragable-block-card": "url:../components/cc-dragable-block-card.vue",
     "cc-dragable-block-linklabel": "url:../components/cc-dragable-block-linklabel.vue",
+    "cc-dragable-block-combo": "url:../components/cc-dragable-block-combo.vue",
   },
   data() {
     return {

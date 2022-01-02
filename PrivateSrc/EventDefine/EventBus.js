@@ -83,7 +83,7 @@ const 事务列表 = {
     console.log("ctrl加鼠标点击卡片")
     console.log(卡片id)
     this.$当前窗口状态.current_cardid_array.push(卡片id)
-    console.log(this.$当前窗口状态.current_cardid_array)
+    this.$事件总线.$emit("选集变化",this.$当前窗口状态.current_cardid_array)
   },
 
   添加卡片: async function (卡片数据) {
@@ -217,7 +217,7 @@ const 事务列表 = {
     this.$当前窗口状态.current_linkid=""
     this.$当前窗口状态.current_linkid_array=[]
     this.$当前窗口状态.current_cardid_array=[]
-
+    this.$事件总线.$emit("选集变化",this.$当前窗口状态.current_cardid_array)
   },
   按下鼠标:function($event){
     if ($event.target.className != "cardscontainer layer") {
