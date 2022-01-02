@@ -3,6 +3,7 @@
     @dblclick="双击画板($event)"
     v-on:paste="黏贴内容($event)"
     @click="点击画板($event)"
+    @mousedown="按下鼠标($event)"
     class="cardscontainer"
     :style="` 
         position:absolute;
@@ -130,6 +131,9 @@ module.exports = {
       //  console.log($event.target);
 
       this.$事件总线.$emit("双击画板", $event);
+    },
+    按下鼠标: function ($event) {
+      this.$事件总线.$emit("按下鼠标", $event);
     },
   },
 };

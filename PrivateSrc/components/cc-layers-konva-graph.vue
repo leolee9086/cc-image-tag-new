@@ -62,6 +62,8 @@ module.exports = {
 
     this.$事件总线.$on("开始连接", (event) => this.生成虚拟连接(event));
     this.$事件总线.$on("结束连接", () => (this.显示虚拟连接 = false));
+    this.$事件总线.$on("移动卡片", ($event) => (this.当前数据 = $event));
+    this.$事件总线.$on("激活数据", ($event) => (this.当前数据 = $event));
   },
 
   computed: {
@@ -113,15 +115,6 @@ module.exports = {
           width: window.innerWidth,
           height: window.innerHeight,
         };
-        this.当前卡片id = this.$当前窗口状态.current_cardid;
-        this.当前链接id = this.$当前窗口状态.current_linkid;
-
-        if (this.当前卡片id) {
-          this.当前数据 = await this.$数据库.cards.get(this.当前卡片id);
-        }
-        if (this.当前链接id) {
-          this.当前数据 = await this.$数据库.links.get(this.当前链接id);
-        }
       },
       deep: true,
     },

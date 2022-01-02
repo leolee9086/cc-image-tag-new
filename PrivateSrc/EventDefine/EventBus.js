@@ -204,9 +204,17 @@ const 事务列表 = {
       });
       this.$事件总线.$emit("添加卡片", 卡片数据);
       this.$事件总线.$emit("结束连接");
-
     }
-
+  },
+  按下鼠标:function($event){
+    if ($event.target.className != "cardscontainer layer") {
+      return null;
+    }
+    let 鼠标点击坐标 = {
+      x:(window.pageYOffset + $event.clientY) / this.$当前窗口状态.缩放倍数,
+      y: (window.pageXOffset + $event.clientX) / this.$当前窗口状态.缩放倍数
+    }
+    this.$事件总线.$emit("开始选择",鼠标点击坐标)
   },
   双击画板:function($event){
     if ($event.target.className != "cardscontainer layer") {
