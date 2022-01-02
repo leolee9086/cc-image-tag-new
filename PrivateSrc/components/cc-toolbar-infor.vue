@@ -772,6 +772,7 @@ module.exports = {
       新预设["id"] = id;
       新预设["name"] = this.新预设名 || "未命名";
       新预设["attrs"] = attrs;
+      新预设["attrs"]["def_block"] = "byref";
 
       if (this.当前对象数据.type == "link") {
         try {

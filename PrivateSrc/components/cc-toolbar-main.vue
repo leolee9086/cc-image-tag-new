@@ -66,7 +66,7 @@
               <el-input-number
                 size="mini"
                 :min="5"
-                :max="30"
+                :max="100"
                 v-model="历史版本数量上限"
               ></el-input-number>
             </el-tooltip>
@@ -252,7 +252,7 @@ module.exports = {
       当前对象名称: "",
       JSON文件列表: [],
       保存时间间隔: 5,
-      历史版本数量上限: 10,
+      历史版本数量上限: 30,
       timer: {},
       保存计数: 1,
       图片格式列表: ["jpg", "png", "jpeg", "svg"],
@@ -323,6 +323,9 @@ module.exports = {
 
         this.保存数据();
         this.保存计数 = 1;
+        if (val * this.历史版本数量上限 <= 60) {
+          alert("历史版本覆盖时长小于一分钟,请注意");
+        }
       }
     },
     历史版本数量上限: async function (val) {
@@ -331,6 +334,9 @@ module.exports = {
 
         this.保存数据();
         this.保存计数 = 1;
+        if (val * this.保存时间间隔 <= 60) {
+          alert("历史版本覆盖时长小于一分钟,请注意");
+        }
       }
     },
     使用svg渲染: function (val) {

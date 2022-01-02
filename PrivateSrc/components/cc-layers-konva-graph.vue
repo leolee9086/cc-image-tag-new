@@ -40,8 +40,7 @@ module.exports = {
         width: window.innerWidth,
         height: window.innerHeight,
       },
-      当前卡片: {},
-      当前链接: {},
+      当前数据: {},
       当前卡片id: this.$当前窗口状态.current_cardid,
       当前链接id: this.$当前窗口状态.current_linkid,
     };
@@ -86,53 +85,39 @@ module.exports = {
       };
     },
     激活块提示设定: function () {
-      let attrs = this.当前卡片.attrs;
-      console.log(this.当前卡片);
+      let attrs = this.当前数据.attrs;
       return {
-        x: attrs ? attrs.left : 0 - this.画布原点.x,
-        y: attrs ? attrs.top : 0 - this.画布原点.y,
-        width: attrs ? attrs.width : null || 100,
-        height: attrs ? attrs.height : null || 100,
-        fill: "red",
-        stroke: "black",
+        x:
+          (attrs ? attrs.left + attrs.offsetx - this.画布原点.x : 0 - this.画布原点.x) -
+          5,
+        y:
+          (attrs ? attrs.top + attrs.offsety - this.画布原点.y : 0 - this.画布原点.y) - 5,
+        width: (attrs ? attrs.width : null || 100) + 10,
+        height: (attrs ? attrs.height : null || 1000) + 10,
+        fill: "transparent",
+        stroke: "darkblue",
         strokeWidth: 5,
+        radius: 5,
+        scale: this.$当前窗口状态.缩放倍数,
       };
     },
   },
   watch: {
-    当前卡片id() {
-      console.log(this.当前卡片id);
-      liveQuery(() => this.$数据库.cards.get(this.当前卡片id)).subscribe({
-        next: (result) => {
-          console.log(this.当前卡片id);
-          this.当前卡片 = result;
-        },
-      });
-      liveQuery(() => this.$数据库.links.get(this.当前链接id)).subscribe({
-        next: (result) => {
-          this.当前链接 = result;
-        },
-      });
-    },
-    当前链接id() {
-      liveQuery(() => this.$数据库.cards.get(this.当前卡片id)).subscribe({
-        next: (result) => {
-          console.log(this.当前卡片id);
-          this.当前卡片 = result;
-        },
-      });
-      liveQuery(() => this.$数据库.links.get(this.当前链接id)).subscribe({
-        next: (result) => {
-          this.当前链接 = result;
-        },
-      });
-    },
     当前鼠标坐标: {
-      handler(val) {
+      handler: async function (val) {
         this.configKonva = {
           width: window.innerWidth,
           height: window.innerHeight,
         };
+        this.当前卡片id = this.$当前窗口状态.current_cardid;
+        this.当前链接id = this.$当前窗口状态.current_linkid;
+
+        if (this.当前卡片id) {
+          this.当前数据 = await this.$数据库.cards.get(this.当前卡片id);
+        }
+        if (this.当前链接id) {
+          this.当前数据 = await this.$数据库.links.get(this.当前链接id);
+        }
       },
       deep: true,
     },
