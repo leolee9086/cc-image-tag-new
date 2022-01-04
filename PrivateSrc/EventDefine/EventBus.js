@@ -102,7 +102,6 @@ const 事务列表 = {
       for (属性名 in 传入数据.attrsproxy) {
         原始数据.attrs[属性名] = 传入数据.attrsproxy[属性名]
       }
-
       await this.$数据库[数据表名].put(原始数据);
 
     } else if (传入数据.id) {

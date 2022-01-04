@@ -252,11 +252,11 @@ module.exports = {
         if (JSON.stringify(val) == JSON.stringify(oldval)) {
           return null;
         }
-        if (parseInt(val.updated) <= parseInt(this.链接.updated)) {
+        if (parseInt(val.updated) < parseInt(this.链接.updated)) {
           console.log(val.updated, this.链接.updated);
           return null;
         }
-        //console.log(val.attrs);
+        console.log(val.attrs);
         this.链接 = val;
         this.链接.type = "link";
         this.链接.subtype = val.subtype || "属于";
@@ -422,7 +422,7 @@ module.exports = {
       if ($event.id == attrs.from_id) {
         this.代理起始标记 =
           (await this.$数据库.cards.get(this.链接.attrs.from_id)) ||
-          this.$数据库.links.get(this.链接.attrs.from_id);
+          (await this.$数据库.links.get(this.链接.attrs.from_id));
 
         that.计算路径();
       }
@@ -437,7 +437,7 @@ module.exports = {
         $event.id == this.链接.id &&
         parseInt($event.updated) >= parseInt(this.链接.updated)
       ) {
-        this.链接 = $event;
+        //  this.链接 = $event;
         this.代理起始标记 =
           (await this.$数据库.cards.get(this.链接.attrs.from_id)) ||
           (await this.$数据库.links.get(this.链接.attrs.from_id)) ||

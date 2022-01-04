@@ -68,12 +68,14 @@
         console.log(this.$数据库)
         window.onload=function(){
         let url参数= that.$解析url(window.location.href)
-        this.表名= url参数.type+"s"
+        console.log(url参数)
+        that.表名= url参数.type+"s"
+        console.log(this.表名)
         console.log(url参数)
         that.id =  url参数["id"]||""
         that.数据源id = url参数.baseid
         that.timer = liveQuery(
-            ()=>that.$数据库[this.表名].get(url参数.id)
+            ()=>that.$数据库[that.表名].get(url参数.id)
         ).subscribe(
             {next:result=>that.carddata = result}
         )  
@@ -97,6 +99,7 @@
                 console.log(val)
                 this.carddata.markdown=val 
                 this.$更新数据时间戳(this.carddata)
+                console.log(this.表名)
                 await this.$数据库[this.表名].put(this.carddata) 
                 this.$事件总线.$emit("上传数据到思源")
             }

@@ -444,8 +444,7 @@ module.exports = {
           // console.log(val);
           this.属性列表.forEach((属性名) => {
             if (!(val.attrs[属性名] === "byref") && !(val.attrs[属性名] === undefined)) {
-              //console.log(val.attrs[属性名]);
-
+              console.log(val.attrs[属性名]);
               this.属性对象[属性名] = val.attrs[属性名];
             }
           });
@@ -579,7 +578,7 @@ module.exports = {
     },
     属性对象: {
       handler: function (val, oldval) {
-        // console.log(val.id, oldval.id);
+        console.log(val.id, oldval.id);
         let flag = false;
         if (val.id == oldval.id) {
           flag = true;
@@ -809,8 +808,10 @@ module.exports = {
       for (序号 in 属性列表) {
         let 属性名 = 属性列表[序号];
         上传数据["attrsproxy"][属性名] = val[属性名];
+        console.log(属性名, 上传数据["attrsproxy"][属性名]);
+
         if (this.预设.attrs && flag) {
-          //  console.log(this.预设.attrs);
+          console.log(this.预设.attrs);
           if (this.预设.attrs[属性名] != "byref") {
             this.变更预设值(属性名);
           }

@@ -47,7 +47,7 @@
           max-width:${对象数据.attrs.height * 窗口缩放倍数} px
           
           `"
-          @dblclick="对象数据.attrs.folded = !对象数据.attrs.folded"
+          @dblclick="开始连接()"
         >
           <span>{{ index }}</span>
 
@@ -77,7 +77,12 @@
       <div v-if="激活" class="cc-card-toolbar">
         <span>{{ index }}</span>
         <span class="el-icon-delete" v-on:click="删除()"></span>
-        <span v-if="数据类型 == 'card'" class="el-icon-share" @click="开始连接()"></span>
+        <el-tooltip content="点击折叠/展开">
+          <span
+            class="el-icon-full-screen"
+            @click="对象数据.attrs.folded = !对象数据.attrs.folded"
+          ></span>
+        </el-tooltip>
         <span
           v-if="数据类型 == 'link'"
           class="el-icon-refresh"
@@ -101,7 +106,7 @@
       <div
         :class="`cc-card-body cc-${数据类型} not-folded`"
         v-if="!对象数据.attrs.folded"
-        @dblclick="对象数据.attrs.folded = !对象数据.attrs.folded"
+        @dblclick="开始连接()"
         :style="`
           
           color:${对象数据.attrs.color};
@@ -339,10 +344,9 @@ module.exports = {
       if (this.def_block) {
         let 思源块内容 = await 以id获取文档内容(window.location.host, "", this.def_block);
         思源块内容.data.content
-          ? (this.思源HTML = 思源块内容.data.content.replace(
-              'contenteditable="true"',
-              'contenteditable="false"'
-            ))
+          ? (this.思源HTML = 思源块内容.data.content
+              .replace('contenteditable="true"', 'contenteditable="false"')
+              .replace('<img src="assets', '<img src="../assets'))
           : (this.思源HTML = "获取思源块内容失败");
       }
     },
