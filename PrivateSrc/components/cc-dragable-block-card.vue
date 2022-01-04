@@ -2,6 +2,7 @@
   <vue-draggable-resizable
     v-if="!hide"
     ref="container"
+    @click="鼠标点击($event)"
     :resizable="显示控制柄"
     :draggable="!正在编辑"
     @activated="激活 = true"
@@ -38,6 +39,7 @@
         v-if="对象数据.attrs.folded"
       >
         <div
+          @click="鼠标点击($event)"
           class="cc-card-body folded"
           slot="reference"
           :style="`              
@@ -50,6 +52,11 @@
           @dblclick="开始连接()"
         >
           <span>{{ index }}</span>
+          <span
+            class="el-icon-siyuan"
+            aria-label="卡片已经连接到思源块"
+            v-if="对象数据.attrs.def_block"
+          ></span>
 
           <span class="subtypetag" v-if="$当前窗口状态.showsubtype">{{
             对象数据.subtype
@@ -74,52 +81,73 @@
           </div>
         </div>
       </el-popover>
+
       <div v-if="激活" class="cc-card-toolbar">
-        <span>{{ index }}</span>
-        <span class="el-icon-delete" v-on:click="删除()"></span>
-        <el-tooltip content="点击折叠/展开">
-          <span
-            class="el-icon-full-screen"
-            @click="对象数据.attrs.folded = !对象数据.attrs.folded"
-          ></span>
-        </el-tooltip>
+        <span aria-label="卡片序号">{{ index }}</span>
+        <span aria-label="删除卡片" class="el-icon-delete" v-on:click="删除()"> </span>
         <span
+          aria-label="展开|关闭卡片"
+          class="el-icon-full-screen"
+          @click="对象数据.attrs.folded = !对象数据.attrs.folded"
+        ></span>
+        <span
+          aria-label="将卡片转换为链接"
           v-if="数据类型 == 'link'"
           class="el-icon-refresh"
           v-on:click="转化为卡片()"
         ></span>
 
         <span
+          aria-label="就地编辑卡片内容"
           class="el-icon-edit"
           v-if="!正在编辑 && !思源HTML"
           @click="正在编辑 = true"
         ></span>
-        <span class="el-icon-check" v-if="正在编辑" @click="正在编辑 = false"></span>
+        <span
+          aria-label="停止编辑卡片内容"
+          class="el-icon-check"
+          v-if="正在编辑"
+          @click="正在编辑 = false"
+        ></span>
         <span
           class="el-icon-focus"
           @click="$事件总线.$emit('定位至卡片', 对象数据.id)"
         ></span>
-        <el-tooltip content="新窗口打开编辑">
-          <span class="el-icon-browser" @click="$窗口内打开超链接(数据超链接)"></span>
-        </el-tooltip>
+        <span
+          aria-label="在新窗口打开卡片内容"
+          class="el-icon-browser"
+          @click="$窗口内打开超链接(数据超链接)"
+        ></span>
+        <span
+          class="el-icon-siyuan"
+          aria-label="发送卡片到思源作为文档"
+          v-if="!对象数据.attrs.def_block"
+          @click="发送卡片数据到思源()"
+        ></span>
       </div>
       <div
         :class="`cc-card-body cc-${数据类型} not-folded`"
         v-if="!对象数据.attrs.folded"
+        aria-label="双击开始卡片连接,ctrl+点击多选"
         @dblclick="开始连接()"
         :style="`
           
           color:${对象数据.attrs.color};
           border:solid ${对象数据.attrs.borderColor} ${边框宽度}px;
           background-color:${对象数据.attrs.backgroundColor};
-          width:${对象数据.attrs.width - 27 + 'px'};
-          height:${对象数据.attrs.height - 27 + 'px'};
+          width:${对象数据.attrs.width - 21 - 边框宽度 * 2 + 'px'};
+          height:${对象数据.attrs.height - 21 - 边框宽度 * 2 + 'px'};
           `"
+        @click="鼠标点击($event)"
       >
         <div>
           <el-row>
             <el-col :span="12">
-              <span class="el-icon-siyuan" v-if="对象数据.attrs.def_block"></span>
+              <span
+                class="el-icon-siyuan"
+                aria-label="卡片已经连接到思源块"
+                v-if="对象数据.attrs.def_block"
+              ></span>
 
               <strong>{{ 对象数据.name }}</strong>
             </el-col>
@@ -283,12 +311,10 @@ module.exports = {
         //   console.log(this.对象数据);
         this.对象数据 = this.$更新数据时间戳(this.对象数据);
         this.$事件总线.$emit("激活数据", this.对象数据);
-        this.边框宽度 = 3;
       } else {
         this.对象数据 = this.$更新数据时间戳(this.对象数据);
         this.$事件总线.$emit("反激活数据", this.对象数据);
         this.正在编辑 = false;
-        this.边框宽度 = 1;
       }
     },
     正在编辑(val) {
@@ -322,13 +348,11 @@ module.exports = {
     },
   },
   methods: {
+    发送卡片数据到思源: function () {
+      this.$事件总线.$emit("发送卡片数据到思源", this.对象数据);
+    },
     鼠标点击($event) {
-      $event.ctrlKey
-        ? this.$事件总线.$emit(
-            "ctrl加鼠标点击卡片",
-            $event.currentTarget.getAttribute("data-node-id")
-          )
-        : null;
+      $event.ctrlKey ? this.$事件总线.$emit("ctrl加鼠标点击卡片", this.对象数据) : null;
     },
     判断id: async function ($event) {
       let that = this;

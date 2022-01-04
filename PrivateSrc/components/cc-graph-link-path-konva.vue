@@ -253,10 +253,10 @@ module.exports = {
           return null;
         }
         if (parseInt(val.updated) < parseInt(this.链接.updated)) {
-          console.log(val.updated, this.链接.updated);
+          //console.log(val.updated, this.链接.updated);
           return null;
         }
-        console.log(val.attrs);
+        //console.log(val.attrs);
         this.链接 = val;
         this.链接.type = "link";
         this.链接.subtype = val.subtype || "属于";

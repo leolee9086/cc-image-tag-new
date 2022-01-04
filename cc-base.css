@@ -1,10 +1,11 @@
 
 /*卡片集合容器样式*/
 .cc-card-combo-drawer{
+  position:absolute;
   width: 100%;
   height:100%;
   border:dashed lightsalmon 2px; 
-  z-index:600;
+  z-index:700;
   background-color: rgba(135, 206, 250, 0.253);
 }
 /*卡片外容器样式*/
@@ -226,8 +227,52 @@ html,body,#app{
   font-size: 14px;
   visibility: hidden;
 }
+.el-icon-leftalign {
+  background: url("/widgets/cc-baselib/icons/左对齐.svg") center no-repeat;
+  background-size: contain;
+}
 
+.el-icon-leftalign::before {
+  content: "\8d3a";
+  font-size: 14px;
+  visibility: hidden;
+}
+.el-icon-rightalign {
+  background: url("/widgets/cc-baselib/icons/左对齐.svg") center no-repeat;
+  background-size: contain;
+  transform: rotate(180deg);
 
+}
+
+.el-icon-rightalign::before {
+  content: "\8d3a";
+  font-size: 14px;
+  visibility: hidden;
+}
+.el-icon-upalign {
+  background: url("/widgets/cc-baselib/icons/左对齐.svg") center no-repeat;
+  background-size: contain;
+  transform: rotate(90deg);
+
+}
+
+.el-icon-upalign::before {
+  content: "\8d3a";
+  font-size: 14px;
+  visibility: hidden;
+}
+.el-icon-downalign {
+  background: url("/widgets/cc-baselib/icons/左对齐.svg") center no-repeat;
+  background-size: contain;
+  transform: rotate(270deg);
+
+}
+
+.el-icon-downalign::before {
+  content: "\8d3a";
+  font-size: 14px;
+  visibility: hidden;
+}
 .draggable {
   padding: 0px;
 }
@@ -264,4 +309,7 @@ position: fixed !important;
 }
 .toolbar.toolbar-view{
 background-color: transparent;
+}
+.tooltip{
+  z-index: 20000;
 }

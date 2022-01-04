@@ -67,22 +67,22 @@ const 事务列表 = {
   },
   
   链接转化为卡片:async function(链接数据){
-   await this.$数据库.links.delete(链接数据.id)
     let 新数据 = JSON.parse(JSON.stringify(链接数据))
     新数据.type="card"
     新数据.subtype="一般概念"
 
     await this.$数据库.cards.put(新数据)
+    this.$事件总线.$emit("保存卡片",新数据)
     let from_id = 新数据.attrs["from_id"]
     let to_id = 新数据.attrs["to_id"]
     this.$事件总线.$emit("连接卡片",[from_id,新数据.id])
     this.$事件总线.$emit("连接卡片",[新数据.id,to_id])
-    
+    await this.$数据库.links.delete(链接数据.id)
+
   },
-  ctrl加鼠标点击卡片:function(卡片id){
-    console.log("ctrl加鼠标点击卡片")
-    console.log(卡片id)
-    this.$当前窗口状态.current_cardid_array.push(卡片id)
+  ctrl加鼠标点击卡片:function(卡片数据){
+    this.$当前窗口状态.current_cardid_array.push(卡片数据)
+    this.$当前窗口状态.current_cardid_array= Array.from(new Set(this.$当前窗口状态.current_cardid_array))
     this.$事件总线.$emit("选集变化",this.$当前窗口状态.current_cardid_array)
   },
 
@@ -90,7 +90,7 @@ const 事务列表 = {
     await this.$数据库.cards.put(卡片数据);
   },
   保存数据:async function (传入数据){
-   传入数据.type=="card"? this.$事件总线.$emit("保存卡片"):this.$事件总线.$emit("保存链接")
+   传入数据.type=="card"? this.$事件总线.$emit("保存卡片",传入数据):this.$事件总线.$emit("保存链接",传入数据)
   },
   保存卡片: async function (传入数据) {
     let 数据表名  = 传入数据.type+"s"
@@ -102,6 +102,7 @@ const 事务列表 = {
       for (属性名 in 传入数据.attrsproxy) {
         原始数据.attrs[属性名] = 传入数据.attrsproxy[属性名]
       }
+      原始数据=this.$更新数据时间戳(原始数据)
       await this.$数据库[数据表名].put(原始数据);
 
     } else if (传入数据.id) {
@@ -157,6 +158,13 @@ const 事务列表 = {
   激活卡片: async function (数据) {
     this.$当前窗口状态.current_linkid = ""
     this.$当前窗口状态.current_cardid = 数据.id;
+    if(this.$当前窗口状态.current_cardid_array[0]){
+    }
+    else{
+      this.$当前窗口状态.current_cardid_array.push(数据)
+      this.$事件总线.$emit("选集变化",this.$当前窗口状态.current_cardid_array)
+
+    }
     if (this.$当前窗口状态.等待连接卡片id) {
       this.$事件总线.$emit("连接卡片",[this.$当前窗口状态.等待连接卡片id,数据.id])
       this.$当前窗口状态.等待连接卡片id = null;
@@ -185,16 +193,18 @@ const 事务列表 = {
     };
     let 新链接 = this.$根据属性生成链接(属性对象);
    // console.log(新链接)
-    await this.$数据库.links.put(新链接);
+    this.$数据库.links.put(新链接);
+    this.$事件总线.$emit("保存链接",新链接)
     this.$事件总线.$emit("结束连接")}
   },
   开始连接: function (data) {
-   // console.log("开始链接");
     this.$当前窗口状态.等待连接卡片id = data.id;
   },
-  显示提示: function (提示内容) {},
+  显示提示: function (提示内容) {
+    this.$当前窗口状态.当前提示内容=提示内容
+
+  },
   窗口缩放: function (缩放倍数) {
-   // console.log(缩放倍数);
     this.$当前窗口状态.缩放倍数 = 缩放倍数;
   },
   点击画板空白处: function($event){
@@ -248,6 +258,9 @@ const 事务列表 = {
 
     this.$画板元数据库.boards.put(画板元数据);
   },
+  发送卡片数据到思源:function(对象数据){
+    console.log(对象数据)
+  }
 
 };
 

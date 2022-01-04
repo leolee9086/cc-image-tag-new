@@ -11,21 +11,23 @@
         {{ `节点信息:${$当前窗口状态.current_cardid || $当前窗口状态.current_linkid}` }}
       </div>
       <strong>预设类型</strong>
-      <el-tooltip
-        :content="`[一般概念]和[属于]是最基本的预设,不包含任何值.
+
+      <el-select
+        :aria-label="`[一般概念]和[属于]是最基本的预设,不包含任何值.
       每次刷新之后会重置.
       但是可以用于批量更改属性`"
+        size="mini"
+        v-model="预设名"
+        @focus="获取预设()"
       >
-        <el-select size="mini" v-model="预设名" @focus="获取预设()">
-          <el-option
-            v-for="(预设, i) in 预设列表"
-            :key="预设.id"
-            :label="预设.name"
-            :value="预设.name"
-          >
-          </el-option>
-        </el-select>
-      </el-tooltip>
+        <el-option
+          v-for="(预设, i) in 预设列表"
+          :key="预设.id"
+          :label="预设.name"
+          :value="预设.name"
+        >
+        </el-option>
+      </el-select>
     </el-row>
     <el-tabs v-model="当前面板">
       <el-tab-pane label="连接" name="连接">
@@ -444,7 +446,7 @@ module.exports = {
           // console.log(val);
           this.属性列表.forEach((属性名) => {
             if (!(val.attrs[属性名] === "byref") && !(val.attrs[属性名] === undefined)) {
-              console.log(val.attrs[属性名]);
+              //console.log(val.attrs[属性名]);
               this.属性对象[属性名] = val.attrs[属性名];
             }
           });
@@ -578,7 +580,7 @@ module.exports = {
     },
     属性对象: {
       handler: function (val, oldval) {
-        console.log(val.id, oldval.id);
+        //console.log(val.id, oldval.id);
         let flag = false;
         if (val.id == oldval.id) {
           flag = true;
@@ -808,10 +810,10 @@ module.exports = {
       for (序号 in 属性列表) {
         let 属性名 = 属性列表[序号];
         上传数据["attrsproxy"][属性名] = val[属性名];
-        console.log(属性名, 上传数据["attrsproxy"][属性名]);
+        //console.log(属性名, 上传数据["attrsproxy"][属性名]);
 
         if (this.预设.attrs && flag) {
-          console.log(this.预设.attrs);
+          // console.log(this.预设.attrs);
           if (this.预设.attrs[属性名] != "byref") {
             this.变更预设值(属性名);
           }

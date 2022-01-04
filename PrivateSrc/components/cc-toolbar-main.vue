@@ -18,15 +18,10 @@
         <el-col :span="8">
           <el-popover trigger="click">
             <el-row>
-              <el-col :span="21">
+              <el-col :span="24">
                 <el-input v-model="当前画板命名" size="mini">
                   <span slot="prepend">画板命名</span>
                 </el-input>
-              </el-col>
-              <el-col :span="3">
-                <el-tooltip content="是否使用svg渲染,默认为否">
-                  <el-checkbox size="mini" v-model="使用svg渲染"></el-checkbox>
-                </el-tooltip>
               </el-col>
             </el-row>
             <el-row :gutter="20" type="flex" justify="space-between">
@@ -34,6 +29,7 @@
                 <el-button
                   size="mini"
                   class="el-icon-time"
+                  aria-label="显示|隐藏文件历史"
                   @click="显示历史面板 = !显示历史面板"
                   >查看历史版本</el-button
                 >
@@ -48,7 +44,11 @@
                   :flile-list="JSON文件列表"
                   :multiple="false"
                 >
-                  <el-button slot="trigger" size="mini" class="el-icon-upload"
+                  <el-button
+                    area-label="导入文件"
+                    slot="trigger"
+                    size="mini"
+                    class="el-icon-upload"
                     >导入旧版文件</el-button
                   >
                 </el-upload></el-col
@@ -183,6 +183,7 @@
         </el-tooltip>
         <el-tooltip content="折叠时是否显示名称">
           <el-switch
+            area-label="折叠时是否显示名称"
             @change="$当前窗口状态.showname = $event"
             size="mini"
             v-model="折叠时显示类别"
@@ -209,18 +210,26 @@
 
             <div>
               卡片数量:{{ 版本.cards.length }} 链接数量:{{ 版本.links.length }}
-              <el-tooltip content="删除这个版本">
-                <span class="el-icon-delete" @click="删除版本数据(版本)"></span>
-              </el-tooltip>
-              <el-tooltip content="回滚到这个版本">
-                <span class="el-icon-check" @click="应用版本数据(版本)"></span>
-              </el-tooltip>
-              <el-tooltip content="导出数据">
-                <span class="el-icon-download" @click="导出版本数据(版本)"></span>
-              </el-tooltip>
-              <el-tooltip content="导出markdown">
-                <span class="el-icon-markdown" @click="导出版本markdown(版本)"></span>
-              </el-tooltip>
+              <span
+                aria-label="删除这个版本"
+                class="el-icon-delete"
+                @click="删除版本数据(版本)"
+              ></span>
+              <span
+                aria-label="回滚到这个版本"
+                class="el-icon-check"
+                @click="应用版本数据(版本)"
+              ></span>
+              <span
+                aria-label="导出版本数据"
+                class="el-icon-download"
+                @click="导出版本数据(版本)"
+              ></span>
+              <span
+                aria-label="导出markdown压缩包"
+                class="el-icon-markdown"
+                @click="导出版本markdown(版本)"
+              ></span>
             </div>
           </el-card>
         </el-timeline-item>
@@ -306,6 +315,7 @@ module.exports = {
       this.历史版本数量上限 = 30;
       this.$数据库.metadata.put({ key: "maxhistorycount", value: 30 });
     }
+
     this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}`;
     this.画板列表 = await this.$画板元数据库.boards.toArray();
     // console.log(this.画板列表);

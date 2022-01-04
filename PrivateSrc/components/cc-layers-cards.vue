@@ -1,5 +1,6 @@
 <template>
   <div
+    aria-label="双击或者黏贴内容新建卡片"
     @dblclick="双击画板($event)"
     v-on:paste="黏贴内容($event)"
     @click="点击画板($event)"
@@ -47,7 +48,6 @@ module.exports = {
   props: ["窗口大小", "当前鼠标坐标"],
   components: {
     "cc-dragable-block-card": "url:../components/cc-dragable-block-card.vue",
-    "cc-dragable-block-linklabel": "url:../components/cc-dragable-block-linklabel.vue",
     "cc-dragable-block-combo": "url:../components/cc-dragable-block-combo.vue",
   },
   data() {
