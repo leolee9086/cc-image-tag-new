@@ -11,6 +11,7 @@
     z-index:-1`"
   >
     <div
+    
       v-if="图像模式 == '重复'"
       :style="`
     background-image:url(${图像路径});
