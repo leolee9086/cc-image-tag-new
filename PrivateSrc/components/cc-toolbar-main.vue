@@ -329,8 +329,8 @@ module.exports = {
     this.timer = setInterval(() => {
       this.保存计数 = this.保存计数 + 1;
     }, 1000);
-    this.$事件总线.$on("保存卡片", this.获取当前元素数据);
-    this.$事件总线.$on("保存链接", this.获取当前元素数据);
+    this.$事件总线.$on("保存卡片", ($event) => this.获取当前元素数据($event));
+    this.$事件总线.$on("保存链接", ($event) => this.获取当前元素数据($event));
   },
   watch: {
     保存时间间隔: async function (val) {
@@ -408,14 +408,15 @@ module.exports = {
     },
   },
   methods: {
-    获取当前元素数据: async function () {
-      this.对象数据 =
-        (await this.$数据库.cards.get(this.卡片数据id)) ||
-        (await this.$数据库.links.get(this.链接数据id)) ||
-        this.对象数据;
-      this.属性对象 = this.对象数据.attrs;
-      this.当前对象名称 = this.对象数据.name;
-      this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}&table=cards`;
+    获取当前元素数据: async function ($event) {
+      if ($event) {
+        if ($event.id == this.卡片数据id || $event.id == this.链接数据id) {
+          this.对象数据 = $event;
+          this.属性对象 = this.对象数据.attrs;
+          this.当前对象名称 = this.对象数据.name;
+          this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}&table=cards`;
+        }
+      }
     },
     保存数据: async function () {
       await this.保存历史();
@@ -770,21 +771,7 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
           this.$当前窗口状态.缩放倍数),
         this.$事件总线.$emit("添加卡片", 卡片数据);
     },
-    设定当前标记: function () {
-      let 上传数据 = { id: "", attrsproxy: {} };
-      上传数据.id = this.对象数据.id;
-      上传数据.type = this.对象数据.type;
 
-      上传数据["attrsproxy"].color = this.属性对象.color;
-      上传数据["attrsproxy"].borderColor = this.属性对象.borderColor;
-      上传数据["attrsproxy"].backgroundColor = this.属性对象.backgroundColor;
-      if (this.对象数据.type == "card") {
-        this.$事件总线.$emit("保存卡片", 上传数据);
-      }
-      if (this.对象数据.type == "link") {
-        this.$事件总线.$emit("保存链接", 上传数据);
-      }
-    },
     修改对象名称: async function () {
       if (this.对象数据.type == "card") {
         let 真实数据 = await this.$数据库.cards.get(this.对象数据.id);
