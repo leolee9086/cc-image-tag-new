@@ -80,7 +80,12 @@ module.exports = {
       if (!this.待发送数据.attrs.def_block) {
         await this.发送内容到(item);
       } else {
-        let id = item.path.replace(".sy", "").slice(item.path.lastIndexOf("/") + 1);
+        let id = "";
+        if (item.path != "/" && item.path) {
+          id = item.path.replace(".sy", "").slice(item.path.lastIndexOf("/") + 1);
+        } else {
+          alert("笔记本是没有对应的文档的,另选一个吧");
+        }
         if (id) {
           this.待发送数据.attrs.def_block = id;
           this.待发送数据 = this.$更新数据时间戳(this.待发送数据);
