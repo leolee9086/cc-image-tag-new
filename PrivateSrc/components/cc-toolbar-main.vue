@@ -323,12 +323,14 @@ module.exports = {
       await this.保存历史();
       await this.从思源块加载数据(this.$baseid);
     } catch (error) {
-      console.log(error);
+      console.log("加载出错", error);
       alert("加载挂件块数据失败,注意手动保存数据");
     }
     this.timer = setInterval(() => {
       this.保存计数 = this.保存计数 + 1;
     }, 1000);
+    this.$事件总线.$on("保存卡片", this.获取当前元素数据);
+    this.$事件总线.$on("保存链接", this.获取当前元素数据);
   },
   watch: {
     保存时间间隔: async function (val) {
@@ -386,20 +388,14 @@ module.exports = {
     卡片数据id: {
       handler: async function (val, oldval) {
         if (val && val != oldval) {
-          this.对象数据 = await this.$数据库.cards.get(this.卡片数据id);
-          this.属性对象 = this.对象数据.attrs;
-          this.当前对象名称 = this.对象数据.name;
-          this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}&table=cards`;
+          this.获取当前元素数据();
         }
       },
     },
     链接数据id: {
       handler: async function (val, oldval) {
         if (val && val != oldval) {
-          this.对象数据 = await this.$数据库.links.get(this.链接数据id);
-          this.属性对象 = this.对象数据.attrs;
-          this.当前对象名称 = this.对象数据.name;
-          this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}&table=cards`;
+          this.获取当前元素数据();
         }
       },
     },
@@ -412,6 +408,15 @@ module.exports = {
     },
   },
   methods: {
+    获取当前元素数据: async function () {
+      this.对象数据 =
+        (await this.$数据库.cards.get(this.卡片数据id)) ||
+        (await this.$数据库.links.get(this.链接数据id)) ||
+        this.对象数据;
+      this.属性对象 = this.对象数据.attrs;
+      this.当前对象名称 = this.对象数据.name;
+      this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}&table=cards`;
+    },
     保存数据: async function () {
       await this.保存历史();
 
@@ -698,45 +703,52 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
       }
       let url = "http://" + this.思源伺服ip + "/" + filepath;
       //  console.log(url);
-      await axios.get(url).then((res) => {
-        文件数据 = res.data;
-        if (文件数据["cardarray"]) {
-          try {
-            this.图片缩放倍数 = parseFloat(文件数据.resize).toFixed(2);
-          } catch (e) {
-            //    console.log(e);
+      let 文件数据 = {};
+      try {
+        await axios.get(url).then((res) => {
+          文件数据 = res.data;
+          if (文件数据["cardarray"]) {
+            try {
+              this.图片缩放倍数 = parseFloat(文件数据.resize).toFixed(2);
+            } catch (e) {
+              //    console.log(e);
+            }
+          }
+        });
+      } catch (e) {
+        alert("文件不存在,将在附件中新建文件");
+        this.$事件总线.$emit("上传当前画板文件数据到思源");
+      }
+      if (文件数据) {
+        let 卡片数组 = 文件数据["cards"];
+        let 链接数组 = 文件数据["links"];
+        let metadata = 文件数据["metadata"];
+        let 卡片预设 = 文件数据["cardpresets"];
+        let 链接预设 = 文件数据["linkpresets"];
+        if (卡片数组) {
+          for (i in 卡片数组) {
+            await this.$数据库.cards.put(卡片数组[i]);
           }
         }
-      });
-
-      let 卡片数组 = 文件数据["cards"];
-      let 链接数组 = 文件数据["links"];
-      let metadata = 文件数据["metadata"];
-      let 卡片预设 = 文件数据["cardpresets"];
-      let 链接预设 = 文件数据["linkpresets"];
-      if (卡片数组) {
-        for (i in 卡片数组) {
-          await this.$数据库.cards.put(卡片数组[i]);
+        if (链接数组) {
+          for (i in 链接数组) {
+            await this.$数据库.links.put(链接数组[i]);
+          }
         }
-      }
-      if (链接数组) {
-        for (i in 链接数组) {
-          await this.$数据库.links.put(链接数组[i]);
+        if (metadata) {
+          for (i in metadata) {
+            await this.$数据库.metadata.put(metadata[i]);
+          }
         }
-      }
-      if (metadata) {
-        for (i in metadata) {
-          await this.$数据库.metadata.put(metadata[i]);
+        if (卡片预设) {
+          for (i in 卡片预设) {
+            await this.$数据库.cardpresets.put(卡片预设[i]);
+          }
         }
-      }
-      if (卡片预设) {
-        for (i in 卡片预设) {
-          await this.$数据库.cardpresets.put(卡片预设[i]);
-        }
-      }
-      if (链接预设) {
-        for (i in 链接预设) {
-          await this.$数据库.linkpresets.put(链接预设[i]);
+        if (链接预设) {
+          for (i in 链接预设) {
+            await this.$数据库.linkpresets.put(链接预设[i]);
+          }
         }
       }
       //     console.log("加载完成");

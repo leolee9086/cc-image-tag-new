@@ -313,3 +313,35 @@ background-color: transparent;
 .tooltip{
   z-index: 20000;
 }
+.cc-card-name * {
+  border:none !important;
+  background-color: transparent!important;
+  font-size: large !important;
+  font-weight: 800 !important;
+  color:inherit !important;
+}
+.cc-card-name{
+  color:inherit !important;
+
+}
+.cc-list-item{
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.cc-list-item:hover{
+  background-color: var(--b3-list-hover)!important;
+}
+.cc-list.fn__flex-1.cc-list--background{
+  max-height: 500px;
+  overflow: scroll;
+}
+.cc-list-icon{
+text-align: center;
+font-size: 16px;
+height:16px;
+width:16px;
+}
+.custom-icon{
+  height:16px;
+width:16px;
+}

@@ -71,9 +71,12 @@ module.exports = {
   watch: {
     数据id数组: {
       handler(val) {
-        console.log("当前选集", val.length);
-        this.获取数据();
+        //console.log("当前选集", val.length);
         val[0] ? (this.显示 = true) : (this.显示 = false);
+
+        if (val.length > 1) {
+          this.获取数据();
+        }
       },
       deep: true,
     },
@@ -166,7 +169,7 @@ module.exports = {
       }
     },
     判断id: function ($event) {
-      this.获取数据();
+      this.数据id数组.length > 1 ? this.获取数据() : null;
     },
 
     获取数据: async function () {
@@ -182,11 +185,11 @@ module.exports = {
       this.数据数组 = Array.from(new Set(数据数组));
       this.数据数组.length == this.数据id数组.length ? this.计算边界框() : null;
     },
-    计算边界框: function () {
+    计算边界框: async function () {
       let 左上角点 = { x: 10000000000, y: 100000000000 };
       let 右下角点 = { x: 0, y: 0 };
       if (this.数据数组.length == this.数据id数组.length) {
-        console.log(this.数据数组);
+        //console.log(this.数据数组);
 
         数据 = {};
         for (i = 0; i < this.数据数组.length; i++) {
@@ -205,7 +208,7 @@ module.exports = {
         this.y = 左上角点.y;
         this.width = 右下角点.x - 左上角点.x;
         this.height = 右下角点.y - 左上角点.y;
-        console.log(this.x, this.y, this.width, this.height);
+        // console.log(this.x, this.y, this.width, this.height);
       }
     },
   },

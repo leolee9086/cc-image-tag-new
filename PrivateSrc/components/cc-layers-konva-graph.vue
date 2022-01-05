@@ -43,6 +43,7 @@ module.exports = {
       当前数据: {},
       当前卡片id: this.$当前窗口状态.current_cardid,
       当前链接id: this.$当前窗口状态.current_linkid,
+      当前网格大小: this.$当前窗口状态.gridsize,
     };
   },
 

@@ -35,7 +35,7 @@
         trigger="hover"
         :open-delay="300"
         placement="right"
-        :width="100"
+        :width="300"
         v-if="对象数据.attrs.folded"
       >
         <div
@@ -54,7 +54,7 @@
           <span>{{ index }}</span>
           <span
             class="el-icon-siyuan"
-            aria-label="卡片已经连接到思源块"
+            aria-label="卡片已经连接到思源块,点击更换源"
             v-if="对象数据.attrs.def_block"
           ></span>
 
@@ -76,9 +76,11 @@
             :链接id="对象数据.attrs.def_block"
           ></cc-link-siyuan>
 
-          <div :style="`font-size:xx-small;color:${对象数据.attrs.color}`">
-            双击标记展开,拖拽移动
-          </div>
+          <div
+            v-html="思源HTML || 预览HTML"
+            class="protyle-wysiwyg protyle-wysiwyg--attr"
+            :style="`font-size:xx-small;color:${对象数据.attrs.color}`"
+          ></div>
         </div>
       </el-popover>
 
@@ -145,24 +147,36 @@
             <el-col :span="12">
               <span
                 class="el-icon-siyuan"
-                aria-label="卡片已经连接到思源块"
+                @click="发送卡片数据到思源()"
+                aria-label="卡片已经连接到思源块,点击更换目标"
                 v-if="对象数据.attrs.def_block"
               ></span>
 
-              <strong>{{ 对象数据.name }}</strong>
+              <el-input
+                :key="对象数据.id"
+                size="mini"
+                class="cc-card-name"
+                :ref="'cardname' + 对象数据.id"
+                autofix="ture"
+                @input="保存数据($event)"
+                @change="保存数据($event)"
+                v-model="对象数据.name"
+              ></el-input>
             </el-col>
             <el-col :span="12">
-              <span size="mini" class="subtypetag">{{ 对象数据.subtype }}</span>
+              <span class="subtypetag">{{ 对象数据.subtype }}</span>
             </el-col>
           </el-row>
         </div>
-        <div></div>
-        <cc-link-siyuan
-          v-if="对象数据.attrs.def_block"
-          :style="`color:${对象数据.attrs.color};`"
-          :锚文本="`引用自${对象数据.attrs.def_block_name || 对象数据.attrs.def_block}`"
-          :链接id="对象数据.attrs.def_block"
-        ></cc-link-siyuan>
+        <div>
+          <span>引用自:</span>
+          <cc-link-siyuan
+            v-if="对象数据.attrs.def_block"
+            :style="`color:${对象数据.attrs.color};`"
+            锚文本=""
+            :链接id="对象数据.attrs.def_block"
+          ></cc-link-siyuan>
+        </div>
         <div class="cc-card-content">
           <div :style="`color:${对象数据.attrs.color};`"></div>
           <cc-vditor-vue
@@ -227,6 +241,10 @@ module.exports = {
         if (JSON.stringify(val) == JSON.stringify(oldval)) {
           return null;
         }
+        if (parseInt(val.updated) < parseInt(this.对象数据.updated)) {
+          //console.log(val.updated, this.链接.updated);
+          return null;
+        }
 
         this.对象数据 = val;
         if (this.对象数据 && this.对象数据.attrs.top < 0) {
@@ -289,6 +307,8 @@ module.exports = {
         attrs.offsety + "" == "NAN" ? (attrs.offsety = 0) : null;
         this.生成html();
         this.保存数据();
+
+        this.$refs.cardname ? this.$refs.cardname.focus() : null;
       },
       deep: true,
       immediate: true,
@@ -349,7 +369,7 @@ module.exports = {
   },
   methods: {
     发送卡片数据到思源: function () {
-      this.$事件总线.$emit("发送卡片数据到思源", this.对象数据);
+      this.$事件总线.$emit("打开发送对话框", this.对象数据);
     },
     鼠标点击($event) {
       $event.ctrlKey ? this.$事件总线.$emit("ctrl加鼠标点击卡片", this.对象数据) : null;
@@ -430,7 +450,8 @@ module.exports = {
       this.对象数据.attrs.height = height / this.窗口缩放倍数 || 100;
       this.保存数据();
     },
-    保存数据: function () {
+    保存数据: function ($event) {
+      $event ? (this.对象数据.name = $event) : null;
       this.对象数据 = this.$更新数据时间戳(this.对象数据);
 
       this.数据类型 == "card"
