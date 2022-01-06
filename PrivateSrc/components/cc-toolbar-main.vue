@@ -408,7 +408,7 @@ module.exports = {
     },
   },
   methods: {
-    获取当前元素数据: async function ($event) {
+    获取当前元素数据: function ($event) {
       if ($event) {
         if ($event.id == this.卡片数据id || $event.id == this.链接数据id) {
           this.对象数据 = $event;

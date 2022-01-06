@@ -379,7 +379,10 @@ module.exports = {
       if (!this.监听) {
         return null;
       }
-      if ($event.id == this.对象数据.id) {
+      if (
+        $event.id == this.对象数据.id &&
+        parseInt($event.updated) > parseInt(this.对象数据.updated)
+      ) {
         this.对象数据 = $event;
       }
     },

@@ -256,7 +256,7 @@ module.exports = {
           //console.log(val.updated, this.链接.updated);
           return null;
         }
-        //console.log(val.attrs);
+        console.log(val.attrs);
         this.链接 = val;
         this.链接.type = "link";
         this.链接.subtype = val.subtype || "属于";
@@ -420,18 +420,23 @@ module.exports = {
         return null;
       }
       if ($event.id == attrs.from_id) {
-        this.代理起始标记 =
-          (await this.$数据库.cards.get(this.链接.attrs.from_id)) ||
-          (await this.$数据库.links.get(this.链接.attrs.from_id));
-
-        that.计算路径();
+        let 类型 = $event.type;
+        类型 == "card"
+          ? (this.代理起始标记 = await this.$数据库.cards.get(this.链接.attrs.from_id))
+          : (this.代理起始标记 = await this.$数据库.links.get(this.链接.attrs.from_id));
+        parseInt($event.updated) >= parseInt(this.代理结束标记.updated)
+          ? that.计算路径()
+          : null;
       }
       if ($event.id == attrs.to_id) {
-        this.代理结束标记 =
-          (await this.$数据库.cards.get(this.链接.attrs.to_id)) ||
-          (await this.$数据库.links.get(this.链接.attrs.to_id));
+        let 类型 = $event.type;
+        类型 == "card"
+          ? (this.代理结束标记 = await this.$数据库.cards.get(this.链接.attrs.to_id))
+          : (this.代理结束标记 = await this.$数据库.links.get(this.链接.attrs.to_id));
 
-        that.计算路径();
+        parseInt($event.updated) >= parseInt(this.代理结束标记.updated)
+          ? that.计算路径()
+          : null;
       }
       if (
         $event.id == this.链接.id &&
@@ -544,6 +549,11 @@ module.exports = {
             this.中点 = this.路径.mid;
           }
         }
+        let 原始数据 = await this.$数据库.links.get(this.链接.id);
+        if (parseInt(原始数据.updated) > parseInt(this.链接.updated)) {
+          this.链接 = 原始数据;
+        }
+
         this.链接 = this.$更新数据时间戳(this.链接);
 
         if (Math.abs(this.链接.attrs.offsetx) > 50 || this.链接.attrs.offsety > 50) {

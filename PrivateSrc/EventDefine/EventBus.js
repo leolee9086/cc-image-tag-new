@@ -106,6 +106,7 @@ const 事务列表 = {
       await this.$数据库[数据表名].put(原始数据);
 
     } else if (传入数据.id) {
+      传入数据 = this.$更新数据时间戳(传入数据)
       await this.$数据库[数据表名].put(传入数据);
 
     }
@@ -137,8 +138,12 @@ const 事务列表 = {
       for (属性名 in 传入数据.attrsproxy) {
         原始数据["attrs"][属性名] = 传入数据["attrsproxy"][属性名];
       }
+      原始数据 = this.$更新数据时间戳(原始数据)
+
       await this.$数据库.links.put(原始数据);
     } else if (传入数据.id) {
+      传入数据 = this.$更新数据时间戳(传入数据)
+
       await this.$数据库.links.put(传入数据);
     }  
   },
