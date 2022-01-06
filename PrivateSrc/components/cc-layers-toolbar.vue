@@ -99,7 +99,9 @@ module.exports = {
       let markdown = this.待发送数据.markdown;
       let title = this.待发送数据.name;
       let notebook = item.box;
+      let hpath = item.hPath.slice(item.hPath.indexOf("/")) + "/";
       let path = item.path.replace(".sy", "");
+
       let 思源伺服ip = window.location.host;
       let apitoken = "";
 
@@ -108,7 +110,7 @@ module.exports = {
         思源伺服ip,
         apitoken,
         notebook,
-        path,
+        hpath,
         markdown
       );
       console.log("成功", res.data);
