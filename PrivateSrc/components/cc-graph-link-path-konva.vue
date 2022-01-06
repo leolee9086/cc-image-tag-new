@@ -256,7 +256,7 @@ module.exports = {
           //console.log(val.updated, this.链接.updated);
           return null;
         }
-        console.log(val.attrs);
+        //console.log(val.attrs);
         this.链接 = val;
         this.链接.type = "link";
         this.链接.subtype = val.subtype || "属于";
@@ -551,6 +551,9 @@ module.exports = {
         }
         let 原始数据 = await this.$数据库.links.get(this.链接.id);
         if (parseInt(原始数据.updated) > parseInt(this.链接.updated)) {
+          原始数据.attrs.path = this.链接.attrs.path;
+          原始数据.attrs.top = this.链接.attrs.top;
+          原始数据.attrs.left = this.链接.attrs.left;
           this.链接 = 原始数据;
         }
 
