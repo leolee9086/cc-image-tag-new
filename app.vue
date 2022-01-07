@@ -110,11 +110,12 @@ module.exports = {
         delta = $event.wheelDelta / 120;
         let 窗口缩放倍数 = this.$当前窗口状态.缩放倍数;
         窗口缩放倍数 += delta / 5;
+        let id = "";
         if (this.$当前窗口状态.current_cardid || this.$当前窗口状态.current_linkid) {
-          let id = this.$当前窗口状态.current_cardid || this.$当前窗口状态.current_linkid;
-          this.$事件总线.$emit("定位至卡片", id);
+          id = this.$当前窗口状态.current_cardid || this.$当前窗口状态.current_linkid;
         }
         this.$事件总线.$emit("窗口缩放", 窗口缩放倍数 > 0 ? 窗口缩放倍数 : 0.01);
+        id ? this.$事件总线.$emit("定位至卡片", id) : null;
       }
     },
     计算坐标($event) {

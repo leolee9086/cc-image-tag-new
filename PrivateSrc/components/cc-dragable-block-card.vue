@@ -121,6 +121,12 @@
           @click="$窗口内打开超链接(数据超链接)"
         ></span>
         <span
+          v-if="对象数据.type == 'link'"
+          class="el-icon-place"
+          aria-label="返回连接线中点"
+          @click="返回原始点()"
+        ></span>
+        <span
           class="el-icon-siyuan"
           aria-label="发送卡片到思源作为文档"
           v-if="!对象数据.attrs.def_block"
@@ -294,6 +300,7 @@ module.exports = {
         this.保存数据();
       },
     },
+
     对象数据: {
       handler: async function (val, oldval) {
         this.folded = val.attrs.folded;
@@ -368,6 +375,11 @@ module.exports = {
     },
   },
   methods: {
+    返回原始点: function () {
+      this.对象数据.attrs.offsetx = 0 - this.对象数据.attrs.width / 2;
+      this.对象数据.attrs.offsety = 0 - this.对象数据.attrs.height / 2;
+      this.保存数据();
+    },
     发送卡片数据到思源: function () {
       this.$事件总线.$emit("打开发送对话框", this.对象数据);
     },

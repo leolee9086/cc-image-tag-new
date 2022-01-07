@@ -32,7 +32,11 @@
   top:-30px;
   width:200px;
 }
+.cc-card-toolbar.combo{
+  top:-40px;
+      transform-origin:0% 40px;
 
+}
 .cc-card-body.not-folded{
   position:absolute;
   overflow:hidden;

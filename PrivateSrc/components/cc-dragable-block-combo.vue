@@ -4,16 +4,22 @@
     ref="container"
     :resizable="false"
     :draggable="false"
-    :y="y - 10"
-    :w="width + 20 || 100"
-    :h="height + 20 || 100"
-    :x="x - 10"
+    :y="y"
+    :w="width || 100"
+    :h="height || 100"
+    :x="x"
     :z="600"
     class-name-handle="resizer"
     class-name="cc-card-combo-container"
   >
     <div class="cc-card-combo-drawer"></div>
-    <div class="cc-card-toolbar">
+    <div
+      class="cc-card-toolbar combo"
+      :style="`
+      
+      transform:scale(${窗口缩放倍数}) 
+      `"
+    >
       <span :aria-label="`选中了${数据数组.length}个元素`">{{ 数据数组.length }}</span>
       <span
         @click="统一属性('left')"
@@ -49,7 +55,7 @@
 <script>
 module.exports = {
   name: "cc-dragable-block-combo",
-  props: ["卡片集合"],
+  props: ["卡片集合", "窗口缩放倍数"],
   data() {
     return {
       卡片集合获取器: "",
@@ -67,6 +73,8 @@ module.exports = {
     this.$事件总线.$on("选集变化", ($event) => (this.数据id数组 = $event));
     this.$事件总线.$on("保存卡片", ($event) => this.判断id($event));
     this.$事件总线.$on("保存链接", ($event) => this.判断id($event));
+    this.$事件总线.$on("窗口缩放", ($event) => this.计算边界框($event));
+    this.$事件总线.$on("定位至卡片", ($event) => this.计算边界框($event));
   },
   watch: {
     数据id数组: {
@@ -79,6 +87,12 @@ module.exports = {
         }
       },
       deep: true,
+    },
+    窗口缩放倍数: {
+      handler(val) {
+        //console.log("当前选集", val.length);
+        this.计算边界框();
+      },
     },
   },
   methods: {
@@ -204,10 +218,10 @@ module.exports = {
             属性数据.left < 左上角点.x ? (左上角点.x = 属性数据.left) : null;
           }
         }
-        this.x = 左上角点.x;
-        this.y = 左上角点.y;
-        this.width = 右下角点.x - 左上角点.x;
-        this.height = 右下角点.y - 左上角点.y;
+        this.x = 左上角点.x * this.窗口缩放倍数 - 10;
+        this.y = 左上角点.y * this.窗口缩放倍数 - 10;
+        this.width = (右下角点.x - 左上角点.x) * this.窗口缩放倍数 + 20;
+        this.height = (右下角点.y - 左上角点.y) * this.窗口缩放倍数 + 20;
         // console.log(this.x, this.y, this.width, this.height);
       }
     },
