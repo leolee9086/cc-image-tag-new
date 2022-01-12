@@ -284,6 +284,10 @@ module.exports = {
     };
   },
   async mounted() {
+    this.$事件总线.$on("保存卡片", ($event) => this.获取当前元素数据($event));
+    this.$事件总线.$on("保存链接", ($event) => this.获取当前元素数据($event));
+    this.$事件总线.$on("激活卡片", ($event) => this.获取当前元素数据($event));
+    this.$事件总线.$on("激活链接", ($event) => this.获取当前元素数据($event));
     try {
       this.当前画板命名 = (await this.$数据库.metadata.get("name")).value;
     } catch (e) {
@@ -338,8 +342,6 @@ module.exports = {
     this.timer = setInterval(() => {
       this.保存计数 = this.保存计数 + 1;
     }, 1000);
-    this.$事件总线.$on("保存卡片", ($event) => this.获取当前元素数据($event));
-    this.$事件总线.$on("保存链接", ($event) => this.获取当前元素数据($event));
   },
   watch: {
     保存时间间隔: async function (val) {
@@ -420,10 +422,10 @@ module.exports = {
     获取当前元素数据: function ($event) {
       if ($event) {
         if ($event.id == this.卡片数据id || $event.id == this.链接数据id) {
-          this.对象数据 = $event;
+          this.对象数据 = $event || this.对象数据;
           this.属性对象 = this.对象数据.attrs;
           this.当前对象名称 = this.对象数据.name;
-          this.预设名 = $event.subtype;
+          this.预设名 = $event.subtype || this.预设名;
           this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}&table=cards`;
         }
       }

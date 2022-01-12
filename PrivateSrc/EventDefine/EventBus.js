@@ -77,6 +77,12 @@ const 事务列表 = {
 
   添加卡片: async function (卡片数据) {
     await this.$数据库.cards.put(卡片数据);
+    //console.log(this.$当前窗口状态.current_cardpreset_name)
+
+    if(this.$当前窗口状态.current_cardpreset_name){
+    //  console.log(this.$当前窗口状态.current_cardpreset_name)
+      this.$事件总线.$emit("改变数据预设",卡片数据,this.$当前窗口状态.current_cardpreset_name)
+    }
   },
   保存数据:async function (传入数据){
    传入数据.type=="card"? this.$事件总线.$emit("保存卡片",传入数据):this.$事件总线.$emit("保存链接",传入数据)
@@ -186,6 +192,10 @@ const 事务列表 = {
     let 新链接 = this.$根据属性生成链接(属性对象);
    // console.log(新链接)
     this.$数据库.links.put(新链接);
+    if(this.$当前窗口状态.current_linkpreset_name){
+   //   console.log(this.$当前窗口状态.current_linkpreset_name)
+      this.$事件总线.$emit("改变数据预设",新链接,this.$当前窗口状态.current_linkpreset_name)
+    }
     this.$事件总线.$emit("保存链接",新链接)
     this.$事件总线.$emit("结束连接")}
   },
@@ -200,7 +210,7 @@ const 事务列表 = {
     this.$当前窗口状态.缩放倍数 = 缩放倍数;
   },
   点击画板空白处: function($event){
-    console.log($event)
+  //  console.log($event)
     if (!this.$当前窗口状态.等待连接卡片id){
     this.$事件总线.$emit("清理选择")
     }
@@ -238,6 +248,7 @@ const 事务列表 = {
       top: (window.pageYOffset + $event.clientY) / this.$当前窗口状态.缩放倍数,
       left: (window.pageXOffset + $event.clientX) / this.$当前窗口状态.缩放倍数,
     });
+ //   console.log("双击")
     this.$事件总线.$emit("添加卡片",卡片数据)
   },
   修改画板元数据: function (属性对象, 画板id) {
@@ -252,7 +263,7 @@ const 事务列表 = {
   },
   发送卡片数据到思源:function(对象数据){
     
-    console.log(对象数据)
+  //  console.log(对象数据)
   },
   打开发送对话框:function(对象数据){
     this.$当前窗口状态.待发送数据 = 对象数据
@@ -267,7 +278,7 @@ const 事务列表 = {
       }
     }).toArray((array)=>{预设值= array[0]})
     let attrsproxy ={}
-    console.log(预设值)
+  //  console.log(预设值)
     if(预设值){
     for(属性名 in 预设值.attrs){
       预设值[属性名]
@@ -281,8 +292,8 @@ const 事务列表 = {
     传出数据.type =对象数据.type
     传出数据.subtype =  预设名
     传出数据.attrsproxy = attrsproxy
-    console.log(传出数据)
-    console.log(attrsproxy)
+   // console.log(传出数据)
+   // console.log(attrsproxy)
     this.$事件总线.$emit("保存卡片",传出数据)
   },
   删除预设:async function(预设项目,预设表名){
@@ -309,7 +320,7 @@ const 事务列表 = {
     let 预设表名 = 预设项目.type+"presets" 
     let 数据表名 = 预设项目.type+"s" 
     let 预设名 = 预设项目.name
-    console.log(预设名)
+   // console.log(预设名)
     if(属性名){
       await this.$数据库[预设表名].put(预设项目)
       await this.$数据库[数据表名]
@@ -321,10 +332,10 @@ const 事务列表 = {
       .modify(
         (value)=>
         {
-          value.attrs[属性名]=预设项目.attrs[属性名]
-        })
-    }
-    let 数据列表 = await this.$数据库[数据表名]
+          value =this.$更新数据时间戳(value)
+          value.attrs[属性名]=预设项目.attrs[属性名]&&预设项目.attrs[属性名]!=="byref" ?预设项目.attrs[属性名]:value.attrs[属性名]
+    })
+    /*let 数据列表 = await this.$数据库[数据表名]
     .filter((data)=>{
       if(data.subtype == 预设名){
         return true;
@@ -332,19 +343,16 @@ const 事务列表 = {
     }).toArray()
 
     if(数据列表[0]){
-      数据列表.forEach(el=>{
-        let 传出数据={}
-        console.log(el.type)
-        传出数据.type=el.type||"card"
-        传出数据.subtype=el.subtype
+      for(i in 数据列表){
+        let el =数据列表[i]
+        el.attrs[属性名] =预设项目.attrs[属性名]&&预设项目.attrs[属性名]!=="byref" ?预设项目.attrs[属性名]:el.attrs[属性名]
+        await this.$数据库[数据表名].put(el)
+        this.$事件总线.$emit("保存数据",el)
 
-        传出数据.id=el.id
-        传出数据.attrsproxy = {属性名:预设项目[属性名]}
-        this.$事件总线.$emit("保存数据",传出数据)
-
-      })
-    }
-  },
+      }
+    }*/
+  }
+},
   新建预设:async function(预设数据,预设名,预设类型){
     
     let  预设表名 = 预设类型+"presets"

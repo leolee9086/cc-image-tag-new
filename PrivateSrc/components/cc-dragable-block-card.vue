@@ -236,6 +236,7 @@ module.exports = {
     this.数据超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html/?id=${this.对象数据.id}&baseid=${this.$baseid}&type=${this.数据类型}`;
     this.hide = false;
     setTimeout(this.计算可见性, 100);
+    this.获取预设(this.value);
     this.$事件总线.$on("保存卡片", (event) => this.判断id(event));
     this.$事件总线.$on("保存链接", (event) => this.判断id(event));
   },
@@ -287,7 +288,6 @@ module.exports = {
             }
           : null;
         this.边框宽度 = val.attrs.borderWidth || 1;
-        this.获取预设(val.subtype);
       },
       deep: true,
       immediate: true,

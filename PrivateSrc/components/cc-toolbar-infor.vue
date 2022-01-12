@@ -539,7 +539,6 @@ module.exports = {
       await this.新建预设();
     },
     变更预设值: async function (属性名, 预设项目) {
-      console.log(this.预设);
       this.预设.type = this.当前对象数据.type;
       this.预设.attrs[属性名] = this.属性对象[属性名];
       this.$事件总线.$emit("变更预设值", 属性名, this.预设);
@@ -687,20 +686,21 @@ module.exports = {
         let 属性名 = 属性列表[序号];
         上传数据["attrsproxy"][属性名] = val[属性名];
         //console.log(属性名, 上传数据["attrsproxy"][属性名]);
-
-        if (this.预设.attrs && flag) {
-          // console.log(this.预设.attrs);
-          if (this.预设.attrs[属性名] != "byref") {
-            this.变更预设值(属性名);
-          }
-        }
       }
-
       if (this.当前对象数据.type == "card") {
         this.$事件总线.$emit("保存卡片", 上传数据);
       }
       if (this.当前对象数据.type == "link") {
         this.$事件总线.$emit("保存链接", 上传数据);
+      }
+      for (序号 in 属性列表) {
+        let 属性名 = 属性列表[序号];
+        if (this.预设.attrs !== undefined && flag) {
+          // console.log(this.预设.attrs);
+          if (this.预设.attrs[属性名] != "byref") {
+            this.变更预设值(属性名);
+          }
+        }
       }
     },
     resizing: function (x, y, w, h) {
