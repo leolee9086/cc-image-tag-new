@@ -144,6 +144,8 @@ Vue.prototype.$根据属性生成卡片=function(属性对象){
       backgroundColor:"lightblue",
       color:"black",
       borderColor:"black",
+      borderWidth:1,
+      fixed_anchor:false,
     }
   }
   for (属性名 in 空标签){
@@ -188,7 +190,9 @@ Vue.prototype.$根据属性生成链接=function(属性对象){
       backgroundColor:"lightblue",
       color:"black",
       borderColor:"black",
-      mid_anchor_rotate:true
+      mid_anchor_rotate:true,
+      borderWidth:1,
+      fixed_anchor:false,
     }
   }
   for (属性名 in 空标签){
@@ -213,6 +217,8 @@ Vue.prototype.$卡片预设属性默认值 = {
   "borderColor":undefined,
   "backgroundColor":undefined,
   "def_block":"byref",
+  "borderWidth":undefined,
+  "fixed_anchor":undefined,
 
   "path_width":undefined,
   "path_type":undefined,
@@ -235,4 +241,17 @@ Vue.prototype.$卡片预设属性默认值 = {
   "mid_anchor_rotate_offset":undefined,
 }
 
+Vue.prototype.$获取预设表 =async function(预设表名){
+  return await this.$数据库[预设表名].toArray()
+}
+Vue.prototype.$获取预设 = async function(预设表名,预设名){
+  let 预设数组  = await this.$数据库[预设表名]
+          .filter((data) => {
+            if (data.name == this.预设名) {
+              return true;
+            }
+          })
+          .toArray();
+  return 预设数组[0]||null
+  }
 

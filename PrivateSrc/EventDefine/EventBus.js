@@ -271,6 +271,35 @@ const 事务列表 = {
     this.$当前窗口状态.待发送数据 = 对象数据
     this.$当前窗口状态.显示发送对话框 = true
   },
+  改变卡片预设:function(卡片数据,预设名){
+    卡片数据.subtype =  预设名
+    卡片数据=this.$更新数据时间戳(卡片数据)
+    this.$事件总线.$emit("保存数据",卡片数据)
+  },
+  新建预设:async function(预设数据,预设名,预设类型){
+    
+    let  预设表名 = 预设类型+"presets"
+    let  预设卡片数据 =
+    await this.$数据库[预设表名].filter(
+      data=>{
+        if (data.name== 预设名){return true}
+      }
+    ).toArray()
+  
+    if(预设类型[0]){
+      alert("预设已经存在,换个新名字吧")
+    }
+    else {
+      let id = Lute.NewNodeID()
+      let 新预设数据= {
+        id:id,
+        attrs:预设数据,
+        name:预设名
+      }
+      this.$数据库[预设表名].put(新预设数据)
+    }
+    
+  }
 };
 
 

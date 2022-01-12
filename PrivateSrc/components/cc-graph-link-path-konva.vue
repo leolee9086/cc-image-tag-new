@@ -707,12 +707,15 @@ module.exports = {
       y偏移 = Math.abs(((矩形.width / 2) * 矢量.y) / 矢量.x);
       if (Math.abs(y偏移) > Math.abs(矩形.height / 2)) {
         y偏移 = 矩形.height / 2;
+        矩形.fixed_anchor?x偏移 = 0:null
       }
 
       if (Math.abs(x偏移) > Math.abs(矩形.width / 2)) {
         x偏移 = 矩形.width / 2;
+        矩形.fixed_anchor?y偏移 = 0:null
       }
       //别问我为什么不用math.sign  反正不要用
+      
       if (矢量.x > 0) {
         交点.x = 矩形中心.x + x偏移;
       } else {

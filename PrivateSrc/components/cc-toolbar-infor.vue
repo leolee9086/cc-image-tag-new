@@ -100,6 +100,7 @@
             <el-collapse-item title="节点样式">
               <strong slot="title">节点样式</strong>
               <el-tabs>
+                
                 <el-tab-pane label="边框色" name="边框色">
                   <span slot="label">
                     边框色
@@ -151,6 +152,14 @@
                     :自定义颜色数组="自定义颜色数组"
                   >
                   </cc-color-pane>
+                </el-tab-pane>
+                <el-tab-pane label="几何设置" name="几何设置">
+                  <el-row>
+                    <el-switch active-text="始终连接到中点" v-model="属性对象.fixed_anchor" ></el-switch>
+                  </el-row>
+                   <el-row>
+                    <el-input-number :value="属性对象.borderWidth||1" @change="属性对象.borderWidth=$event" ></el-input-number>
+                  </el-row>
                 </el-tab-pane>
               </el-tabs>
             </el-collapse-item>
@@ -327,7 +336,7 @@
                 @click="删除预设(预设项目)"
               ></el-button>
             </div>
-            <el-row v-for="(属性名, i) in 属性列表">
+            <el-row v-for="属性名,i in 属性列表">
               <el-col :span="20"
                 ><span>{{ 属性名 }}</span>
               </el-col>
@@ -407,35 +416,14 @@ module.exports = {
       预设名: "",
       新预设名: "",
       重命名计数: 1,
-      属性列表: [
-        "color",
-        "borderColor",
-        "backgroundColor",
-        "def_block",
-
-        "path_width",
-        "path_type",
-        "path_color",
-
-        "from_anchor_size",
-        "to_anchor_size",
-        "mid_anchor_size",
-
-        "from_anchor_image",
-        "to_anchor_image",
-        "mid_anchor_image",
-
-        "from_anchor_rotate",
-        "to_anchor_rotate",
-        "mid_anchor_rotate",
-
-        "from_anchor_rotate_offset",
-        "to_anchor_rotate_offset",
-        "mid_anchor_rotate_offset",
-      ],
+      属性列表:[],
     };
   },
   mounted() {
+    for(属性名 in this.$卡片预设属性默认值){
+      this.属性列表.push(属性名)
+    }
+    console.log(this.属性列表)
     this.获取预设();
   },
 
@@ -444,12 +432,12 @@ module.exports = {
       handler: function (val, oldval) {
         if (val && val.attrs) {
           // console.log(val);
-          this.属性列表.forEach((属性名) => {
+          for(属性名 in this.属性列表){
             if (!(val.attrs[属性名] === "byref") && !(val.attrs[属性名] === undefined)) {
               //console.log(val.attrs[属性名]);
               this.属性对象[属性名] = val.attrs[属性名];
             }
-          });
+          }
           this.设定当前标记(this.属性对象);
         }
       },
@@ -726,32 +714,13 @@ module.exports = {
       this.预设名 = 预设名;
     },
     获取预设: async function () {
-      if (this.当前对象数据.type == "link") {
-        this.预设列表 = await this.$数据库.linkpresets.toArray();
-        //  console.log(this.预设列表);
+      if (!this.当前对象数据.type) {
+        return null;
       }
-      if (this.当前对象数据.type == "card") {
-        //  console.log(this.预设列表);
-
-        this.预设列表 = await this.$数据库.cardpresets.toArray();
-      }
-      if (this.预设名 && this.当前对象数据.type == "card") {
-        await this.$数据库.cardpresets
-          .filter((data) => {
-            if (data.name == this.预设名) {
-              return true;
-            }
-          })
-          .toArray((array) => (array[0] ? (this.预设 = array[0]) : null));
-      }
-      if (this.预设名 && this.当前对象数据.type == "link") {
-        await this.$数据库.linkpresets
-          .filter((data) => {
-            if (data.name == this.预设名) {
-              return true;
-            }
-          })
-          .toArray((array) => (array[0] ? (this.预设 = array[0]) : null));
+      let 预设表名 = this.当前对象数据.type + "presets";
+      this.预设列表 =  await this.$获取预设表(预设表名)
+      if (this.预设名) {
+        this.预设= await this.$获取预设(预设表名,this.预设名)
       }
     },
     新建预设: async function () {

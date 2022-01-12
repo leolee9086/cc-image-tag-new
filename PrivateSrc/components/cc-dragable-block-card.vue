@@ -141,7 +141,7 @@
         :style="`
           
           color:${对象数据.attrs.color};
-          border:solid ${对象数据.attrs.borderColor} ${边框宽度}px;
+          border:solid ${对象数据.attrs.borderColor} ${对象数据.attrs.borderWidth||1}px;
           background-color:${对象数据.attrs.backgroundColor};
           width:${对象数据.attrs.width - 21 - 边框宽度 * 2 + 'px'};
           height:${对象数据.attrs.height - 21 - 边框宽度 * 2 + 'px'};
@@ -175,7 +175,9 @@
           </el-row>
         </div>
         <div>
-          <span>引用自:</span>
+          <span 
+          v-if="对象数据.attrs.def_block"
+          >引用自:</span>
           <cc-link-siyuan
             v-if="对象数据.attrs.def_block"
             :style="`color:${对象数据.attrs.color};`"
@@ -287,6 +289,7 @@ module.exports = {
               this.对象数据.offsety = 0;
             }
           : null;
+        this.边框宽度= val.attrs.borderWidth||1
       },
       deep: true,
       immediate: true,
@@ -402,11 +405,21 @@ module.exports = {
       this.预览HTML = await Vditor.md2html(this.对象数据.markdown);
       if (this.def_block) {
         let 思源块内容 = await 以id获取文档内容(window.location.host, "", this.def_block);
-        思源块内容.data.content
-          ? (this.思源HTML = 思源块内容.data.content
-              .replace('contenteditable="true"', 'contenteditable="false"')
-              .replace('<img src="assets', '<img src="../assets'))
-          : (this.思源HTML = "获取思源块内容失败");
+        if (思源块内容.data.content) {
+          let el = window.document.createElement("div");
+          el.innerHTML = 思源块内容.data.content;
+          let images = el.querySelectorAll("img");
+          if (images[0]) {
+            images.forEach((element) => {
+              let src = element.getAttribute("src");
+              if (src.slice(0, 6) == "assets") {
+                element.setAttribute("src", "/" + src);
+              }
+            });
+          }
+
+          this.思源HTML = el.innerHTML;
+        } else this.思源HTML = "获取思源块内容失败";
       }
     },
     开始连接() {
