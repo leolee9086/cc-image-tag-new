@@ -14,20 +14,19 @@ else{
   Vue.prototype.$baseid= Vue.prototype.$挂件自身元素().getAttribute("data-node-id")
 }
 const 数据库 = new Dexie(Vue.prototype.$baseid);
-数据库.version(2).stores({
+数据库.version(3).stores({
   cards: 'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs', 
   links:'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs',
   states:"++id,current_cardid,current_linkid,viewcenter",
   metadata:"key,value",
   history:"++id,data",
-  cardpresets:"id,&name,attrs",
-  linkpresets:"id,&name,attrs",
+  cardpresets:"id,parent_id,root_id,hash,box,path,&name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs",
+  linkpresets:"id,parent_id,root_id,hash,box,path,&name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs",
 });
 
 const 画板元数据库 = new Dexie("cc_whiteboardfiles");
 画板元数据库.version(4).stores({
   boards: 'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs', 
-  
 });
 画板元数据库.open()
 const 默认链接预设={
@@ -255,3 +254,18 @@ Vue.prototype.$获取预设 = async function(预设表名,预设名){
   return 预设数组[0]||null
   }
 
+  const 窗口状态对象 = {
+    current_linkid: "",
+    editMode: "",
+    current_cardid: "",
+    lastviewcentter: "",
+    等待连接卡片id: "",
+    缩放倍数:1,
+    使用svg:false,
+    showname:true,
+    showsubtype:true,
+    current_cardid_array:[],
+    current_cardpreset_name:"",
+    current_linkpreset_name:"",
+  };
+  Vue.prototype.$当前窗口状态 = 窗口状态对象;

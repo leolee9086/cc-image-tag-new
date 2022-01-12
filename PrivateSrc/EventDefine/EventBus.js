@@ -1,16 +1,5 @@
 const 事件总线 = new Vue();
-const 窗口状态对象 = {
-  current_linkid: "",
-  editMode: "",
-  current_cardid: "",
-  lastviewcentter: "",
-  等待连接卡片id: "",
-  缩放倍数:1,
-  使用svg:false,
-  showname:true,
-  showsubtype:true,
-  current_cardid_array:[]
-};
+
 
 const 事务列表 = {
   数据库: 数据库,
@@ -98,13 +87,11 @@ const 事务列表 = {
     if (传入数据.attrsproxy) {
       let 原始数据 = await this.$数据库[数据表名].get(传入数据.id);
       原始数据.subtype = 传入数据.subtype||"属于";
-
       for (属性名 in 传入数据.attrsproxy) {
         原始数据.attrs[属性名] = 传入数据.attrsproxy[属性名]
       }
       原始数据=this.$更新数据时间戳(原始数据)
       await this.$数据库[数据表名].put(原始数据);
-
     } else if (传入数据.id) {
       传入数据 = this.$更新数据时间戳(传入数据)
       await this.$数据库[数据表名].put(传入数据);
@@ -271,10 +258,92 @@ const 事务列表 = {
     this.$当前窗口状态.待发送数据 = 对象数据
     this.$当前窗口状态.显示发送对话框 = true
   },
-  改变卡片预设:function(卡片数据,预设名){
-    卡片数据.subtype =  预设名
-    卡片数据=this.$更新数据时间戳(卡片数据)
-    this.$事件总线.$emit("保存数据",卡片数据)
+  改变数据预设:async function(对象数据,预设名){
+    对象数据.subtype =  预设名
+    let 预设值= {}
+    await  this.$数据库[对象数据.type+"presets"].filter((data)=>{
+      if(data.name == 预设名){
+        return true;
+      }
+    }).toArray((array)=>{预设值= array[0]})
+    let attrsproxy ={}
+    console.log(预设值)
+    if(预设值){
+    for(属性名 in 预设值.attrs){
+      预设值[属性名]
+      if(预设值.attrs[属性名]!==undefined&&预设值.attrs[属性名]!=="byref"){
+        attrsproxy[属性名]= 预设值.attrs[属性名]
+      }
+    }
+    }
+    let 传出数据 = {}
+    传出数据.id  = 对象数据.id
+    传出数据.type =对象数据.type
+    传出数据.subtype =  预设名
+    传出数据.attrsproxy = attrsproxy
+    console.log(传出数据)
+    console.log(attrsproxy)
+    this.$事件总线.$emit("保存卡片",传出数据)
+  },
+  删除预设:async function(预设项目,预设表名){
+    let 数据表名= 预设表名.replace("presets","s")
+    let 预设名 =预设项目.name
+
+    let 数据数组 =await this.$数据库[数据表名] 
+    .filter((data) => {
+      if (data.subtype == 预设名) {
+        return true;
+      }
+    })
+    .toArray()
+    await this.$数据库[预设表名].delete(预设项目.id);
+
+    for(i in 数据数组){
+      let el = 数据数组[i]
+      el.subtype = 预设表名=="cardpresets"?"一般概念":"属于"
+      this.$事件总线.$emit("改变数据预设",el,el.subtype)
+    }
+    
+  },
+  变更预设值:async function(属性名,预设项目){
+    let 预设表名 = 预设项目.type+"presets" 
+    let 数据表名 = 预设项目.type+"s" 
+    let 预设名 = 预设项目.name
+    console.log(预设名)
+    if(属性名){
+      await this.$数据库[预设表名].put(预设项目)
+      await this.$数据库[数据表名]
+      .filter((data)=>{
+        if(data.subtype == 预设名){
+          return true;
+        }
+      })
+      .modify(
+        (value)=>
+        {
+          value.attrs[属性名]=预设项目.attrs[属性名]
+        })
+    }
+    let 数据列表 = await this.$数据库[数据表名]
+    .filter((data)=>{
+      if(data.subtype == 预设名){
+        return true;
+      }
+    }).toArray()
+
+    if(数据列表[0]){
+      数据列表.forEach(el=>{
+        let 传出数据={}
+        console.log(el.type)
+        传出数据.type=el.type||"card"
+        传出数据.subtype=el.subtype
+
+        传出数据.id=el.id
+        传出数据.attrsproxy = {属性名:预设项目[属性名]}
+        this.$事件总线.$emit("保存数据",传出数据)
+
+      })
+    }
   },
   新建预设:async function(预设数据,预设名,预设类型){
     
@@ -296,9 +365,8 @@ const 事务列表 = {
         attrs:预设数据,
         name:预设名
       }
-      this.$数据库[预设表名].put(新预设数据)
+     await this.$数据库[预设表名].put(新预设数据)
     }
-    
   }
 };
 
@@ -310,7 +378,6 @@ for (let item in 事务列表) {
   }
 }
 
-Vue.prototype.$当前窗口状态 = 窗口状态对象;
 Vue.prototype.$事件总线 = 事件总线;
 Vue.prototype.$思源伺服ip = window.location.host;
 Vue.prototype.$主界面 = window.parent.document

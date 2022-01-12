@@ -166,10 +166,18 @@
           >当前元素坐标 x:{{ parseInt(属性对象.left) }}y{{ parseInt(属性对象.top) }}</span
         >
         <el-row type="flex" justify="space-between">
-          <el-col :span="21">
+          <el-col :span="12">
             <el-input v-model="当前对象名称" size="mini" @input="修改对象名称()">
               <span slot="prepend">名称</span>
             </el-input>
+          </el-col>
+          <el-col :span="9">
+            <cc-presets-selector
+              :数据id="对象数据.id || ''"
+              :数据表名="对象数据.type + 's' || ''"
+              v-model="当前预设名"
+            >
+            </cc-presets-selector>
           </el-col>
         </el-row>
       </el-col>
@@ -244,6 +252,7 @@ module.exports = {
   components: componentsList,
   data() {
     return {
+      当前预设名: "",
       apitoken: "",
       数据源id: {},
       属性对象: {},
@@ -414,6 +423,7 @@ module.exports = {
           this.对象数据 = $event;
           this.属性对象 = this.对象数据.attrs;
           this.当前对象名称 = this.对象数据.name;
+          this.预设名 = $event.subtype;
           this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}&table=cards`;
         }
       }

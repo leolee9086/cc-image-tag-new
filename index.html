@@ -37,6 +37,8 @@
   <link id="protyleRevealStyle" rel="stylesheet" type="text/css" href="/stage/protyle/js/reveal/reveal.css">
   <link id="protyleRevealThemeStyle" rel="stylesheet" type="text/css" href="/stage/protyle/js/reveal/theme/white.css">
   <script src="./PrivateSrc/store/dataDefine.js"></script>
+  <script src="./PrivateSrc/GeomDefine/LinkDefine.js"></script>
+
   <script src="./PrivateSrc/EventDefine/EventBus.js" ></script>
 
 
@@ -63,8 +65,10 @@
     "cc-layers-cards",
     "cc-layers-graph",
     "cc-layers-tooltip",
-    "cc-layers-konva-graph"
+    "cc-layers-konva-graph",
+    "cc-presets-selector",
   ]
+  
   应用组件列表.forEach(组件名=>
     Vue.component(组件名,`url:/widgets/cc-image-tag-new/PrivateSrc/components/${组件名}.vue`)
   )

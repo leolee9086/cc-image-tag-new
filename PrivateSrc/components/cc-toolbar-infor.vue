@@ -11,23 +11,12 @@
         {{ `节点信息:${$当前窗口状态.current_cardid || $当前窗口状态.current_linkid}` }}
       </div>
       <strong>预设类型</strong>
-
-      <el-select
-        :aria-label="`[一般概念]和[属于]是最基本的预设,不包含任何值.
-      每次刷新之后会重置.
-      但是可以用于批量更改属性`"
-        size="mini"
+      <cc-presets-selector
+        :数据id="当前对象数据.id || ''"
+        :数据表名="当前对象数据.type + 's' || ''"
         v-model="预设名"
-        @focus="获取预设()"
       >
-        <el-option
-          v-for="(预设, i) in 预设列表"
-          :key="预设.id"
-          :label="预设.name"
-          :value="预设.name"
-        >
-        </el-option>
-      </el-select>
+      </cc-presets-selector>
     </el-row>
     <el-tabs v-model="当前面板">
       <el-tab-pane label="连接" name="连接">
@@ -91,16 +80,10 @@
 
       <el-tab-pane label="样式" name="样式">
         <el-row>
-          <el-input v-model="新预设名">
-            <span @click="新建预设()" slot="append">创建新预设</span>
-          </el-input>
-        </el-row>
-        <el-row>
           <el-collapse>
             <el-collapse-item title="节点样式">
               <strong slot="title">节点样式</strong>
               <el-tabs>
-                
                 <el-tab-pane label="边框色" name="边框色">
                   <span slot="label">
                     边框色
@@ -155,10 +138,16 @@
                 </el-tab-pane>
                 <el-tab-pane label="几何设置" name="几何设置">
                   <el-row>
-                    <el-switch active-text="始终连接到中点" v-model="属性对象.fixed_anchor" ></el-switch>
+                    <el-switch
+                      active-text="始终连接到中点"
+                      v-model="属性对象.fixed_anchor"
+                    ></el-switch>
                   </el-row>
-                   <el-row>
-                    <el-input-number :value="属性对象.borderWidth||1" @change="属性对象.borderWidth=$event" ></el-input-number>
+                  <el-row>
+                    <el-input-number
+                      :value="属性对象.borderWidth || 1"
+                      @change="属性对象.borderWidth = $event"
+                    ></el-input-number>
                   </el-row>
                 </el-tab-pane>
               </el-tabs>
@@ -321,6 +310,11 @@
         </el-row>
       </el-tab-pane>
       <el-tab-pane label="预设" name="预设">
+        <el-row>
+          <el-input v-model="新预设名">
+            <span @click="新建预设()" slot="append">创建新预设</span>
+          </el-input>
+        </el-row>
         <el-collapse>
           <el-collapse-item v-for="(预设项目, i) in 预设列表">
             <div slot="title">
@@ -330,13 +324,15 @@
                 icon="el-icon-delete"
                 circle
                 v-if="
-                  预设项目.id != '20211230111132-wbdnm23' &&
-                  预设项目.id != '20211230113017-0vgkowg'
+                  !(
+                    (预设项目.name == '一般概念' && 当前对象数据.type == 'card') ||
+                    (预设项目.name == '属于' && 当前对象数据.type == 'link')
+                  )
                 "
                 @click="删除预设(预设项目)"
               ></el-button>
             </div>
-            <el-row v-for="属性名,i in 属性列表">
+            <el-row v-for="(属性名, i) in 属性列表">
               <el-col :span="20"
                 ><span>{{ 属性名 }}</span>
               </el-col>
@@ -380,7 +376,6 @@
 module.exports = {
   name: "cc-toolbar-infor",
   props: ["卡片数据id", "链接数据id", "思源伺服ip", "显示"],
-  components: componentsList,
   data() {
     return {
       当前面板: "样式",
@@ -416,104 +411,57 @@ module.exports = {
       预设名: "",
       新预设名: "",
       重命名计数: 1,
-      属性列表:[],
+      属性列表: [],
     };
   },
   mounted() {
-    for(属性名 in this.$卡片预设属性默认值){
-      this.属性列表.push(属性名)
+    for (属性名 in this.$卡片预设属性默认值) {
+      this.属性列表.push(属性名);
     }
-    console.log(this.属性列表)
+    console.log(this.属性列表);
     this.获取预设();
+    this.$事件总线.$on(
+      "激活卡片",
+      ($event) => (this.当前对象数据 = $event || this.当前对象数据)
+    );
+    this.$事件总线.$on(
+      "激活链接",
+      ($event) => (this.当前对象数据 = $event || this.当前对象数据)
+    );
   },
 
   watch: {
-    预设: {
-      handler: function (val, oldval) {
-        if (val && val.attrs) {
-          // console.log(val);
-          for(属性名 in this.属性列表){
-            if (!(val.attrs[属性名] === "byref") && !(val.attrs[属性名] === undefined)) {
-              //console.log(val.attrs[属性名]);
-              this.属性对象[属性名] = val.attrs[属性名];
-            }
-          }
-          this.设定当前标记(this.属性对象);
-        }
-      },
-      deep: true,
-    },
-
     预设名: {
       handler: async function (val, oldval) {
-        if (this.当前对象数据.type == "link") {
-          await this.$数据库.linkpresets
-            .filter((data) => {
-              if (data.name == val) {
-                return true;
-              }
-            })
-            .toArray((array) =>
-              array[0] ? (this.预设 = array[0]) : this.重建预设(this.当前对象数据)
-            );
-          this.新预设名 = this.预设.name || "未命名";
-          this.预设id = this.预设.id;
-          await this.$数据库.links.update(this.当前对象数据.id, {
-            subtype: this.预设.name,
-          });
-        }
-        if (this.当前对象数据.type == "card") {
-          await this.$数据库.cardpresets
-            .filter((data) => {
-              if (data.name == val) {
-                return true;
-              }
-            })
-            .toArray((array) =>
-              array[0] ? (this.预设 = array[0]) : this.重建预设(this.当前对象数据)
-            );
-          this.新预设名 = this.预设.name || "未命名";
-          this.预设id = this.预设.id;
-          await this.$数据库.cards.update(this.当前对象数据.id, {
-            subtype: this.预设.name,
-          });
-        }
+        let 数据表名 = this.当前对象数据.type + "s" || "cards";
+        let 预设表名 = this.当前对象数据.type + "presets" || "cadpresets";
+        //  this.$事件总线.$emit("改变数据预设", this.当前对象数据, val);
+        await this.$数据库[预设表名]
+          .filter((data) => {
+            if (data.name == val) {
+              return true;
+            }
+          })
+          .toArray((array) =>
+            array[0] ? (this.预设 = array[0]) : this.重建预设(this.当前对象数据)
+          );
+        this.新预设名 = val || "未命名";
+        this.预设id = this.预设.id;
       },
     },
-    卡片数据id: {
-      handler: async function (val, oldval) {
-        if (val && val != oldval) {
-          this.当前对象数据 = await this.$数据库.cards.get(this.卡片数据id);
-          this.属性对象 = JSON.parse(JSON.stringify(this.当前对象数据.attrs));
-          this.属性对象.id = this.当前对象数据.id;
-          this.当前对象名称 = this.当前对象数据.name;
-          this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.当前对象数据.id}&baseid=${this.$baseid}&table=cards`;
-        }
-      },
-    },
-    链接数据id: {
-      handler: async function (val, oldval) {
-        if (val && val != oldval) {
-          this.当前对象数据 = await this.$数据库.links.get(this.链接数据id);
-          this.属性对象 = JSON.parse(JSON.stringify(this.当前对象数据.attrs));
-          this.属性对象.id = this.当前对象数据.id;
-          this.属性对象.path_width = this.属性对象.path_width || 1;
-          this.当前对象名称 = this.当前对象数据.name;
-          this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.当前对象数据.id}&baseid=${this.$baseid}&table=cards`;
-        }
-      },
-    },
+
     当前对象数据: {
       handler: async function (val, oldval) {
         //  console.log("当前数据", val);
         if (!val) {
           return null;
         }
+        this.预设名 = val.subtype;
+        await this.获取预设();
+
         this.当前数据类型 = val.type;
         //  console.log(this.当前数据类型);
         this.当前思源块id = val.attrs.def_block;
-        this.预设名 = val.subtype;
-        await this.获取预设();
         if (val.type == "card") {
           this.当前图上正向链接列表 = await this.$数据库.links
             .filter((value) => {
@@ -533,8 +481,6 @@ module.exports = {
               }
             })
             .toArray();
-        }
-        if (val.type == "card") {
         }
       },
       deep: true,
@@ -582,29 +528,9 @@ module.exports = {
   methods: {
     删除预设: async function (预设项目) {
       let id = 预设项目.id;
-      if (this.当前对象数据.type == "link") {
-        await this.$数据库.linkpresets.delete(预设项目.id);
-        await this.$数据库.links
-          .filter((data) => {
-            if (data.subtype == this.预设名) {
-              return true;
-            }
-          })
-          .modify((value) => (value.subtype = "属于"));
-        this.预设名 = "属于";
-      }
-      if (this.当前对象数据.type == "card") {
-        await this.$数据库.cardpresets.delete(预设项目.id);
-        await this.$数据库.cards
-          .filter((data) => {
-            if (data.subtype == this.预设名) {
-              return true;
-            }
-          })
-          .modify((value) => (value.subtype = "一般概念"));
-        this.预设名 = "一般概念";
-      }
-      await this.获取预设();
+      let 预设表名 = this.当前对象数据.type + "presets";
+      this.$事件总线.$emit("删除预设", 预设项目, 预设表名);
+      this.预设名 = 预设表名 == "cardpresets" ? "一般概念" : "属于";
     },
     重建预设: async function (对象数据) {
       if (对象数据 && 对象数据.id) {
@@ -613,29 +539,10 @@ module.exports = {
       await this.新建预设();
     },
     变更预设值: async function (属性名, 预设项目) {
-      if (属性名) {
-        this.预设.attrs[属性名] = this.属性对象[属性名];
-        if (this.当前对象数据.type == "link") {
-          await this.$数据库.linkpresets.put(this.预设);
-          await this.$数据库.links
-            .filter((data) => {
-              if (data.subtype == this.预设名) {
-                return true;
-              }
-            })
-            .modify((value) => (value.attrs[属性名] = this.属性对象[属性名]));
-        }
-        if (this.当前对象数据.type == "card") {
-          await this.$数据库.cardpresets.put(this.预设);
-          await this.$数据库.cards
-            .filter((data) => {
-              if (data.subtype == this.预设名) {
-                return true;
-              }
-            })
-            .modify((value) => (value.attrs[属性名] = this.属性对象[属性名]));
-        }
-      }
+      console.log(this.预设);
+      this.预设.type = this.当前对象数据.type;
+      this.预设.attrs[属性名] = this.属性对象[属性名];
+      this.$事件总线.$emit("变更预设值", 属性名, this.预设);
     },
 
     设为实例值: async function (属性名, 预设项目) {
@@ -718,9 +625,9 @@ module.exports = {
         return null;
       }
       let 预设表名 = this.当前对象数据.type + "presets";
-      this.预设列表 =  await this.$获取预设表(预设表名)
+      this.预设列表 = await this.$获取预设表(预设表名);
       if (this.预设名) {
-        this.预设= await this.$获取预设(预设表名,this.预设名)
+        this.预设 = await this.$获取预设(预设表名, this.预设名);
       }
     },
     新建预设: async function () {

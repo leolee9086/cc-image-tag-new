@@ -141,7 +141,7 @@
         :style="`
           
           color:${对象数据.attrs.color};
-          border:solid ${对象数据.attrs.borderColor} ${对象数据.attrs.borderWidth||1}px;
+          border:solid ${对象数据.attrs.borderColor} ${对象数据.attrs.borderWidth || 1}px;
           background-color:${对象数据.attrs.backgroundColor};
           width:${对象数据.attrs.width - 21 - 边框宽度 * 2 + 'px'};
           height:${对象数据.attrs.height - 21 - 边框宽度 * 2 + 'px'};
@@ -175,9 +175,7 @@
           </el-row>
         </div>
         <div>
-          <span 
-          v-if="对象数据.attrs.def_block"
-          >引用自:</span>
+          <span v-if="对象数据.attrs.def_block">引用自:</span>
           <cc-link-siyuan
             v-if="对象数据.attrs.def_block"
             :style="`color:${对象数据.attrs.color};`"
@@ -209,7 +207,6 @@
 module.exports = {
   name: "cc-block-card",
   props: ["value", "index", "移除标签", "数据源id", "窗口缩放倍数", "数据类型"],
-  components: componentsList,
   model: { prop: "value", event: "change" },
   data() {
     return {
@@ -220,12 +217,12 @@ module.exports = {
       开始监听: false,
       数据超链接: "",
       folded: "",
-
       hide: "",
       显示控制柄: true,
       边框宽度: 1,
       思源HTML: "",
       def_block: "",
+      预设: "",
     };
   },
   beforeMount() {
@@ -238,7 +235,7 @@ module.exports = {
     this.开始监听 = true;
     this.数据超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html/?id=${this.对象数据.id}&baseid=${this.$baseid}&type=${this.数据类型}`;
     this.hide = false;
-    this.timer = setInterval(this.计算可见性, 100);
+    setTimeout(this.计算可见性, 100);
     this.$事件总线.$on("保存卡片", (event) => this.判断id(event));
     this.$事件总线.$on("保存链接", (event) => this.判断id(event));
   },
@@ -289,7 +286,8 @@ module.exports = {
               this.对象数据.offsety = 0;
             }
           : null;
-        this.边框宽度= val.attrs.borderWidth||1
+        this.边框宽度 = val.attrs.borderWidth || 1;
+        this.获取预设(val.subtype);
       },
       deep: true,
       immediate: true,
@@ -378,6 +376,20 @@ module.exports = {
     },
   },
   methods: {
+    获取预设: async function (预设名) {
+      let 预设表名 = this.对象数据.type + "presets";
+      this.预设 = await this.$获取预设(预设表名, 预设名);
+
+      if (!this.预设) {
+        return null;
+      } else {
+        for (属性名 in this.卡片预设默认值) {
+          if (this.预设[属性名] && this.预设[属性名] !== "byref") {
+            this.对象数据.attrs.属性名 = this.预设.属性名;
+          }
+        }
+      }
+    },
     返回原始点: function () {
       this.对象数据.attrs.offsetx = 0 - this.对象数据.attrs.width / 2;
       this.对象数据.attrs.offsety = 0 - this.对象数据.attrs.height / 2;
@@ -495,6 +507,7 @@ module.exports = {
     计算可见性: async function () {
       this.hide = true;
       let 对象数据 = this.对象数据;
+
       let $当前窗口状态 = this.$当前窗口状态;
       if (this.对象数据 && this.对象数据.attrs.top < 0) {
         this.对象数据.top = 0;
@@ -520,6 +533,11 @@ module.exports = {
         this.hide = true;
       } else {
         this.hide = false;
+      }
+      if (对象数据) {
+        setTimeout(this.计算可见性, 100);
+      } else {
+        clearTimeout(this.计算可见性);
       }
     },
   },

@@ -25,7 +25,7 @@ module.exports = {
     this.代理结束标记 =
       (await this.$数据库.cards.get(this.链接.attrs.to_id)) ||
       (await this.$数据库.links.get(this.链接.attrs.to_id));
-
+    if(!this.代理起始标记||!this.代理结束标记){this.$事件总线.$emit("删除链接",this.link)}
     this.加载节点图片(this.起始节点图片, "起始节点图片元素");
     this.加载节点图片(this.结束节点图片, "结束节点图片元素");
     this.加载节点图片(this.中间节点图片, "中间节点图片元素");
@@ -339,7 +339,7 @@ module.exports = {
 
       if (是否自动旋转) {
         let 方向矢量 = { x: 终点坐标.x - 起点坐标.x, y: 终点坐标.y - 起点坐标.y };
-        let 单位方向矢量 = this.单位矢量(方向矢量);
+        let 单位方向矢量 = 几何定义.单位矢量(方向矢量);
         角度 = this.计算角度(单位方向矢量);
         obj.rotation = 角度 - 90;
       }
@@ -458,35 +458,9 @@ module.exports = {
     测试连接() {
       //  console.log(this.link);
     },
-    矢量模(矢量) {
-      let x = 矢量.x;
-      let y = 矢量.y;
-      return Math.sqrt(x * x + y * y);
-    },
-    单位矢量(矢量) {
-      let x = 矢量.x;
-      let y = 矢量.y;
-      let 矢量模 = this.矢量模(矢量);
-      return { x: x / 矢量模, y: y / 矢量模 };
-    },
-    矢量加(矢量1, 矢量2) {
-      return { x: 矢量1.x + 矢量2.x, y: 矢量1.y + 矢量2.y };
-    },
-    矢量减: function (矢量1, 矢量2) {
-      return { x: 矢量1.x - 矢量2.x, y: 矢量1.y - 矢量2.y };
-    },
-    矢量内积(矢量1, 矢量2) {
-      return { x: 矢量1.x + 矢量2.x, y: 矢量2.y + 矢量2.y };
-    },
-    矢量除标量(矢量, 标量) {
-      return { x: 矢量.x / 标量, y: 矢量.y / 标量 };
-    },
-    矢量(x, y) {
-      return { x: x, y: y };
-    },
-    矢量乘标量(矢量, 标量) {
-      return { x: 标量 * 矢量["x"], y: 标量 * 矢量["y"] };
-    },
+    
+   
+   
     计算路径: async function () {
       if (!this.代理起始标记 || !this.代理结束标记) {
         return null;
@@ -595,37 +569,37 @@ module.exports = {
     生成引线路径: function (路径线段) {
       let 起始节点 = 路径线段.起点;
       let 结束节点 = 路径线段.终点;
-      let 路径矢量 = this.矢量减(结束节点, 起始节点);
+      let 路径矢量 = 几何定义.矢量减(结束节点, 起始节点);
       let define = "";
       let midpoint = {};
       define = `
             M ${起始节点.x} ${起始节点.y}
             l ${路径矢量.x} ${路径矢量.y}
             `;
-      midpoint = this.矢量加(起始节点, this.矢量除标量(路径矢量, 2));
+      midpoint = 几何定义.矢量加(起始节点, 几何定义.矢量除标量(路径矢量, 2));
       return { d: define, mid: midpoint };
     },
     生成直线路径: function (路径线段) {
-      let 起始节点 = this.矢量减(路径线段.起点, this.起始节点偏移);
-      let 结束节点 = this.矢量减(路径线段.终点, this.结束节点偏移);
-      let 路径矢量 = this.矢量减(结束节点, 起始节点);
+      let 起始节点 = 几何定义.矢量减(路径线段.起点, this.起始节点偏移);
+      let 结束节点 = 几何定义.矢量减(路径线段.终点, this.结束节点偏移);
+      let 路径矢量 = 几何定义.矢量减(结束节点, 起始节点);
       let define = "";
       let midpoint = {};
       define = `
             M ${起始节点.x} ${起始节点.y}
             l ${路径矢量.x} ${路径矢量.y}
             `;
-      midpoint = this.矢量加(起始节点, this.矢量除标量(路径矢量, 2));
+      midpoint = 几何定义.矢量加(起始节点, 几何定义.矢量除标量(路径矢量, 2));
       return { d: define, mid: midpoint };
     },
     两点生成三次贝塞尔曲线: function (路径线段) {
-      let 起始节点 = this.矢量减(路径线段.起点, this.起始节点偏移);
-      let 结束节点 = this.矢量减(路径线段.终点, this.结束节点偏移);
+      let 起始节点 = 几何定义.矢量减(路径线段.起点, this.起始节点偏移);
+      let 结束节点 = 几何定义.矢量减(路径线段.终点, this.结束节点偏移);
 
-      let 路径矢量 = this.矢量减(结束节点, 起始节点);
+      let 路径矢量 = 几何定义.矢量减(结束节点, 起始节点);
       let define = "";
       let midpoint = {};
-      midpoint = this.矢量加(起始节点, this.矢量除标量(路径矢量, 2));
+      midpoint = 几何定义.矢量加(起始节点, 几何定义.矢量除标量(路径矢量, 2));
       define = `
             M ${起始节点.x} ${起始节点.y}
             C ${起始节点.x + Math.sign(路径矢量.x) * 100} ${
@@ -637,9 +611,9 @@ module.exports = {
       return { d: define, mid: midpoint };
     },
     生成折线路径: function (路径线段) {
-      let 起始节点 = this.矢量减(路径线段.起点, this.起始节点偏移);
-      let 结束节点 = this.矢量减(路径线段.终点, this.结束节点偏移);
-      let 路径矢量 = this.矢量减(结束节点, 起始节点);
+      let 起始节点 = 几何定义.矢量减(路径线段.起点, this.起始节点偏移);
+      let 结束节点 = 几何定义.矢量减(路径线段.终点, this.结束节点偏移);
+      let 路径矢量 = 几何定义.矢量减(结束节点, 起始节点);
       let define = "";
       let mid = "";
       if (路径矢量["x"] * 路径矢量["x"] - 路径矢量["y"] * 路径矢量["y"] >= 0) {
@@ -666,15 +640,15 @@ module.exports = {
       if (代理起始标记 && 代理结束标记 && this.链接) {
         let 起始中心 = this.计算中心(代理起始标记);
         let 结束中心 = this.计算中心(代理结束标记);
-        let 方向矢量 = this.矢量减(结束中心, 起始中心);
+        let 方向矢量 = 几何定义.矢量减(结束中心, 起始中心);
         if (方向矢量.x === 0) {
           方向矢量.x = 0.00000000001;
         }
         if (方向矢量.y === 0) {
           方向矢量.y = 0.00000000001;
         }
-        let 反转方向矢量 = this.矢量乘标量(方向矢量, -1);
-        方向矢量 = this.矢量乘标量(方向矢量, 1);
+        let 反转方向矢量 = 几何定义.矢量乘标量(方向矢量, -1);
+        方向矢量 = 几何定义.矢量乘标量(方向矢量, 1);
         let 起始节点 = this.矩形与矢量交点(代理起始标记, 方向矢量);
         let 结束节点 = this.矩形与矢量交点(代理结束标记, 反转方向矢量);
         let 路径线段 = { 起点: 起始节点, 终点: 结束节点 };
