@@ -513,7 +513,6 @@ module.exports = {
     计算可见性: async function () {
       this.hide = true;
       let 对象数据 = this.对象数据;
-
       let $当前窗口状态 = this.$当前窗口状态;
       if (this.对象数据 && this.对象数据.attrs.top < 0) {
         this.对象数据.top = 0;
