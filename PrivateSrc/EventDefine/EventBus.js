@@ -296,7 +296,7 @@ const 事务列表 = {
    // console.log(attrsproxy)
     this.$事件总线.$emit("保存卡片",传出数据)
   },
-  删除预设:async function(预设项目,预设表名){
+  删除预设:async function(预设项目,预设表名,callback){
     let 数据表名= 预设表名.replace("presets","s")
     let 预设名 =预设项目.name
 
@@ -315,7 +315,9 @@ const 事务列表 = {
     })
     await this.$数据库[预设表名].delete(预设项目.id);
 
-    
+    if(callback){
+      callback.apply()
+    }
   },
   变更预设值:async function(属性名,预设项目){
     let 预设表名 = 预设项目.type+"presets" 

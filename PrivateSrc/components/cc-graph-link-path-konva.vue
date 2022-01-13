@@ -25,7 +25,9 @@ module.exports = {
     this.代理结束标记 =
       (await this.$数据库.cards.get(this.链接.attrs.to_id)) ||
       (await this.$数据库.links.get(this.链接.attrs.to_id));
-    if(!this.代理起始标记||!this.代理结束标记){this.$事件总线.$emit("删除链接",this.link)}
+    if (!this.代理起始标记 || !this.代理结束标记) {
+      this.$事件总线.$emit("删除链接", this.link);
+    }
     this.加载节点图片(this.起始节点图片, "起始节点图片元素");
     this.加载节点图片(this.结束节点图片, "结束节点图片元素");
     this.加载节点图片(this.中间节点图片, "中间节点图片元素");
@@ -458,9 +460,7 @@ module.exports = {
     测试连接() {
       //  console.log(this.link);
     },
-    
-   
-   
+
     计算路径: async function () {
       if (!this.代理起始标记 || !this.代理结束标记) {
         return null;
@@ -602,11 +602,14 @@ module.exports = {
       midpoint = 几何定义.矢量加(起始节点, 几何定义.矢量除标量(路径矢量, 2));
       define = `
             M ${起始节点.x} ${起始节点.y}
-            C ${起始节点.x + Math.sign(路径矢量.x) * 100} ${
-        起始节点.y + Math.sign(路径矢量.y) * 100
-      } ${结束节点.x - Math.sign(路径矢量.x) * 100} ${
-        结束节点.y - Math.sign(路径矢量.y) * 100
-      } ${结束节点.x} ${结束节点.y}
+            l ${-this.起始节点偏移.x * 2} ${-this.起始节点偏移.y * 2}
+            C ${起始节点.x - this.起始节点偏移.x * 20} ${
+        起始节点.y - this.起始节点偏移.y * 20
+      } ${结束节点.x - this.结束节点偏移.x * 20} ${
+        结束节点.y - this.结束节点偏移.y * 20
+      } ${结束节点.x - this.结束节点偏移.x * 2} ${结束节点.y - this.结束节点偏移.y * 2} 
+      
+            L ${结束节点.x} ${结束节点.y}
             `;
       return { d: define, mid: midpoint };
     },
@@ -681,15 +684,15 @@ module.exports = {
       y偏移 = Math.abs(((矩形.width / 2) * 矢量.y) / 矢量.x);
       if (Math.abs(y偏移) > Math.abs(矩形.height / 2)) {
         y偏移 = 矩形.height / 2;
-        矩形.fixed_anchor?x偏移 = 0:null
+        矩形.fixed_anchor ? (x偏移 = 0) : null;
       }
 
       if (Math.abs(x偏移) > Math.abs(矩形.width / 2)) {
         x偏移 = 矩形.width / 2;
-        矩形.fixed_anchor?y偏移 = 0:null
+        矩形.fixed_anchor ? (y偏移 = 0) : null;
       }
       //别问我为什么不用math.sign  反正不要用
-      
+
       if (矢量.x > 0) {
         交点.x = 矩形中心.x + x偏移;
       } else {

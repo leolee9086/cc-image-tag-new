@@ -141,10 +141,16 @@
         :style="`
           
           color:${对象数据.attrs.color};
-          border:solid ${对象数据.attrs.borderColor} ${对象数据.attrs.borderWidth || 1}px;
+          border:${对象数据.attrs.borderStyle || 'solid'} ${对象数据.attrs.borderColor} ${
+          对象数据.attrs.borderWidth || 1
+        }px;
           background-color:${对象数据.attrs.backgroundColor};
-          width:${对象数据.attrs.width - 21 - 边框宽度 * 2 + 'px'};
-          height:${对象数据.attrs.height - 21 - 边框宽度 * 2 + 'px'};
+          width:${
+            对象数据.attrs.width - 21 - (对象数据.attrs.borderWidth || 1) * 2 + 'px'
+          };
+          height:${
+            对象数据.attrs.height - 21 - (对象数据.attrs.borderWidth || 1) * 2 + 'px'
+          };
           `"
         @click="鼠标点击($event)"
       >

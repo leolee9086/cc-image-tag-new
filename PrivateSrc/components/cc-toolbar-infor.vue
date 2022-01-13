@@ -137,16 +137,14 @@
                   </cc-color-pane>
                 </el-tab-pane>
                 <el-tab-pane label="几何设置" name="几何设置">
-                  <span slot="label">
-                    连接线
+                  <span slot="label"> 边框和锚点 </span>
+                  <el-row>
                     <el-tooltip
-                      v-if="预设.attrs.path_width != 'byref'"
+                      v-if="预设.attrs.fixed_anchor != 'byref'"
                       content="这是一个预设值,修改后会修改所有同类型元素"
                     >
                       <span class="el-icon-copy-document"></span>
                     </el-tooltip>
-                  </span>
-                  <el-row>
                     <el-checkbox
                       :value="
                         属性对象.fixed_anchor !== undefined
@@ -158,10 +156,35 @@
                     <span>始终连接到中点</span>
                   </el-row>
                   <el-row>
+                    <el-tooltip
+                      v-if="预设.attrs.borderWidth != 'byref'"
+                      content="这是一个预设值,修改后会修改所有同类型元素"
+                    >
+                      <span class="el-icon-copy-document"></span>
+                    </el-tooltip>
                     <el-input-number
-                      :value="属性对象.borderWidth || 1"
+                      size="mini"
+                      :value="属性对象.borderWidth"
                       @change="属性对象.borderWidth = $event"
+                      :min="1"
+                      :max="50"
                     ></el-input-number>
+                  </el-row>
+                  <el-row>
+                    <el-tooltip
+                      v-if="预设.attrs.borderStyle != 'byref'"
+                      content="这是一个预设值,修改后会修改所有同类型元素"
+                    >
+                      <span class="el-icon-copy-document"></span>
+                    </el-tooltip>
+                    <el-select v-model="属性对象.borderStyle">
+                      <el-option
+                        v-for="(item, i) in 边框线型对照表"
+                        :label="item.label"
+                        :value="item.value"
+                      >
+                      </el-option>
+                    </el-select>
                   </el-row>
                 </el-tab-pane>
               </el-tabs>
@@ -170,7 +193,7 @@
               <el-tabs>
                 <el-tab-pane label="连接线" name="连接线">
                   <span slot="label">
-                    连接线
+                    几何设置
                     <el-tooltip
                       v-if="预设.attrs.path_width != 'byref'"
                       content="这是一个预设值,修改后会修改所有同类型元素"
@@ -181,7 +204,7 @@
                   <el-row>
                     <el-col :span="15">
                       <el-slider
-                        :value="属性对象.path_width || 5"
+                        v-model="属性对象.path_width"
                         @change="属性对象.path_width = $event"
                       ></el-slider>
                     </el-col>
@@ -356,6 +379,18 @@ module.exports = {
       新预设名: "",
       重命名计数: 1,
       属性列表: [],
+      边框线型对照表: [
+        { value: "none", label: "无" },
+        { value: "hidden", label: "隐藏" },
+        { value: "solid", label: "实线" },
+        { value: "double", label: "双线" },
+        { value: "dashed", label: "虚线" },
+        { value: "dotted", label: "点线" },
+        { value: "groove", label: "线雕" },
+        { value: "ridge", label: "浮雕" },
+        { value: "inset", label: "陷入" },
+        { value: "outset", label: "突起" },
+      ],
     };
   },
   mounted() {
@@ -474,7 +509,7 @@ module.exports = {
     删除预设: async function (预设项目) {
       let id = 预设项目.id;
       let 预设表名 = this.当前对象数据.type + "presets";
-      this.$事件总线.$emit("删除预设", 预设项目, 预设表名);
+      this.$事件总线.$emit("删除预设", 预设项目, 预设表名, this.获取预设);
       this.预设名 = 预设表名 == "cardpresets" ? "一般概念" : "属于";
     },
     重建预设: async function (对象数据) {
@@ -604,6 +639,7 @@ module.exports = {
           this.新预设名 = this.新预设名 + this.$用Lute生成时间戳();
           this.重命名计数 = this.重命名计数 + 1;
           this.新建预设();
+          return null;
         }
       }
       if (this.当前对象数据.type == "card") {
@@ -616,8 +652,10 @@ module.exports = {
           this.新预设名 = this.新预设名 + this.$用Lute生成时间戳();
           this.重命名计数 = this.重命名计数 + 1;
           this.新建预设();
+          return null;
         }
       }
+      await this.获取预设();
     },
 
     设定当前标记: function (val, flag) {

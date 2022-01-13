@@ -349,3 +349,6 @@ width:16px;
   height:16px;
 width:16px;
 }
+.protyle-wysiwyg [data-node-id].li>.protyle-action svg{
+  height:34px
+}
