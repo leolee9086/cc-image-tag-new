@@ -300,20 +300,21 @@ const 事务列表 = {
     let 数据表名= 预设表名.replace("presets","s")
     let 预设名 =预设项目.name
 
-    let 数据数组 =await this.$数据库[数据表名] 
+   await this.$数据库[数据表名] 
     .filter((data) => {
       if (data.subtype == 预设名) {
         return true;
       }
     })
-    .toArray()
+    .modify((value)=>{if(value){
+      value =this.$更新数据时间戳(value)
+
+      value.subtype=预设表名=="cardpresets"?"一般概念":"属于"
+      
+      }
+    })
     await this.$数据库[预设表名].delete(预设项目.id);
 
-    for(i in 数据数组){
-      let el = 数据数组[i]
-      el.subtype = 预设表名=="cardpresets"?"一般概念":"属于"
-      this.$事件总线.$emit("改变数据预设",el,el.subtype)
-    }
     
   },
   变更预设值:async function(属性名,预设项目){
@@ -322,8 +323,8 @@ const 事务列表 = {
     let 预设名 = 预设项目.name
    // console.log(预设名)
     if(属性名){
-      await this.$数据库[预设表名].put(预设项目)
-      await this.$数据库[数据表名]
+      await this.$数据库[预设表名].put(预设项目).then(()=>
+       this.$数据库[数据表名]
       .filter((data)=>{
         if(data.subtype == 预设名){
           return true;
@@ -334,7 +335,7 @@ const 事务列表 = {
         {
           value =this.$更新数据时间戳(value)
           value.attrs[属性名]=预设项目.attrs[属性名]&&预设项目.attrs[属性名]!=="byref" ?预设项目.attrs[属性名]:value.attrs[属性名]
-    })
+    }))
     /*let 数据列表 = await this.$数据库[数据表名]
     .filter((data)=>{
       if(data.subtype == 预设名){
@@ -363,7 +364,7 @@ const 事务列表 = {
       }
     ).toArray()
   
-    if(预设类型[0]){
+    if(预设卡片数据[0]){
       alert("预设已经存在,换个新名字吧")
     }
     else {
