@@ -121,9 +121,19 @@
             </div>
             <div slot="reference" @focus="搜索()" class="el-icon-zoom-in"></div>
           </el-popover>
-
-          <span class="el-icon-plus" @click="添加卡片()"></span>
-
+          <el-popover trigger="hover" placement="top" :height="500">
+            <div>
+              <el-link aria-label="搜索思源块并新建" @click="添加卡片()"
+                >新建到已有文档的子文档</el-link
+              >
+            </div>
+            <div>
+              <el-link aria-label="搜索思源块并新建" @click="添加卡片('链接到')"
+                >链接到已有文档</el-link
+              >
+            </div>
+            <span slot="reference" class="el-icon-siyuan"></span>
+          </el-popover>
           <div class="el-icon-help" @click="聚焦到卡片(对象数据)"></div>
 
           <span class="el-icon-browser" @click="$窗口内打开超链接(画板超链接)"></span>
@@ -774,14 +784,17 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
       }
       this.$事件总线.$emit("定位至卡片", 对象数据);
     },
-    添加卡片: function () {
+    添加卡片: function (def) {
       let 卡片数据 = this.$根据属性生成卡片({});
       (卡片数据.attrs.top =
         (window.pageYOffset + window.innerHeight / 2 - 50) / this.$当前窗口状态.缩放倍数),
         (卡片数据.attrs.left =
           (window.pageXOffset + window.innerWidth / 2 - 50) /
-          this.$当前窗口状态.缩放倍数),
-        this.$事件总线.$emit("添加卡片", 卡片数据);
+          this.$当前窗口状态.缩放倍数);
+      if (def) {
+        卡片数据.attrs.def_block = def;
+      }
+      this.$事件总线.$emit("打开发送对话框", 卡片数据);
     },
 
     修改对象名称: async function () {

@@ -137,11 +137,25 @@
                   </cc-color-pane>
                 </el-tab-pane>
                 <el-tab-pane label="几何设置" name="几何设置">
+                  <span slot="label">
+                    连接线
+                    <el-tooltip
+                      v-if="预设.attrs.path_width != 'byref'"
+                      content="这是一个预设值,修改后会修改所有同类型元素"
+                    >
+                      <span class="el-icon-copy-document"></span>
+                    </el-tooltip>
+                  </span>
                   <el-row>
-                    <el-switch
-                      active-text="始终连接到中点"
-                      v-model="属性对象.fixed_anchor"
-                    ></el-switch>
+                    <el-checkbox
+                      :value="
+                        属性对象.fixed_anchor !== undefined
+                          ? 属性对象.fixed_anchor
+                          : false
+                      "
+                      @change="属性对象.fixed_anchor = $event"
+                    ></el-checkbox>
+                    <span>始终连接到中点</span>
                   </el-row>
                   <el-row>
                     <el-input-number
@@ -167,7 +181,7 @@
                   <el-row>
                     <el-col :span="15">
                       <el-slider
-                        v-model="属性对象.path_width"
+                        :value="属性对象.path_width || 5"
                         @change="属性对象.path_width = $event"
                       ></el-slider>
                     </el-col>
@@ -197,34 +211,13 @@
                       <span class="el-icon-copy-document"></span>
                     </el-tooltip>
                   </span>
-                  <el-col :span="12">
-                    <el-image :src="属性对象.from_anchor_image"></el-image>
-                  </el-col>
-                  <el-col :span="12">
-                    <el-input-number
-                      size="mini"
-                      v-model="属性对象.from_anchor_size"
-                    ></el-input-number>
-                    <cc-assets-selector
-                      v-model="属性对象.from_anchor_image"
-                      :apitoken="apitoken"
-                      :思源伺服ip="思源伺服ip"
-                      :k="起点图片格式"
-                    ></cc-assets-selector>
-                    <el-select v-model="起点图片格式" size="mini" allow-create filterable>
-                      <el-option v-for="格式 in 图片格式列表" :label="格式" :value="格式">
-                      </el-option>
-                    </el-select>
-                    <el-input v-model="属性对象.from_anchor_image" size="mini"></el-input>
-                    <el-checkbox
-                      v-model="起点自动旋转"
-                      @change="属性对象.from_anchor_rotate = $event"
-                      :inactive-value="0"
-                      :active-value="1"
-                    ></el-checkbox>
-                    <cc-knob :size="50" v-model="属性对象.from_anchor_rotate_offset">
-                    </cc-knob>
-                  </el-col>
+                  <cc-anchor-setter
+                    位置="from"
+                    :对象数据="当前对象数据"
+                    :思源伺服ip="思源伺服ip"
+                    :预设="预设"
+                    :byref="预设.attrs.mid_anchor_size == 'byref'"
+                  ></cc-anchor-setter>
                 </el-tab-pane>
                 <el-tab-pane label="中点标记" name="中点标记">
                   <span slot="label">
@@ -236,34 +229,13 @@
                       <span class="el-icon-copy-document"></span>
                     </el-tooltip>
                   </span>
-                  <el-col :span="12">
-                    <el-image :src="属性对象.mid_anchor_image"></el-image>
-                  </el-col>
-                  <el-col :span="12">
-                    <el-input-number
-                      size="mini"
-                      v-model="属性对象.mid_anchor_size"
-                    ></el-input-number>
-                    <cc-assets-selector
-                      v-model="属性对象.mid_anchor_image"
-                      :apitoken="apitoken"
-                      :思源伺服ip="思源伺服ip"
-                      :k="起点图片格式"
-                    ></cc-assets-selector>
-                    <el-select v-model="起点图片格式" size="mini" allow-create filterable>
-                      <el-option v-for="格式 in 图片格式列表" :label="格式" :value="格式">
-                      </el-option>
-                    </el-select>
-                    <el-input v-model="属性对象.mid_anchor_image" size="mini"></el-input>
-                    <el-checkbox
-                      v-model="中点自动旋转"
-                      @change="属性对象.mid_anchor_rotate = $event"
-                      :inactive-value="0"
-                      :active-value="1"
-                    ></el-checkbox>
-                    <cc-knob :size="50" v-model="属性对象.mid_anchor_rotate_offset">
-                    </cc-knob>
-                  </el-col>
+                  <cc-anchor-setter
+                    位置="mid"
+                    :对象数据="当前对象数据"
+                    :思源伺服ip="思源伺服ip"
+                    :预设="预设"
+                    :byref="预设.attrs.mid_anchor_size == 'byref'"
+                  ></cc-anchor-setter>
                 </el-tab-pane>
                 <el-tab-pane label="终点标记样式" name="终点标记样式">
                   <span slot="label">
@@ -275,34 +247,13 @@
                       <span class="el-icon-copy-document"></span>
                     </el-tooltip>
                   </span>
-                  <el-col :span="12">
-                    <el-image :src="属性对象.to_anchor_image"></el-image>
-                  </el-col>
-                  <el-col :span="12">
-                    <el-input-number
-                      size="mini"
-                      v-model="属性对象.to_anchor_size"
-                    ></el-input-number>
-                    <cc-assets-selector
-                      v-model="属性对象.to_anchor_image"
-                      :apitoken="apitoken"
-                      :思源伺服ip="思源伺服ip"
-                      :k="起点图片格式"
-                    ></cc-assets-selector>
-                    <el-select v-model="起点图片格式" size="mini" allow-create filterable>
-                      <el-option v-for="格式 in 图片格式列表" :label="格式" :value="格式">
-                      </el-option>
-                    </el-select>
-                    <el-input v-model="属性对象.to_anchor_image" size="mini"></el-input>
-                    <el-checkbox
-                      v-model="终点自动旋转"
-                      @change="属性对象.to_anchor_rotate = $event"
-                      :inactive-value="0"
-                      :active-value="1"
-                    ></el-checkbox>
-                    <cc-knob :size="50" v-model="属性对象.to_anchor_rotate_offset">
-                    </cc-knob>
-                  </el-col>
+                  <cc-anchor-setter
+                    位置="to"
+                    :对象数据="当前对象数据"
+                    :思源伺服ip="思源伺服ip"
+                    :预设="预设"
+                    :byref="预设.attrs.to_anchor_size == 'byref'"
+                  ></cc-anchor-setter>
                 </el-tab-pane>
               </el-tabs>
             </el-collapse-item>
@@ -394,14 +345,7 @@ module.exports = {
       属性对象: {},
       自定义颜色数组: [],
       当前数据类型: "",
-      起点图片格式: "",
-      终点图片格式: "",
-      图片格式列表: ["jpg", "png", "jpeg", "svg"],
-      起点自动旋转: false,
-      终点自动旋转: false,
-      中点自动旋转: true,
       预设列表: [{}],
-
       预设id: "",
       预设: {
         id: "",
@@ -462,6 +406,7 @@ module.exports = {
         this.当前数据类型 = val.type;
         //  console.log(this.当前数据类型);
         this.当前思源块id = val.attrs.def_block;
+        this.属性对象 = val.attrs || this.属性对象;
         if (val.type == "card") {
           this.当前图上正向链接列表 = await this.$数据库.links
             .filter((value) => {
