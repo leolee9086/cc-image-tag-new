@@ -48,7 +48,6 @@ module.exports = {
           this.待发送数据 = this.$更新数据时间戳(this.待发送数据);
           this.$事件总线.$emit("保存数据", this.待发送数据);
           this.显示发送对话框 = false;
-          this.$窗口内打开思源块(id);
         }
       }
     },

@@ -76,13 +76,17 @@ const 事务列表 = {
     this.$事件总线.$emit("选集变化",this.$当前窗口状态.current_cardid_array)
   },
 
-  添加卡片: async function (卡片数据) {
+  添加卡片: async function (卡片数据,def) {
     await this.$数据库.cards.put(卡片数据);
     //console.log(this.$当前窗口状态.current_cardpreset_name)
 
     if(this.$当前窗口状态.current_cardpreset_name){
     //  console.log(this.$当前窗口状态.current_cardpreset_name)
       this.$事件总线.$emit("改变数据预设",卡片数据,this.$当前窗口状态.current_cardpreset_name)
+    }
+    if(def){
+      this.$事件总线.$emit("打开发送对话框", 卡片数据);
+
     }
   },
   保存数据:async function (传入数据){

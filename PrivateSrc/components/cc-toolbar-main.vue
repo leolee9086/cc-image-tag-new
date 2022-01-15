@@ -794,7 +794,7 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
       if (def) {
         卡片数据.attrs.def_block = def;
       }
-      this.$事件总线.$emit("添加卡片", 卡片数据,def);
+      this.$事件总线.$emit("添加卡片", 卡片数据, true);
     },
 
     修改对象名称: async function () {
