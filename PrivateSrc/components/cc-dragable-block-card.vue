@@ -253,11 +253,11 @@ module.exports = {
         if (JSON.stringify(val) == JSON.stringify(oldval)) {
           return null;
         }
-        if (parseInt(val.updated) < parseInt(this.对象数据.updated)) {
+        if (parseInt(val.updated) <= parseInt(this.对象数据.updated)) {
           //console.log(val.updated, this.链接.updated);
           return null;
         }
-
+        console.log(val.updated);
         this.对象数据 = val;
         if (this.对象数据 && this.对象数据.attrs.top < 0) {
           this.对象数据.top = 0;
@@ -319,8 +319,15 @@ module.exports = {
         attrs.height + "" == "NAN" ? (attrs.height = 100) : null;
         attrs.offsetx + "" == "NAN" ? (attrs.offsetx = 0) : null;
         attrs.offsety + "" == "NAN" ? (attrs.offsety = 0) : null;
+
         this.生成html();
-        this.保存数据();
+        let 拷贝对象 = JSON.parse(JSON.stringify(val));
+        let 拷贝旧对象 = JSON.parse(JSON.stringify(oldval || "{}"));
+        拷贝对象.updated = "";
+        拷贝旧对象.updated = "";
+        if (JSON.stringify(拷贝对象) != JSON.stringify(拷贝旧对象)) {
+          this.保存数据();
+        }
 
         this.$refs.cardname ? this.$refs.cardname.focus() : null;
       },
@@ -409,7 +416,7 @@ module.exports = {
     },
     判断id: async function ($event) {
       let that = this;
-      if (!this.监听) {
+      if (!this.开始监听) {
         return null;
       }
       if (
@@ -496,10 +503,11 @@ module.exports = {
       this.对象数据.attrs.height = height / this.窗口缩放倍数 || 100;
       this.保存数据();
     },
-    保存数据: function ($event) {
+    保存数据: async function ($event) {
       $event ? (this.对象数据.name = $event) : null;
       this.对象数据 = this.$更新数据时间戳(this.对象数据);
-
+      let 数据表名 = this.对象数据.type + "s";
+      await this.$数据库[数据表名].put(this.对象数据);
       this.数据类型 == "card"
         ? this.$事件总线.$emit("保存卡片", this.对象数据)
         : this.$事件总线.$emit("保存链接", this.对象数据);

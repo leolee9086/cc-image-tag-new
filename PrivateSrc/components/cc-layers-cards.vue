@@ -67,7 +67,9 @@ module.exports = {
   mounted() {
     this.卡片获取器 = liveQuery(() => this.$数据库.cards.toArray());
     this.卡片订阅器 = this.卡片获取器.subscribe({
-      next: (result) => (this.卡片数组 = result),
+      next: (result) => {
+        this.卡片数组 = result;
+      },
     });
     this.链接获取器 = liveQuery(() => this.$数据库.links.toArray());
     this.链接订阅器 = this.链接获取器.subscribe({

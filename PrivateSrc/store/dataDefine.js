@@ -106,8 +106,14 @@ Vue.prototype.$从数据库获取更新数据 =async function(表名,本地数�
 Vue.prototype.$用Lute生成时间戳=function(){
   return Lute.NewNodeID().slice(0,14)
 }
+Vue.prototype.$生成毫秒时间戳=function(){
+  
+ let str = moment().format("YYYYMMDDHHmmssSSSS")
+ console.log(str)
+  return str
+}
 Vue.prototype.$更新数据时间戳=function(数据){
-  数据.updated = this.$用Lute生成时间戳()
+  数据.updated = this.$生成毫秒时间戳()
   return 数据
 }
 Vue.prototype.$生成ial=function(属性数组,卡片数据){

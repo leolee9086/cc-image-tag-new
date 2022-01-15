@@ -251,44 +251,10 @@ module.exports = {
     },
     link: {
       handler: async function (val, oldval) {
-        if (JSON.stringify(val) == JSON.stringify(oldval)) {
-          return null;
-        }
-        if (parseInt(val.updated) < parseInt(this.链接.updated)) {
-          //console.log(val.updated, this.链接.updated);
-          return null;
-        }
-        //console.log(val.attrs);
-        this.链接 = val;
-        this.链接.type = "link";
-        this.链接.subtype = val.subtype || "属于";
-
-        this.路径类型 = val.attrs.path_type;
-        this.起点标记大小 =
-          val.attrs.from_anchor_size || val.attrs.path_width / 0.382 || this.起点标记大小;
-        this.终点标记大小 =
-          val.attrs.to_anchor_size || val.attrs.path_width / 0.382 || this.终点标记大小;
-        this.中间标记大小 =
-          val.attrs.mid_anchor_size || val.attrs.path_width / 0.382 || this.中间标记大小;
-
-        this.起始节点图片 = val.attrs.from_anchor_image || this.起始节点图片;
-        this.结束节点图片 = val.attrs.to_anchor_image || this.结束节点图片;
-        this.中间节点图片 = val.attrs.mid_anchor_image || this.中间节点图片;
-
-        this.起点标记自动旋转 = val.attrs.from_anchor_rotate;
-        this.终点标记自动旋转 = val.attrs.to_anchor_rotate;
-        this.中间标记自动旋转 = val.attrs.mid_anchor_rotate;
-
-        this.起始标记角度偏移 = val.attrs.from_anchor_rotate_offset || 0;
-        this.结束标记角度偏移 = val.attrs.to_anchor_rotate_offset || 180;
-        this.中间标记角度偏移 = val.attrs.mid_anchor_rotate_offset || 0;
-
-        this.计算路径();
-
         // console.log(this.路径类型);
+        this.判断时间并计算链接(val, oldval);
       },
       deep: true,
-      immediate: true,
     },
 
     链接: {
@@ -303,6 +269,41 @@ module.exports = {
     },
   },
   methods: {
+    判断时间并计算链接: function (val, oldval) {
+      if (JSON.stringify(val) == JSON.stringify(oldval)) {
+        return null;
+      }
+      if (parseInt(val.updated) < parseInt(this.链接.updated)) {
+        //console.log(val.updated, this.链接.updated);
+        return null;
+      }
+      //console.log(val.attrs);
+      this.链接 = val;
+      this.链接.type = "link";
+      this.链接.subtype = val.subtype || "属于";
+
+      this.路径类型 = val.attrs.path_type;
+      this.起点标记大小 =
+        val.attrs.from_anchor_size || val.attrs.path_width / 0.382 || this.起点标记大小;
+      this.终点标记大小 =
+        val.attrs.to_anchor_size || val.attrs.path_width / 0.382 || this.终点标记大小;
+      this.中间标记大小 =
+        val.attrs.mid_anchor_size || val.attrs.path_width / 0.382 || this.中间标记大小;
+
+      this.起始节点图片 = val.attrs.from_anchor_image || this.起始节点图片;
+      this.结束节点图片 = val.attrs.to_anchor_image || this.结束节点图片;
+      this.中间节点图片 = val.attrs.mid_anchor_image || this.中间节点图片;
+
+      this.起点标记自动旋转 = val.attrs.from_anchor_rotate;
+      this.终点标记自动旋转 = val.attrs.to_anchor_rotate;
+      this.中间标记自动旋转 = val.attrs.mid_anchor_rotate;
+
+      this.起始标记角度偏移 = val.attrs.from_anchor_rotate_offset || 0;
+      this.结束标记角度偏移 = val.attrs.to_anchor_rotate_offset || 180;
+      this.中间标记角度偏移 = val.attrs.mid_anchor_rotate_offset || 0;
+
+      this.计算路径();
+    },
     计算节点标志偏移: function (
       起点坐标,
       终点坐标,
@@ -426,7 +427,7 @@ module.exports = {
         类型 == "card"
           ? (this.代理起始标记 = await this.$数据库.cards.get(this.链接.attrs.from_id))
           : (this.代理起始标记 = await this.$数据库.links.get(this.链接.attrs.from_id));
-        parseInt($event.updated) >= parseInt(this.代理结束标记.updated)
+        parseInt($event.updated) > parseInt(this.代理结束标记.updated)
           ? that.计算路径()
           : null;
       }
@@ -436,15 +437,14 @@ module.exports = {
           ? (this.代理结束标记 = await this.$数据库.cards.get(this.链接.attrs.to_id))
           : (this.代理结束标记 = await this.$数据库.links.get(this.链接.attrs.to_id));
 
-        parseInt($event.updated) >= parseInt(this.代理结束标记.updated)
+        parseInt($event.updated) > parseInt(this.代理结束标记.updated)
           ? that.计算路径()
           : null;
       }
       if (
         $event.id == this.链接.id &&
-        parseInt($event.updated) >= parseInt(this.链接.updated)
+        parseInt($event.updated) > parseInt(this.链接.updated)
       ) {
-        //  this.链接 = $event;
         this.代理起始标记 =
           (await this.$数据库.cards.get(this.链接.attrs.from_id)) ||
           (await this.$数据库.links.get(this.链接.attrs.from_id)) ||
@@ -454,7 +454,7 @@ module.exports = {
           (await this.$数据库.links.get(this.链接.attrs.to_id)) ||
           this.代理结束标记;
 
-        that.计算路径();
+        this.判断时间并计算链接($event, this.链接);
       }
     },
     测试连接() {
