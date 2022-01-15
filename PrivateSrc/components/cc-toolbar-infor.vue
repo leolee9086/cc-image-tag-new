@@ -145,14 +145,14 @@
                     >
                       <span class="el-icon-copy-document"></span>
                     </el-tooltip>
-                    <el-checkbox
+                    <el-switch
                       :value="
                         属性对象.fixed_anchor !== undefined
                           ? 属性对象.fixed_anchor
                           : false
                       "
                       @change="属性对象.fixed_anchor = $event"
-                    ></el-checkbox>
+                    ></el-switch>
                     <span>始终连接到中点</span>
                   </el-row>
                   <el-row>
@@ -439,6 +439,8 @@ module.exports = {
         await this.获取预设();
 
         this.当前数据类型 = val.type;
+        this.属性对象 = val.attrs || this.属性对象;
+
         //  console.log(this.当前数据类型);
         /* this.当前思源块id = val.attrs.def_block;
         this.属性对象 = val.attrs || this.属性对象;
@@ -506,8 +508,7 @@ module.exports = {
   },
 
   methods: {
-    删除预设: async function (预设项目) {
-      let id = 预设项目.id;
+    删除预设: function (预设项目) {
       let 预设表名 = this.当前对象数据.type + "presets";
       this.$事件总线.$emit("删除预设", 预设项目, 预设表名, this.获取预设);
       this.预设名 = 预设表名 == "cardpresets" ? "一般概念" : "属于";
@@ -518,7 +519,7 @@ module.exports = {
       }
       await this.新建预设();
     },
-    变更预设值: async function (属性名, 预设项目) {
+    变更预设值: function (属性名, 预设项目) {
       this.预设.type = this.当前对象数据.type;
       this.预设.attrs[属性名] = this.属性对象[属性名];
       this.$事件总线.$emit("变更预设值", 属性名, this.预设);

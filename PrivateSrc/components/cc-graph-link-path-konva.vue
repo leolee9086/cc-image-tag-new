@@ -289,12 +289,13 @@ module.exports = {
       }
       //console.log(val.attrs);
       this.链接 = val;
+      this.链接 = this.$填充默认值(this.链接);
       this.计算路径();
 
       this.链接.type = "link";
       this.链接.subtype = val.subtype || "属于";
 
-      this.路径类型 = val.attrs.path_type;
+      this.路径类型 = val.attrs.path_type || "直线";
       this.起点标记大小 =
         val.attrs.from_anchor_size || val.attrs.path_width / 0.382 || this.起点标记大小;
       this.终点标记大小 =
@@ -662,6 +663,7 @@ module.exports = {
         return { d: "", mid: { x: 0, y: 0 } };
       }
     },
+
     计算中心(代理标记) {
       let 中心 = {};
       if (代理标记.offsetx + "" != "undefined" && 代理标记.offsetx + "" != "NAN") {

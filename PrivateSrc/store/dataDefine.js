@@ -251,7 +251,45 @@ Vue.prototype.$卡片预设属性默认值 = {
   "to_anchor_rotate_offset":undefined,
   "mid_anchor_rotate_offset":undefined,
 }
+Vue.prototype.$卡片属性默认值 = {
+  "color":"black",
+  "borderColor":"black",
+  "backgroundColor":"lightblue",
+  "def_block":"",
+  "borderWidth":1,
+  "fixed_anchor":false,
+  "borderStyle":"solid",
 
+  "path_width":5/0.382,
+  "path_type":"直线",
+  "path_color":"black",
+
+  "from_anchor_size":30,
+  "to_anchor_size":30,
+  "mid_anchor_size":30,
+
+  "from_anchor_image":"./PrivateSrc/icon/arrow1.png",
+  "to_anchor_image":"./PrivateSrc/icon/arrow1.png",
+  "mid_anchor_image":"./PrivateSrc/icon/arrow1.png",
+
+  "from_anchor_rotate":false,
+  "to_anchor_rotate":false,
+  "mid_anchor_rotate":false,
+
+  "from_anchor_rotate_offset":0,
+  "to_anchor_rotate_offset":180,
+  "mid_anchor_rotate_offset":0,
+}
+Vue.prototype.$填充默认值=function(数据) {
+  if (数据 && 数据.attrs) {
+    for (属性名 in this.$卡片属性默认值) {
+      if (数据["attrs"][属性名] === undefined) {
+        数据["attrs"][属性名] = this.$卡片属性默认值[属性名];
+      }
+    }
+  }
+  return 数据;
+}
 Vue.prototype.$获取预设表 =async function(预设表名){
   return await this.$数据库[预设表名].toArray()
 }

@@ -260,6 +260,8 @@ module.exports = {
         }
         console.log(val.updated);
         this.对象数据 = val;
+        this.对象数据 = this.$填充默认值(this.对象数据);
+
         if (this.对象数据 && this.对象数据.attrs.top < 0) {
           this.对象数据.top = 0;
         }

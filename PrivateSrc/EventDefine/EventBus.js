@@ -98,7 +98,7 @@ const 事务列表 = {
         原始数据.attrs[属性名] = 传入数据.attrsproxy[属性名]
       }
       原始数据=this.$更新数据时间戳(原始数据)
-      await this.$数据库[数据表名].put(原始数据);
+      this.$事件总线.$emit("保存卡片",原始数据)
     } else if (传入数据.id) {
       传入数据 = this.$更新数据时间戳(传入数据)
       let 原始数据 = await this.$数据库[数据表名].get(传入数据.id);
@@ -198,7 +198,7 @@ const 事务列表 = {
     };
     let 新链接 = this.$根据属性生成链接(属性对象);
    // console.log(新链接)
-    this.$数据库.links.put(新链接);
+    await this.$数据库.links.put(新链接);
     if(this.$当前窗口状态.current_linkpreset_name){
    //   console.log(this.$当前窗口状态.current_linkpreset_name)
       this.$事件总线.$emit("改变数据预设",新链接,this.$当前窗口状态.current_linkpreset_name)
@@ -331,7 +331,7 @@ const 事务列表 = {
     let 数据表名 = 预设项目.type+"s" 
     let 预设名 = 预设项目.name
    // console.log(预设名)
-    if(属性名){
+    if(属性名&&预设表名){
       await this.$数据库[预设表名].put(预设项目).then(()=>
        this.$数据库[数据表名]
       .filter((data)=>{
