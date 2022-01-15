@@ -1,5 +1,5 @@
 <template>
-  <v-group>
+  <v-group v-if="链接 && 代理起始标记 && 代理结束标记">
     <v-path v-if="链接['attrs']" :config="链接设定"></v-path>
     <v-path v-if="链接['attrs'] && 显示引线" :config="引线设定"></v-path>
     <v-image v-if="链接['attrs'] && 结束节点图片元素" :config="结束节点设定"> </v-image>
@@ -32,7 +32,10 @@ module.exports = {
     this.加载节点图片(this.结束节点图片, "结束节点图片元素");
     this.加载节点图片(this.中间节点图片, "中间节点图片元素");
 
-    this.计算路径();
+    /* this.计算路径();
+    setInterval(() => {
+      async () => this.计算路径();
+    }, 5);*/
   },
   beforeDestroy() {
     this.监听 = false;
@@ -78,7 +81,7 @@ module.exports = {
   computed: {
     结束节点偏移: function () {
       let obj = {};
-      if (this.代理结束标记.attrs) {
+      if (this.代理结束标记 && this.代理结束标记.attrs) {
         obj = this.计算节点标志偏移(
           this.终点,
           this.起点,
@@ -92,7 +95,7 @@ module.exports = {
     },
     起始节点偏移: function () {
       let obj = {};
-      if (this.代理起始标记.attrs) {
+      if (this.代理起始标记 && this.代理起始标记.attrs) {
         obj = this.计算节点标志偏移(
           this.起点,
           this.终点,
@@ -106,7 +109,7 @@ module.exports = {
     },
     中间节点偏移: function () {
       let obj = {};
-      if (this.代理起始标记.attrs) {
+      if (this.代理起始标记 && this.代理起始标记.attrs) {
         obj.x = 0;
         obj.y = 0;
         obj.rotation = this.计算节点标志偏移(
@@ -250,7 +253,7 @@ module.exports = {
       deep: true,
     },
     link: {
-      handler: async function (val, oldval) {
+      handler: function (val, oldval) {
         // console.log(this.路径类型);
         this.判断时间并计算链接(val, oldval);
       },
@@ -262,23 +265,32 @@ module.exports = {
         if (!val.attrs) {
           return null;
         }
-
-        this.$事件总线.$emit("保存链接", val);
+        let 拷贝对象 = JSON.parse(JSON.stringify(val));
+        let 拷贝旧对象 = JSON.parse(JSON.stringify(oldval || "{}"));
+        拷贝对象.updated = "";
+        拷贝旧对象.updated = "";
+        if (JSON.stringify(拷贝对象) !== JSON.stringify(拷贝旧对象)) {
+          console.log("aaa", val);
+          this.$事件总线.$emit("保存链接", val);
+        }
       },
       deep: true,
     },
   },
   methods: {
     判断时间并计算链接: function (val, oldval) {
-      if (JSON.stringify(val) == JSON.stringify(oldval)) {
+      console.log(val.updated, oldval.updated);
+
+      if (parseInt(val.updated) <= parseInt(oldval.updated)) {
         return null;
       }
-      if (parseInt(val.updated) < parseInt(this.链接.updated)) {
-        //console.log(val.updated, this.链接.updated);
+      if (!val.attrs) {
         return null;
       }
       //console.log(val.attrs);
       this.链接 = val;
+      this.计算路径();
+
       this.链接.type = "link";
       this.链接.subtype = val.subtype || "属于";
 
@@ -301,8 +313,6 @@ module.exports = {
       this.起始标记角度偏移 = val.attrs.from_anchor_rotate_offset || 0;
       this.结束标记角度偏移 = val.attrs.to_anchor_rotate_offset || 180;
       this.中间标记角度偏移 = val.attrs.mid_anchor_rotate_offset || 0;
-
-      this.计算路径();
     },
     计算节点标志偏移: function (
       起点坐标,
@@ -410,7 +420,7 @@ module.exports = {
         this[参数名] = image;
       };
     },
-    判断id: async function ($event) {
+    判断id: function ($event) {
       let that = this;
       if (!this.监听) {
         return null;
@@ -424,44 +434,32 @@ module.exports = {
       }
       if ($event.id == attrs.from_id) {
         let 类型 = $event.type;
-        类型 == "card"
-          ? (this.代理起始标记 = await this.$数据库.cards.get(this.链接.attrs.from_id))
-          : (this.代理起始标记 = await this.$数据库.links.get(this.链接.attrs.from_id));
-        parseInt($event.updated) > parseInt(this.代理结束标记.updated)
-          ? that.计算路径()
-          : null;
+        if (parseInt($event.updated) >= parseInt(this.代理起始标记.updated)) {
+          this.代理起始标记 = $event;
+          that.计算路径();
+        }
       }
       if ($event.id == attrs.to_id) {
         let 类型 = $event.type;
-        类型 == "card"
-          ? (this.代理结束标记 = await this.$数据库.cards.get(this.链接.attrs.to_id))
-          : (this.代理结束标记 = await this.$数据库.links.get(this.链接.attrs.to_id));
-
-        parseInt($event.updated) > parseInt(this.代理结束标记.updated)
-          ? that.计算路径()
-          : null;
+        if (parseInt($event.updated) >= parseInt(this.代理结束标记.updated)) {
+          this.代理结束标记 = $event;
+          that.计算路径();
+        }
       }
-      if (
-        $event.id == this.链接.id &&
-        parseInt($event.updated) > parseInt(this.链接.updated)
-      ) {
-        this.代理起始标记 =
-          (await this.$数据库.cards.get(this.链接.attrs.from_id)) ||
-          (await this.$数据库.links.get(this.链接.attrs.from_id)) ||
-          this.代理起始标记;
-        this.代理结束标记 =
-          (await this.$数据库.cards.get(this.链接.attrs.to_id)) ||
-          (await this.$数据库.links.get(this.链接.attrs.to_id)) ||
-          this.代理结束标记;
+      if ($event.id == this.链接.id) {
+        if (parseInt($event.updated) >= parseInt(this.链接.updated)) {
+          this.链接 = $event;
 
-        this.判断时间并计算链接($event, this.链接);
+          this.计算路径();
+        }
       }
     },
     测试连接() {
       //  console.log(this.link);
     },
 
-    计算路径: async function () {
+    计算路径: function () {
+      this.监听 = false;
       if (!this.代理起始标记 || !this.代理结束标记) {
         return null;
       }
@@ -523,26 +521,30 @@ module.exports = {
             this.中点 = this.路径.mid;
           }
         }
-        let 原始数据 = await this.$数据库.links.get(this.链接.id);
+        /* let 原始数据 = await this.$数据库.links.get(this.链接.id);
         if (parseInt(原始数据.updated) > parseInt(this.链接.updated)) {
           原始数据.attrs.path = this.链接.attrs.path;
           原始数据.attrs.top = this.链接.attrs.top;
           原始数据.attrs.left = this.链接.attrs.left;
           this.链接 = 原始数据;
-        }
+        }*/
 
-        this.链接 = this.$更新数据时间戳(this.链接);
+        this.计算引线(this.链接);
 
         if (Math.abs(this.链接.attrs.offsetx) > 50 || this.链接.attrs.offsety > 50) {
           // console.log("计算引线");
           this.显示引线 = true;
-          this.计算引线(this.链接);
         } else {
           this.显示引线 = false;
         }
+        this.链接 = this.$更新数据时间戳(this.链接);
+
+        this.$事件总线.$emit("保存链接", this.链接);
+
+        this.监听 = true;
       }
     },
-    计算引线: async function (链接) {
+    计算引线: function (链接) {
       let 引线链接 = JSON.parse(JSON.stringify(链接));
       let 引线终点 = { x: 引线链接.attrs.left, y: 引线链接.attrs.top };
       let 引线矢量 = {
@@ -607,8 +609,8 @@ module.exports = {
         起始节点.y - this.起始节点偏移.y * 20
       } ${结束节点.x - this.结束节点偏移.x * 20} ${
         结束节点.y - this.结束节点偏移.y * 20
-      } ${结束节点.x - this.结束节点偏移.x * 2} ${结束节点.y - this.结束节点偏移.y * 2} 
-      
+      } ${结束节点.x - this.结束节点偏移.x * 2} ${结束节点.y - this.结束节点偏移.y * 2}
+
             L ${结束节点.x} ${结束节点.y}
             `;
       return { d: define, mid: midpoint };

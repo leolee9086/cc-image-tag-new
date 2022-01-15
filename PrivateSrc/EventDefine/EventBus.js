@@ -57,6 +57,7 @@ const 事务列表 = {
   
   链接转化为卡片:async function(链接数据){
     let 新数据 = JSON.parse(JSON.stringify(链接数据))
+    新数据.id=Lute.NewNodeID()
     新数据.type="card"
     新数据.subtype="一般概念"
 
@@ -100,7 +101,9 @@ const 事务列表 = {
       await this.$数据库[数据表名].put(原始数据);
     } else if (传入数据.id) {
       传入数据 = this.$更新数据时间戳(传入数据)
-      await this.$数据库[数据表名].put(传入数据);
+      let 原始数据 = await this.$数据库[数据表名].get(传入数据.id);
+      if(原始数据){
+      await this.$数据库[数据表名].put(传入数据);}
 
     }
 
@@ -120,9 +123,10 @@ const 事务列表 = {
   删除链接: async function (链接数据) {
     let id = 链接数据.id || 链接数据;
     await this.$数据库.links.delete(id);
-
+  
   },
   保存链接: async function (传入数据) {
+    let 数据表名  = 传入数据.type+"s"
 
     if (传入数据.attrsproxy) {
       let 原始数据 = await this.$数据库.links.get(传入数据.id);
@@ -136,9 +140,11 @@ const 事务列表 = {
 
       await this.$数据库.links.put(原始数据);
     } else if (传入数据.id) {
+      let 原始数据 = await this.$数据库[数据表名].get(传入数据.id);
       传入数据 = this.$更新数据时间戳(传入数据)
 
-      await this.$数据库.links.put(传入数据);
+      if(原始数据){
+      await this.$数据库[数据表名].put(传入数据);}
     }  
   },
   定位至卡片: async function (卡片数据) {
@@ -339,22 +345,7 @@ const 事务列表 = {
           value =this.$更新数据时间戳(value)
           value.attrs[属性名]=预设项目.attrs[属性名]&&预设项目.attrs[属性名]!=="byref" ?预设项目.attrs[属性名]:value.attrs[属性名]
     }))
-    /*let 数据列表 = await this.$数据库[数据表名]
-    .filter((data)=>{
-      if(data.subtype == 预设名){
-        return true;
-      }
-    }).toArray()
-
-    if(数据列表[0]){
-      for(i in 数据列表){
-        let el =数据列表[i]
-        el.attrs[属性名] =预设项目.attrs[属性名]&&预设项目.attrs[属性名]!=="byref" ?预设项目.attrs[属性名]:el.attrs[属性名]
-        await this.$数据库[数据表名].put(el)
-        this.$事件总线.$emit("保存数据",el)
-
-      }
-    }*/
+  
   }
 },
   新建预设:async function(预设数据,预设名,预设类型){

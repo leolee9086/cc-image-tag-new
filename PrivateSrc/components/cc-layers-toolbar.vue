@@ -13,7 +13,7 @@
       :思源伺服ip="思源伺服ip"
       :卡片数据id="当前卡片数据id"
       :链接数据id="当前链接数据id"
-    ></cc-toolbar-main> 
+    ></cc-toolbar-main>
     <cc-toolbar-infor
       :显示="显示详情面板"
       :思源伺服ip="思源伺服ip"

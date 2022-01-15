@@ -440,7 +440,7 @@ module.exports = {
 
         this.当前数据类型 = val.type;
         //  console.log(this.当前数据类型);
-        this.当前思源块id = val.attrs.def_block;
+        /* this.当前思源块id = val.attrs.def_block;
         this.属性对象 = val.attrs || this.属性对象;
         if (val.type == "card") {
           this.当前图上正向链接列表 = await this.$数据库.links
@@ -461,7 +461,7 @@ module.exports = {
               }
             })
             .toArray();
-        }
+        }*/
       },
       deep: true,
     },
@@ -606,7 +606,7 @@ module.exports = {
       let 预设表名 = this.当前对象数据.type + "presets";
       this.预设列表 = await this.$获取预设表(预设表名);
       if (this.预设名) {
-        this.预设 = await this.$获取预设(预设表名, this.预设名);
+        this.预设 = (await this.$获取预设(预设表名, this.预设名)) || this.预设 || {};
       }
     },
     新建预设: async function () {

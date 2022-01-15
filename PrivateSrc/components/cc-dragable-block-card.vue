@@ -245,6 +245,7 @@ module.exports = {
     this.获取预设(this.value);
     this.$事件总线.$on("保存卡片", (event) => this.判断id(event));
     this.$事件总线.$on("保存链接", (event) => this.判断id(event));
+    this.$事件总线.$on("保存数据", (event) => this.判断id(event));
   },
 
   watch: {
@@ -309,7 +310,7 @@ module.exports = {
     },
 
     对象数据: {
-      handler: async function (val, oldval) {
+      handler: function (val, oldval) {
         this.folded = val.attrs.folded;
         this.def_block = val.attrs.def_block;
         let attrs = this.对象数据.attrs;
@@ -367,24 +368,24 @@ module.exports = {
   computed: {
     top: function () {
       let a =
-        (this.value.attrs.top + this.value.attrs.offsety) * this.窗口缩放倍数 ||
-        this.value.attrs.top * this.窗口缩放倍数 ||
+        (this.对象数据.attrs.top + this.对象数据.attrs.offsety) * this.窗口缩放倍数 ||
+        this.对象数据.attrs.top * this.窗口缩放倍数 ||
         0;
       return a;
     },
     left: function () {
       let a =
-        (this.value.attrs.left + this.value.attrs.offsetx) * this.窗口缩放倍数 ||
-        this.value.attrs.left * this.窗口缩放倍数 ||
+        (this.对象数据.attrs.left + this.对象数据.attrs.offsetx) * this.窗口缩放倍数 ||
+        this.对象数据.attrs.left * this.窗口缩放倍数 ||
         0;
       return a;
     },
     width: function () {
-      return this.value.attrs.width * this.窗口缩放倍数;
+      return this.对象数据.attrs.width * this.窗口缩放倍数;
     },
     height: function () {
       return !this.folded
-        ? this.value.attrs.height * this.窗口缩放倍数
+        ? this.对象数据.attrs.height * this.窗口缩放倍数
         : 30 * this.窗口缩放倍数;
     },
   },
@@ -414,15 +415,14 @@ module.exports = {
     鼠标点击($event) {
       $event.ctrlKey ? this.$事件总线.$emit("ctrl加鼠标点击卡片", this.对象数据) : null;
     },
-    判断id: async function ($event) {
+    判断id: function ($event) {
       let that = this;
-      if (!this.开始监听) {
-        return null;
-      }
+
       if (
         $event.id == this.对象数据.id &&
-        parseInt($event.updated) > parseInt(this.对象数据.updated)
+        parseInt($event.updated) >= parseInt(this.对象数据.updated)
       ) {
+        console.log($event.updated);
         this.对象数据 = $event;
       }
     },
@@ -464,7 +464,7 @@ module.exports = {
     展开链接: function () {
       this.$emit("callbacklink", this.对象数据.attrs.def_block);
     },
-    计算坐标: async function (x, y) {
+    计算坐标: function (x, y) {
       if (this.数据类型 == "card") {
         this.对象数据.attrs.top = y / this.窗口缩放倍数;
         this.对象数据.attrs.left = x / this.窗口缩放倍数;
@@ -503,11 +503,10 @@ module.exports = {
       this.对象数据.attrs.height = height / this.窗口缩放倍数 || 100;
       this.保存数据();
     },
-    保存数据: async function ($event) {
+    保存数据: function ($event) {
       $event ? (this.对象数据.name = $event) : null;
       this.对象数据 = this.$更新数据时间戳(this.对象数据);
       let 数据表名 = this.对象数据.type + "s";
-      await this.$数据库[数据表名].put(this.对象数据);
       this.数据类型 == "card"
         ? this.$事件总线.$emit("保存卡片", this.对象数据)
         : this.$事件总线.$emit("保存链接", this.对象数据);

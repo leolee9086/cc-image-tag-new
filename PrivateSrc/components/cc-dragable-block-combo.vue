@@ -97,15 +97,9 @@ module.exports = {
   },
   methods: {
     统一属性: async function (参数) {
-      let x = this.x;
-      let y = this.y;
-      let width = this.width;
-      let height = this.height;
       if (参数 == "left") {
         for (i in this.数据数组) {
-          let 原始数据 = this.数据数组[i];
-          let 现状数据 = (await this.$数据库.cards.get(原始数据.id)) || 原始数据;
-          现状数据 = (await this.$数据库.links.get(原始数据.id)) || 现状数据;
+          let 现状数据 = this.数据数组[i];
           if (现状数据.type == "card") {
             现状数据.attrs.left = this.x;
             现状数据 = this.$更新数据时间戳(现状数据);
@@ -120,9 +114,7 @@ module.exports = {
 
       if (参数 == "right") {
         for (i in this.数据数组) {
-          let 原始数据 = this.数据数组[i];
-          let 现状数据 = (await this.$数据库.cards.get(原始数据.id)) || 原始数据;
-          现状数据 = (await this.$数据库.links.get(原始数据.id)) || 现状数据;
+          let 现状数据 = this.数据数组[i];
           if (现状数据.type == "card") {
             现状数据.attrs.left = this.x + this.width - 现状数据.attrs.width;
             现状数据 = this.$更新数据时间戳(现状数据);
@@ -137,9 +129,7 @@ module.exports = {
       }
       if (参数 == "up") {
         for (i in this.数据数组) {
-          let 原始数据 = this.数据数组[i];
-          let 现状数据 = (await this.$数据库.cards.get(原始数据.id)) || 原始数据;
-          现状数据 = (await this.$数据库.links.get(原始数据.id)) || 现状数据;
+          let 现状数据 = this.数据数组[i];
           if (现状数据.type == "card") {
             现状数据.attrs.top = this.y;
             现状数据 = this.$更新数据时间戳(现状数据);
@@ -153,9 +143,7 @@ module.exports = {
       }
       if (参数 == "down") {
         for (i in this.数据数组) {
-          let 原始数据 = this.数据数组[i];
-          let 现状数据 = (await this.$数据库.cards.get(原始数据.id)) || 原始数据;
-          现状数据 = (await this.$数据库.links.get(原始数据.id)) || 现状数据;
+          let 现状数据 = this.数据数组[i];
           if (现状数据.type == "card") {
             现状数据.attrs.top = this.y + this.height - 现状数据.attrs.height;
             现状数据 = this.$更新数据时间戳(现状数据);
@@ -174,16 +162,25 @@ module.exports = {
           let 数据类型 = 数据.type + "s";
           await this.$数据库[数据类型].put(数据);
           if (数据类型 == "cards") {
-            this.$数据库.$emit("保存卡片", 数据);
+            this.$事件总线.$emit("保存卡片", 数据);
           }
           if (数据类型 == "links") {
-            this.$数据库.$emit("保存链接", 数据);
+            this.$事件总线.$emit("保存链接", 数据);
           }
-        } catch (e) {}
+        } catch (e) {
+          console.log(e);
+        }
       }
     },
+
     判断id: function ($event) {
-      this.数据id数组.length > 1 ? this.获取数据() : null;
+      if ($event && this.数据id数组.length > 1) {
+        this.数据数组.forEach((element) => {
+          if (element && element.id == $event.id) {
+            this.计算边界框();
+          }
+        });
+      }
     },
 
     获取数据: async function () {
@@ -199,7 +196,7 @@ module.exports = {
       this.数据数组 = Array.from(new Set(数据数组));
       this.数据数组.length == this.数据id数组.length ? this.计算边界框() : null;
     },
-    计算边界框: async function () {
+    计算边界框: function () {
       let 左上角点 = { x: 10000000000, y: 100000000000 };
       let 右下角点 = { x: 0, y: 0 };
       if (this.数据数组.length == this.数据id数组.length) {
