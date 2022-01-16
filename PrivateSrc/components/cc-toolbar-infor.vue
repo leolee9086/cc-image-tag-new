@@ -380,8 +380,6 @@ module.exports = {
       重命名计数: 1,
       属性列表: [],
       边框线型对照表: [
-        { value: "none", label: "无" },
-        { value: "hidden", label: "隐藏" },
         { value: "solid", label: "实线" },
         { value: "double", label: "双线" },
         { value: "dashed", label: "虚线" },
