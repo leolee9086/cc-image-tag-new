@@ -437,40 +437,16 @@ module.exports = {
         }
         this.预设名 = val.subtype;
         await this.获取预设();
+        this.当前思源块id = val.attrs.def_block;
 
         this.当前数据类型 = val.type;
         this.属性对象 = val.attrs || this.属性对象;
-
-        //  console.log(this.当前数据类型);
-        /* this.当前思源块id = val.attrs.def_block;
-        this.属性对象 = val.attrs || this.属性对象;
-        if (val.type == "card") {
-          this.当前图上正向链接列表 = await this.$数据库.links
-            .filter((value) => {
-              if (value.attrs) {
-                if (value.attrs.from_id == val) {
-                  return true;
-                }
-              }
-            })
-            .toArray();
-          this.当前图上反向链接列表 = await this.$数据库.links
-            .filter((value) => {
-              if (value.attrs) {
-                if (value.attrs.to_id == val) {
-                  return true;
-                }
-              }
-            })
-            .toArray();
-        }*/
       },
       deep: true,
     },
     当前思源块id: {
       async handler(val, oldval) {
         if (val) {
-          this.当前思源块id = val.replace("((", "").replace("))", "").slice(0, 22);
           id = this.当前思源块id;
           //  console.log(id);
           this.当前反向链接列表 = await this.以id获取反向链接(id);
