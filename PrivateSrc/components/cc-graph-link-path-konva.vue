@@ -32,10 +32,7 @@ module.exports = {
     this.加载节点图片(this.结束节点图片, "结束节点图片元素");
     this.加载节点图片(this.中间节点图片, "中间节点图片元素");
 
-    /* this.计算路径();
-    setInterval(() => {
-      async () => this.计算路径();
-    }, 5);*/
+    this.计算路径();
   },
   beforeDestroy() {
     this.监听 = false;
@@ -468,6 +465,7 @@ module.exports = {
       if (!this.代理起始标记["attrs"] || !this.代理结束标记["attrs"]) {
         return null;
       }
+      let 旧链接 = JSON.parse(JSON.stringify(this.链接));
       let 代理起始标记 = this.代理起始标记["attrs"];
       let 代理结束标记 = this.代理结束标记["attrs"];
       /*   if (JSON.stringify(旧代理起始标记) == JSON.stringify(代理起始标记) && JSON.stringify(旧代理结束标记) == JSON.stringify(代理结束标记)) {
@@ -522,13 +520,6 @@ module.exports = {
             this.中点 = this.路径.mid;
           }
         }
-        /* let 原始数据 = await this.$数据库.links.get(this.链接.id);
-        if (parseInt(原始数据.updated) > parseInt(this.链接.updated)) {
-          原始数据.attrs.path = this.链接.attrs.path;
-          原始数据.attrs.top = this.链接.attrs.top;
-          原始数据.attrs.left = this.链接.attrs.left;
-          this.链接 = 原始数据;
-        }*/
 
         this.计算引线(this.链接);
 
@@ -538,10 +529,14 @@ module.exports = {
         } else {
           this.显示引线 = false;
         }
-        this.链接 = this.$更新数据时间戳(this.链接);
+        let 新链接 = JSON.parse(JSON.stringify(this.链接 || {}));
+        旧链接.updated = "";
+        新链接.updated = "";
+        if (!JSON.stringify(旧链接) === JSON.stringify(新链接)) {
+          this.链接 = this.$更新数据时间戳(this.链接);
 
-        this.$事件总线.$emit("保存链接", this.链接);
-
+          this.$事件总线.$emit("保存链接", this.链接);
+        }
         this.监听 = true;
       }
     },
