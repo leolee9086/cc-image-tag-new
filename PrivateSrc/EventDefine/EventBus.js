@@ -61,13 +61,14 @@ const 事务列表 = {
     新数据.type="card"
     新数据.subtype="一般概念"
 
-    await this.$数据库.cards.put(新数据)
     this.$事件总线.$emit("保存卡片",新数据)
-    let from_id = 新数据.attrs["from_id"]
-    let to_id = 新数据.attrs["to_id"]
-    this.$事件总线.$emit("连接卡片",[from_id,新数据.id])
-    this.$事件总线.$emit("连接卡片",[新数据.id,to_id])
-    await this.$数据库.links.delete(链接数据.id)
+    let 起始卡片 =  await this.$数据库.cards.get(链接数据.attrs.from_id)||await this.$数据库.links.get(链接数据.attrs.from_id) 
+    let 结束卡片 = await this.$数据库.cards.get(链接数据.attrs.to_id)||await this.$数据库.links.get(链接数据.attrs.to_id) 
+    this.$事件总线.$emit("连接卡片",[起始卡片,新数据])
+    this.$事件总线.$emit("连接卡片",[新数据,结束卡片])
+    await this.$数据库.links.delete(链接数据.id).then(()=>this.$数据库.cards.put(新数据))
+     
+    
 
   },
   ctrl加鼠标点击卡片:function(卡片数据){
@@ -78,7 +79,7 @@ const 事务列表 = {
 
   添加卡片: async function (卡片数据,def) {
     await this.$数据库.cards.put(卡片数据);
-    this.$事件总线.$emit("保存数据",卡片数据)
+    this.$事件总线.$emit("保存数据",卡片数据,true)
     //console.log(this.$当前窗口状态.current_cardpreset_name)
 
     if(this.$当前窗口状态.current_cardpreset_name){
@@ -90,20 +91,25 @@ const 事务列表 = {
     }
     
   },
-  保存数据:async function (传入数据){
+  保存数据: function (传入数据){
    传入数据.type=="card"? this.$事件总线.$emit("保存卡片",传入数据):this.$事件总线.$emit("保存链接",传入数据)
   },
   保存卡片: async function (传入数据) {
+    if(!传入数据){return null}
     let 数据表名  = 传入数据.type+"s"
     //console.log(数据表名)
     if (传入数据.attrsproxy) {
+
       let 原始数据 = await this.$数据库[数据表名].get(传入数据.id);
+      if(原始数据){
       原始数据.subtype = 传入数据.subtype||"属于";
       for (属性名 in 传入数据.attrsproxy) {
         原始数据.attrs[属性名] = 传入数据.attrsproxy[属性名]
       }
       原始数据=this.$更新数据时间戳(原始数据)
-      this.$事件总线.$emit("保存卡片",原始数据)
+      传入数据=原始数据
+      }
+      this.$事件总线.$emit("保存卡片",传入数据)
     } else if (传入数据.id) {
       传入数据 = this.$更新数据时间戳(传入数据)
       let 原始数据 = await this.$数据库[数据表名].get(传入数据.id);
@@ -113,37 +119,48 @@ const 事务列表 = {
     }
 
   },
-  删除数据:async function (传入数据){
+  删除数据: function (传入数据){
+    if(传入数据.attrs){
     传入数据.type=="card"?this.$事件总线.$emit("删除卡片",传入数据):
-    this.$事件总线.$emit("删除链接",传入数据)
+    this.$事件总线.$emit("删除链接",传入数据)}
   },
-  删除卡片: async function (卡片数据) {
+  删除卡片:async  function (卡片数据) {
     let id = 卡片数据.id || 卡片数据;
     await this.$数据库.cards.delete(id);
     await  this.$数据库.links.filter(
       data=>{if (data.attrs.from_id==id||data.attrs.to_id==id){return true}}
-    ).delete()
+    ).toArray(array=>array.forEach(data=>this.$事件总线.$emit("删除数据",data)))
 
   },
-  删除链接: async function (链接数据) {
+  删除链接:async  function (链接数据) {
     let id = 链接数据.id || 链接数据;
     await this.$数据库.links.delete(id);
-  
+    await  this.$数据库.links.filter(
+      data=>{
+      if (data.attrs&&(data.attrs.from_id==id||data.attrs.to_id==id)){return true}
+      }
+    ).toArray(array=>array.forEach(data=>this.$事件总线.$emit("删除数据",data)))
   },
   保存链接: async function (传入数据) {
+
+    if(!传入数据){return null}
+
     let 数据表名  = 传入数据.type+"s"
 
     if (传入数据.attrsproxy) {
       let 原始数据 = await this.$数据库.links.get(传入数据.id);
-      原始数据.subtype = 传入数据.subtype||"属于";
+      if(原始数据){
+        原始数据.subtype = 传入数据.subtype||"属于";
 
-      for (属性名 in 传入数据.attrsproxy) {
-        原始数据["attrs"][属性名] = 传入数据["attrsproxy"][属性名];
+        for (属性名 in 传入数据.attrsproxy) {
+          原始数据["attrs"][属性名] = 传入数据["attrsproxy"][属性名];
+        }
+        
+        原始数据 = this.$更新数据时间戳(原始数据)
+        传入数据 = 原始数据
       }
-      
-      原始数据 = this.$更新数据时间戳(原始数据)
 
-      await this.$数据库.links.put(原始数据);
+      await this.$数据库.links.put(传入数据);
     } else if (传入数据.id) {
       let 原始数据 = await this.$数据库[数据表名].get(传入数据.id);
       传入数据 = this.$更新数据时间戳(传入数据)
@@ -176,7 +193,9 @@ const 事务列表 = {
 
     }
     if (this.$当前窗口状态.等待连接卡片id) {
-      this.$事件总线.$emit("连接卡片",[this.$当前窗口状态.等待连接卡片id,数据.id])
+      let 等待连接卡片id =this.$当前窗口状态.等待连接卡片id
+      let 等待连接卡片 =await this.$数据库.cards.get(等待连接卡片id)||await this.$数据库.links.get(等待连接卡片id)  
+      this.$事件总线.$emit("连接卡片",[等待连接卡片,数据])
       this.$当前窗口状态.等待连接卡片id = null;
     }
     await this.$数据库.states.put(this.$当前窗口状态);
@@ -185,31 +204,35 @@ const 事务列表 = {
     this.$当前窗口状态.current_cardid = ""
     this.$当前窗口状态.current_linkid = 数据.id;
     if (this.$当前窗口状态.等待连接卡片id) {
-      this.$事件总线.$emit("连接卡片",[this.$当前窗口状态.等待连接卡片id,数据.id])
+      let 等待连接卡片id =this.$当前窗口状态.等待连接卡片id
+
+      let 等待连接卡片 =await this.$数据库.cards.get(等待连接卡片id)||await this.$数据库.links.get(等待连接卡片id)  
+      this.$事件总线.$emit("连接卡片",[等待连接卡片,数据])
       this.$当前窗口状态.等待连接卡片id = null;
     }
     await this.$数据库.states.put(this.$当前窗口状态);
   },
-  连接卡片:async function(卡片数组){
-    let 起始卡片id =  卡片数组[0]
-    let 结束卡片id = 卡片数组[1]
-    let 起始卡片 =await this.$数据库.cards.get(起始卡片id)||await this.$数据库.links.get(起始卡片id)
-    let 结束卡片 =await this.$数据库.cards.get(结束卡片id)||await this.$数据库.links.get(结束卡片id)
+  连接卡片: function(卡片数组){
+    let 起始卡片 =  卡片数组[0]
+    let 结束卡片 = 卡片数组[1]
 
-    if (起始卡片id!=结束卡片id&&起始卡片&&结束卡片){
+    if (起始卡片&&结束卡片){
     let 属性对象 = {
-      from_id: 起始卡片id||起始卡片,
-      to_id: 结束卡片id||结束卡片,
+      from_id: 起始卡片.id,
+      to_id: 结束卡片.id,
     };
     let 新链接 = this.$根据属性生成链接(属性对象);
    // console.log(新链接)
-    await this.$数据库.links.put(新链接);
+     this.$数据库.links.put(新链接).then(()=>{
     if(this.$当前窗口状态.current_linkpreset_name){
    //   console.log(this.$当前窗口状态.current_linkpreset_name)
       this.$事件总线.$emit("改变数据预设",新链接,this.$当前窗口状态.current_linkpreset_name)
     }
     this.$事件总线.$emit("保存链接",新链接)
-    this.$事件总线.$emit("结束连接")}
+    this.$事件总线.$emit("结束连接")
+    }
+    
+    )}
   },
   开始连接: function (data) {
     this.$当前窗口状态.等待连接卡片id = data.id;

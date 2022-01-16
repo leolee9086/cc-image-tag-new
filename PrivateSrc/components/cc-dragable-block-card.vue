@@ -11,10 +11,10 @@
     @dragstop="dragstop"
     @resizing="resizing"
     @resizestop="resizestop"
-    :y="top"
+    :y="top || 0"
     :w="width || 对象数据.attrs.width * 窗口缩放倍数 || 100"
     :h="height || 对象数据.attrs.height * 窗口缩放倍数 || 100"
-    :x="left"
+    :x="left || 0"
     :z="210"
     class-name-handle="resizer"
     class-name="cc-card-container"
@@ -170,8 +170,8 @@
                 class="cc-card-name"
                 :ref="'cardname' + 对象数据.id"
                 autofix="ture"
-                @input="保存数据($event)"
-                @change="保存数据($event)"
+                @input="保存数据(true, $event)"
+                @change="保存数据(true, $event)"
                 v-model="对象数据.name"
               ></el-input>
             </el-col>
@@ -216,7 +216,7 @@ module.exports = {
   model: { prop: "value", event: "change" },
   data() {
     return {
-      对象数据: "",
+      对象数据: {},
       预览HTML: "",
       激活: false,
       正在编辑: false,
@@ -234,18 +234,23 @@ module.exports = {
   beforeMount() {
     this.folded = null;
   },
-  async mounted() {
+  mounted() {
     //console.log("加载卡片", this.value);
-    this.对象数据 = this.value;
+    if (this.value.attrs) {
+      this.对象数据 = this.value;
+    } else {
+      this.删除();
+    }
 
     this.开始监听 = true;
     this.数据超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html/?id=${this.对象数据.id}&baseid=${this.$baseid}&type=${this.数据类型}`;
     this.hide = false;
-    setTimeout(this.计算可见性, 100);
+    setTimeout(this.计算可见性, 500);
     this.获取预设(this.value);
     this.$事件总线.$on("保存卡片", (event) => this.判断id(event));
     this.$事件总线.$on("保存链接", (event) => this.判断id(event));
     this.$事件总线.$on("保存数据", (event) => this.判断id(event));
+    this.$事件总线.$on("删除数据", (event) => this.判断id(event));
   },
 
   watch: {
@@ -258,7 +263,10 @@ module.exports = {
           //console.log(val.updated, this.链接.updated);
           return null;
         }
-        console.log(val.updated);
+        if (!val.attrs || (val.attrs && val.attrs.trashed)) {
+          this.删除();
+          return null;
+        }
         this.对象数据 = val;
         this.对象数据 = this.$填充默认值(this.对象数据);
 
@@ -313,8 +321,10 @@ module.exports = {
 
     对象数据: {
       handler: function (val, oldval) {
+        if (!val.attrs) {
+          return null;
+        }
         this.folded = val.attrs.folded;
-        this.def_block = val.attrs.def_block;
         let attrs = this.对象数据.attrs;
         attrs.top + "" == "NAN" ? (attrs.top = 0) : null;
         attrs.left + "" == "NAN" ? (attrs.left = 0) : null;
@@ -322,8 +332,10 @@ module.exports = {
         attrs.height + "" == "NAN" ? (attrs.height = 100) : null;
         attrs.offsetx + "" == "NAN" ? (attrs.offsetx = 0) : null;
         attrs.offsety + "" == "NAN" ? (attrs.offsety = 0) : null;
-
-        this.生成html();
+        if (this.def_block != val.attrs.def_block);
+        {
+          this.生成html();
+        }
         let 拷贝对象 = JSON.parse(JSON.stringify(val));
         let 拷贝旧对象 = JSON.parse(JSON.stringify(oldval || "{}"));
         拷贝对象.updated = "";
@@ -424,8 +436,13 @@ module.exports = {
         $event.id == this.对象数据.id &&
         parseInt($event.updated) >= parseInt(this.对象数据.updated)
       ) {
-        console.log($event.updated);
-        this.对象数据 = $event;
+        let 旧数据 = JSON.parse(JSON.stringify(this.对象数据 || {}));
+        let 新数据 = JSON.parse(JSON.stringify($event || {}));
+        旧数据.updated = "";
+        新数据.updated = "";
+        if (JSON.stringify(旧数据) !== JSON.stringify(新数据)) {
+          this.对象数据 = $event;
+        }
       }
     },
     生成html: async function () {
@@ -465,8 +482,10 @@ module.exports = {
       this.$事件总线.$emit("开始连接", this.对象数据);
     },
     删除() {
-      if ((this.开始监听 = true)) {
-        this.移除标签;
+      if (this.开始监听 == true) {
+        if (this.对象数据.attrs) {
+          this.对象数据.attrs.trashed = true;
+        }
         this.$emit("delete", this.index);
         this.$事件总线.$emit("删除数据", this.对象数据);
       }
@@ -477,7 +496,7 @@ module.exports = {
     展开链接: function () {
       this.$emit("callbacklink", this.对象数据.attrs.def_block);
     },
-    计算坐标: function (x, y) {
+    计算坐标: async function (x, y) {
       if (this.数据类型 == "card") {
         this.对象数据.attrs.top = y / this.窗口缩放倍数;
         this.对象数据.attrs.left = x / this.窗口缩放倍数;
@@ -497,7 +516,7 @@ module.exports = {
     dragstop(x, y) {
       this.计算坐标(x, y);
 
-      this.保存数据();
+      this.保存数据(true);
       this.$事件总线.$emit("缩放卡片", this.对象数据);
     },
     resizing: function (x, y, width, height) {
@@ -514,15 +533,15 @@ module.exports = {
 
       this.对象数据.attrs.width = width / this.窗口缩放倍数 || 100;
       this.对象数据.attrs.height = height / this.窗口缩放倍数 || 100;
-      this.保存数据();
+      this.保存数据(true);
     },
-    保存数据: function ($event) {
+    保存数据: function (flag, $event) {
       $event ? (this.对象数据.name = $event) : null;
       this.对象数据 = this.$更新数据时间戳(this.对象数据);
       let 数据表名 = this.对象数据.type + "s";
       this.数据类型 == "card"
-        ? this.$事件总线.$emit("保存卡片", this.对象数据)
-        : this.$事件总线.$emit("保存链接", this.对象数据);
+        ? this.$事件总线.$emit("保存卡片", this.对象数据, flag)
+        : this.$事件总线.$emit("保存链接", this.对象数据, flag);
     },
     转化为卡片: function () {
       let 新数据 = JSON.parse(JSON.stringify(this.对象数据));
@@ -533,12 +552,16 @@ module.exports = {
     计算可见性: async function () {
       this.hide = true;
       let 对象数据 = this.对象数据;
+      if (!对象数据.attrs) {
+        this.删除();
+        return null;
+      }
       let $当前窗口状态 = this.$当前窗口状态;
       if (this.对象数据 && this.对象数据.attrs.top < 0) {
-        this.对象数据.top = 0;
+        this.对象数据.attrs.top = 0;
       }
       if (this.对象数据 && this.对象数据.attrs.left < 0) {
-        this.对象数据.left = 0;
+        this.对象数据.attrs.left = 0;
       }
       if (
         window.pageYOffset >
@@ -560,7 +583,7 @@ module.exports = {
         this.hide = false;
       }
       if (对象数据) {
-        setTimeout(this.计算可见性, 100);
+        setTimeout(this.计算可见性, 500);
       } else {
         clearTimeout(this.计算可见性);
       }

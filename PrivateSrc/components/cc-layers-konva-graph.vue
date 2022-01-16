@@ -2,6 +2,7 @@
   <v-stage class="cc-graph" ref="stage" :config="configKonva">
     <v-layer ref="layer-links">
       <cc-graph-link-path-konva
+        v-if="link"
         v-for="(link, i) in 链接数组"
         :link="link"
         :key="链接数组[i].id + 'label'"

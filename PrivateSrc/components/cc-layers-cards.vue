@@ -19,7 +19,7 @@
       :data-node-id="item.id"
       :ref="item.id"
       v-for="(item, i) in 卡片数组"
-      v-if="item && !item.hide"
+      v-if="item && !item.hide && item.attrs"
       :key="卡片数组[i]['id']"
       v-model="卡片数组[i]"
       :index="i"

@@ -1,5 +1,8 @@
 <template>
-  <v-group v-if="链接 && 代理起始标记 && 代理结束标记">
+  <v-group
+    @click="$事件总线.$emit('激活链接', 链接)"
+    v-if="链接 && 代理起始标记 && 代理结束标记"
+  >
     <v-path v-if="链接['attrs']" :config="链接设定"></v-path>
     <v-path v-if="链接['attrs'] && 显示引线" :config="引线设定"></v-path>
     <v-image v-if="链接['attrs'] && 结束节点图片元素" :config="结束节点设定"> </v-image>
@@ -12,7 +15,11 @@ module.exports = {
   name: "cc-graph-link-path-konva",
   props: ["link", "画布原点", "虚拟起始标记", "虚拟结束标记"],
   async mounted() {
-    this.链接 = JSON.parse(JSON.stringify(this.link));
+    if (this.link.attrs) {
+      this.链接 = JSON.parse(JSON.stringify(this.link));
+    } else {
+      this.$事件总线.$emit("删除数据", this.link);
+    }
     this.监听 = true;
 
     this.$事件总线.$on("保存卡片", (event) => this.判断id(event));
@@ -461,7 +468,7 @@ module.exports = {
       //  console.log(this.link);
     },
 
-    计算路径: function () {
+    计算路径: async function () {
       this.监听 = false;
       if (!this.代理起始标记 || !this.代理结束标记) {
         return null;
