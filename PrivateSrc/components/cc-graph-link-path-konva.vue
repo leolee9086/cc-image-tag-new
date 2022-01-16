@@ -276,8 +276,6 @@ module.exports = {
   },
   methods: {
     判断时间并计算链接: function (val, oldval) {
-      console.log(val.updated, oldval.updated);
-
       if (parseInt(val.updated) <= parseInt(oldval.updated)) {
         return null;
       }
@@ -285,6 +283,13 @@ module.exports = {
         return null;
       }
       //console.log(val.attrs);
+      let 旧链接 = JSON.parse(JSON.stringify(val));
+      let 新链接 = JSON.parse(JSON.stringify(oldval));
+      旧链接.updated = "";
+      新链接.updated = "";
+      if (JSON.stringify(旧链接) === JSON.stringify(新链接)) {
+        return null;
+      }
       this.链接 = val;
       this.链接 = this.$填充默认值(this.链接);
       this.计算路径();
@@ -465,7 +470,6 @@ module.exports = {
       if (!this.代理起始标记["attrs"] || !this.代理结束标记["attrs"]) {
         return null;
       }
-      let 旧链接 = JSON.parse(JSON.stringify(this.链接));
       let 代理起始标记 = this.代理起始标记["attrs"];
       let 代理结束标记 = this.代理结束标记["attrs"];
       /*   if (JSON.stringify(旧代理起始标记) == JSON.stringify(代理起始标记) && JSON.stringify(旧代理结束标记) == JSON.stringify(代理结束标记)) {
@@ -529,14 +533,10 @@ module.exports = {
         } else {
           this.显示引线 = false;
         }
-        let 新链接 = JSON.parse(JSON.stringify(this.链接 || {}));
-        旧链接.updated = "";
-        新链接.updated = "";
-        if (!JSON.stringify(旧链接) === JSON.stringify(新链接)) {
-          this.链接 = this.$更新数据时间戳(this.链接);
 
-          this.$事件总线.$emit("保存链接", this.链接);
-        }
+        this.链接 = this.$更新数据时间戳(this.链接);
+        this.$事件总线.$emit("保存链接", this.链接);
+
         this.监听 = true;
       }
     },
