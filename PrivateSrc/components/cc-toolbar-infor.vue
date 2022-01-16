@@ -681,10 +681,10 @@ module.exports = {
     以id获取正向链接: async function (id) {
       this.思源伺服ip = window.location.host;
       let obj = {};
-      let sql = `select * from blocks where id in (select def_block_id from refs where block_id = '${id}')`;
+      let sql = `select * from blocks where id in (select def_block_id from refs where block_id = '${id}' or block_root_id=${id})`;
       obj = await 以sql向思源请求块数据(this.思源伺服ip, this.apitoken, sql);
       // console.log(obj);
-      return obj;
+      return obj || {};
     },
   },
 };
