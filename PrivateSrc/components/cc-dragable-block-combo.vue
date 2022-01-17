@@ -238,16 +238,14 @@ module.exports = {
     },
 
     判断id: function ($event) {
-      let 数据数组 = JSON.parse(JSON.stringify(this.数据数组));
       if ($event && this.数据id数组.length > 1) {
         for (i = 0; i < this.数据数组.length; i++) {
-          let element = 数据数组[i];
+          let element = this.数据数组[i];
           if (element && element.id == $event.id) {
-            数据数组[i] = $event;
+            this.数据数组[i] = $event;
           }
         }
       }
-      this.数据数组 = JSON.parse(JSON.stringify(数据数组));
       this.计算边界框();
     },
 
@@ -314,7 +312,6 @@ module.exports = {
       this.y = 左上角点.y * this.窗口缩放倍数 || this.x;
       this.width = (右下角点.x - 左上角点.x) * this.窗口缩放倍数 || this.width;
       this.height = (右下角点.y - 左上角点.y) * this.窗口缩放倍数 || this.width;
-      console.log(this.x, this.y, this.width, this.height);
     },
   },
 };
