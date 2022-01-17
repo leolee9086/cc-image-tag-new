@@ -29,23 +29,99 @@
                 <span>id:</span>
               </span>
             </el-input>
+            <el-card>
+              <cc-block-list
+                :blocklist="当前反向链接列表['backlinks']"
+                title="反向链接"
+                :count="当前反向链接列表['linkRefsCount']"
+              >
+                <el-tooltip
+                  slot="action_doc"
+                  slot-scope="item"
+                  effect="dark"
+                  content="上图"
+                  placement="top-start"
+                >
+                  <span
+                    class="el-icon-plus"
+                    @click="思源链接上图(item.data, '链接', true)"
+                  ></span>
+                </el-tooltip>
+                <el-tooltip
+                  slot="action_child"
+                  slot-scope="item"
+                  effect="dark"
+                  content="上图"
+                  placement="top-start"
+                >
+                  <span
+                    class="el-icon-plus"
+                    @click="思源链接上图(item.data, '链接', true)"
+                  ></span>
+                </el-tooltip>
+              </cc-block-list>
 
-            <cc-block-list
-              :blocklist="当前反向链接列表['backlinks']"
-              title="反向链接"
-              :count="当前反向链接列表['linkRefsCount']"
-            ></cc-block-list>
-
-            <cc-block-list
-              :blocklist="当前反向链接列表['backmentions']"
-              :count="当前反向链接列表['mentionsCount']"
-              title="提及"
-            ></cc-block-list>
-            <cc-block-list
-              :blocklist="当前正向链接列表"
-              :count="当前正向链接列表.length"
-              title="正向链接"
-            ></cc-block-list>
+              <cc-block-list
+                :blocklist="当前反向链接列表['backmentions']"
+                :count="当前反向链接列表['mentionsCount']"
+                title="提及"
+              >
+                <el-tooltip
+                  slot="action_doc"
+                  slot-scope="item"
+                  effect="dark"
+                  content="上图"
+                  placement="top-start"
+                >
+                  <span
+                    class="el-icon-plus"
+                    @click="思源链接上图(item.data, '提及', true)"
+                  ></span>
+                </el-tooltip>
+                <el-tooltip
+                  slot="action_child"
+                  slot-scope="item"
+                  effect="dark"
+                  content="上图"
+                  placement="top-start"
+                >
+                  <span
+                    class="el-icon-plus"
+                    @click="思源链接上图(item.data, '提及', true)"
+                  ></span>
+                </el-tooltip>
+              </cc-block-list>
+              <cc-block-list
+                :blocklist="当前正向链接列表"
+                :count="当前正向链接列表.length"
+                title="正向链接"
+              >
+                <el-tooltip
+                  slot="action_doc"
+                  slot-scope="item"
+                  effect="dark"
+                  content="上图"
+                  placement="top-start"
+                >
+                  <span
+                    class="el-icon-plus"
+                    @click="思源链接上图(item.data, '链接')"
+                  ></span>
+                </el-tooltip>
+                <el-tooltip
+                  slot="action_child"
+                  slot-scope="item"
+                  effect="dark"
+                  content="上图"
+                  placement="top-start"
+                >
+                  <span
+                    class="el-icon-plus"
+                    @click="思源链接上图(item.data, '链接')"
+                  ></span>
+                </el-tooltip>
+              </cc-block-list>
+            </el-card>
           </el-collapse-item>
           <el-collapse-item>
             <strong slot="title">图上连接</strong>
@@ -446,7 +522,6 @@ module.exports = {
       async handler(val, oldval) {
         if (val) {
           id = this.当前思源块id;
-          //  console.log(id);
           this.当前反向链接列表 = await this.以id获取反向链接(id);
           this.当前正向链接列表 = await this.以id获取正向链接(id);
 
@@ -455,6 +530,7 @@ module.exports = {
           this.当前反向链接列表 = [];
           this.当前正向链接列表 = [];
         }
+        console.log(this.当前反向链接列表, this.当前正向链接列表);
       },
     },
     最小化窗口: {
@@ -482,6 +558,33 @@ module.exports = {
   },
 
   methods: {
+    思源链接上图(id, 类型, 反向) {
+      let that = this;
+      let 属性对象 = this.属性对象;
+      let 待发送数据 = this.$根据属性生成卡片({
+        top: 属性对象.top,
+        left: 属性对象.left + 属性对象.width + 200,
+      });
+      console.log(待发送数据);
+
+      待发送数据.attrs.def_block = id;
+      let 卡片数组 = [];
+      console.log(this.当前对象数据);
+      if (!反向) {
+        卡片数组 = [this.当前对象数据, 待发送数据];
+      } else {
+        卡片数组 = [待发送数据, this.当前对象数据];
+      }
+      this.$数据库.cards
+        .put(待发送数据)
+        .then(() => {
+          this.$事件总线.$emit("添加卡片", 待发送数据);
+        })
+        .then(() => {
+          console.log("链接", 卡片数组);
+          this.$事件总线.$emit("连接卡片", 卡片数组, 类型.replace("正向", ""));
+        });
+    },
     删除预设: function (预设项目) {
       let 预设表名 = this.当前对象数据.type + "presets";
       this.$事件总线.$emit("删除预设", 预设项目, 预设表名, this.获取预设);
@@ -679,7 +782,15 @@ module.exports = {
     以id获取正向链接: async function (id) {
       this.思源伺服ip = window.location.host;
       let obj = {};
-      let sql = `select * from blocks where id in (select def_block_id from refs where block_id = '${id}' or block_root_id=${id})`;
+
+      let sql = `
+      select * from
+      blocks where id in (
+        select def_block_id
+        from refs
+        where block_id = '${id}' or root_id='${id}'
+        or block_id in (select id from blocks where parent_id='${id}')
+        )`;
       obj = await 以sql向思源请求块数据(this.思源伺服ip, this.apitoken, sql);
       // console.log(obj);
       return obj || {};

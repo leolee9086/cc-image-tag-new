@@ -213,7 +213,7 @@ const 事务列表 = {
     }
     await this.$数据库.states.put(this.$当前窗口状态);
   },
-  连接卡片: function(卡片数组){
+  连接卡片: function(卡片数组,链接类型){
     let 起始卡片 =  卡片数组[0]
     let 结束卡片 = 卡片数组[1]
 
@@ -223,8 +223,10 @@ const 事务列表 = {
       to_id: 结束卡片.id,
     };
     let 新链接 = this.$根据属性生成链接(属性对象);
-   // console.log(新链接)
-     this.$数据库.links.put(新链接).then(()=>{
+    if(链接类型){新链接.subtype=链接类型}
+    console.log(新链接)
+     this.$数据库.links.put(新链接).then(()=>this.$事件总线.$emit("保存链接",新链接)
+     ).then(()=>{
     if(this.$当前窗口状态.current_linkpreset_name){
    //   console.log(this.$当前窗口状态.current_linkpreset_name)
       this.$事件总线.$emit("改变数据预设",新链接,this.$当前窗口状态.current_linkpreset_name)
@@ -357,10 +359,12 @@ const 事务列表 = {
     }
   },
   变更预设值: function(属性名,预设项目){
+    if(!预设项目){return null}
+    if(!预设项目.type){return null}
     let 预设表名 = 预设项目.type+"presets" 
     let 数据表名 = 预设项目.type+"s" 
     let 预设名 = 预设项目.name
-   // console.log(预设名)
+    console.log(预设表名)
     if(属性名&&预设表名){
        this.$数据库[预设表名].put(预设项目).then(()=>
        this.$数据库[数据表名]

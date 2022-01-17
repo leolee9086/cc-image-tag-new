@@ -269,10 +269,46 @@ html,body,#app{
   background: url("/widgets/cc-baselib/icons/左对齐.svg") center no-repeat;
   background-size: contain;
   transform: rotate(270deg);
-
 }
-
 .el-icon-downalign::before {
+  content: "\8d3a";
+  font-size: 14px;
+  visibility: hidden;
+}
+.el-icon-width {
+  background: url("/widgets/cc-baselib/icons/宽度.svg") center no-repeat;
+  background-size: contain;
+}
+.el-icon-width::before {
+  content: "\8d3a";
+  font-size: 14px;
+  visibility: hidden;
+}
+.el-icon-height {
+  background: url("/widgets/cc-baselib/icons/宽度.svg") center no-repeat;
+  background-size: contain;
+  transform: rotate(270deg);
+}
+.el-icon-height::before {
+  content: "\8d3a";
+  font-size: 14px;
+  visibility: hidden;
+}
+.el-icon-xspace {
+  background: url("/widgets/cc-baselib/icons/等高分布.svg") center no-repeat;
+  background-size: contain;
+  transform: rotate(270deg);
+}
+.el-icon-xspace::before {
+  content: "\8d3a";
+  font-size: 14px;
+  visibility: hidden;
+}
+.el-icon-yspace {
+  background: url("/widgets/cc-baselib/icons/等高分布.svg") center no-repeat;
+  background-size: contain;
+}
+.el-icon-yspace::before {
   content: "\8d3a";
   font-size: 14px;
   visibility: hidden;

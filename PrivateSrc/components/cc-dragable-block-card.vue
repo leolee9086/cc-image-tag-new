@@ -462,7 +462,11 @@ module.exports = {
       }
       this.预览HTML = el.innerHTML;
       if (this.def_block) {
-        let 思源块内容 = await 以id获取文档内容(window.location.host, "", this.def_block);
+        let 思源块内容 = await 以id获取文档聚焦内容(
+          window.location.host,
+          "",
+          this.def_block
+        );
         if (思源块内容.data && 思源块内容.data.content) {
           let el = window.document.createElement("div");
           el.innerHTML = 思源块内容.data.content;
