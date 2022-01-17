@@ -6,13 +6,15 @@ const window = {
 }
 importScripts("/widgets/cc-baselib/static/dexie.min.js")
 const 数据库 = new Dexie('datas');
-数据库.version(4).stores({
-  cards: 'id,parent_id,root_id,hash,path,attrs,markdown,content,type,index,created,updated,children,x,y', 
-  links:'id,from_id,to_id,type,subtype,labels',
-  states:"++id,editMode,currentCardId,currentLinkId,LastViewpotCenter",
-  GraphConfig:"defalutCard,defaultNode,layout",
+数据库.version(3).stores({
+  cards: 'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs', 
+  links:'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs',
+  states:"++id,current_cardid,current_linkid,viewcenter",
+  metadata:"key,value",
+  history:"++id,data",
+  cardpresets:"id,parent_id,root_id,hash,box,path,&name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs",
+  linkpresets:"id,parent_id,root_id,hash,box,path,&name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs",
 });
-
 
 
 
@@ -88,10 +90,6 @@ onerror = function(e){
       port.postMessage(e)
     }
   )
-}
-
-测试链接= function(e,port){
-  port.postMessage(e.data)
 }
 
 

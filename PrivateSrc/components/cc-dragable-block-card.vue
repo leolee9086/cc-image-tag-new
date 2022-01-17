@@ -1,6 +1,6 @@
 <template>
   <vue-draggable-resizable
-    v-if="!hide"
+    v-show="!hide"
     ref="container"
     @click="鼠标点击($event)"
     :resizable="显示控制柄"

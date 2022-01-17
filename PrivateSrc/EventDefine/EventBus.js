@@ -283,8 +283,9 @@ const 事务列表 = {
       top: (window.pageYOffset + $event.clientY) / this.$当前窗口状态.缩放倍数,
       left: (window.pageXOffset + $event.clientX) / this.$当前窗口状态.缩放倍数,
     });
- //   console.log("双击")
-    this.$事件总线.$emit("添加卡片",卡片数据)
+    this.$数据库.cards.put(卡片数据).then(
+    this.$事件总线.$emit("保存卡片",卡片数据)
+    )
   },
   修改画板元数据: function (属性对象, 画板id) {
     this.$数据库.metadata.put(属性对象);
@@ -304,14 +305,14 @@ const 事务列表 = {
     this.$当前窗口状态.待发送数据 = 对象数据
     this.$当前窗口状态.显示发送对话框 = true
   },
-  改变数据预设:async function(对象数据,预设名){
+  改变数据预设: function(对象数据,预设名){
     对象数据.subtype =  预设名
     let 预设值= {}
-    await  this.$数据库[对象数据.type+"presets"].filter((data)=>{
+      this.$数据库[对象数据.type+"presets"].filter((data)=>{
       if(data.name == 预设名){
         return true;
       }
-    }).toArray((array)=>{预设值= array[0]})
+    }).toArray((array)=>{预设值= array[0]}).then(()=>{
     let attrsproxy ={}
   //  console.log(预设值)
     if(预设值){
@@ -329,7 +330,7 @@ const 事务列表 = {
     传出数据.attrsproxy = attrsproxy
    // console.log(传出数据)
    // console.log(attrsproxy)
-    this.$事件总线.$emit("保存卡片",传出数据)
+    this.$事件总线.$emit("保存卡片",传出数据)})
   },
   删除预设:async function(预设项目,预设表名,callback){
     let 数据表名= 预设表名.replace("presets","s")
@@ -354,13 +355,13 @@ const 事务列表 = {
       callback.apply()
     }
   },
-  变更预设值:async function(属性名,预设项目){
+  变更预设值: function(属性名,预设项目){
     let 预设表名 = 预设项目.type+"presets" 
     let 数据表名 = 预设项目.type+"s" 
     let 预设名 = 预设项目.name
    // console.log(预设名)
     if(属性名&&预设表名){
-      await this.$数据库[预设表名].put(预设项目).then(()=>
+       this.$数据库[预设表名].put(预设项目).then(()=>
        this.$数据库[数据表名]
       .filter((data)=>{
         if(data.subtype == 预设名){
@@ -372,7 +373,7 @@ const 事务列表 = {
         {
           value =this.$更新数据时间戳(value)
           value.attrs[属性名]=预设项目.attrs[属性名]&&预设项目.attrs[属性名]!=="byref" ?预设项目.attrs[属性名]:value.attrs[属性名]
-    }))
+        }))
   
   }
 },
