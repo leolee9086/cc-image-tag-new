@@ -91,7 +91,8 @@ const 事务列表 = {
     }
     
   },
-  保存数据: function (传入数据){
+  保存数据: function (传入数据,flag){
+    if(flag){return null}
    传入数据.type=="card"? this.$事件总线.$emit("保存卡片",传入数据):this.$事件总线.$emit("保存链接",传入数据)
   },
   保存卡片: async function (传入数据) {
@@ -245,7 +246,6 @@ const 事务列表 = {
     this.$当前窗口状态.缩放倍数 = 缩放倍数;
   },
   点击画板空白处: function($event){
-  //  console.log($event)
     if (!this.$当前窗口状态.等待连接卡片id){
     this.$事件总线.$emit("清理选择")
     }
@@ -254,8 +254,9 @@ const 事务列表 = {
         top: (window.pageYOffset + $event.clientY) / this.$当前窗口状态.缩放倍数,
         left: (window.pageXOffset + $event.clientX) / this.$当前窗口状态.缩放倍数,
       });
-      this.$事件总线.$emit("添加卡片", 卡片数据);
-      this.$事件总线.$emit("结束连接");
+      this.$数据库.cards.put(卡片数据).then(()=>{
+      this.$事件总线.$emit("保存卡片", 卡片数据);
+      this.$事件总线.$emit("结束连接");})
     }
   },
   清理选择:function(){
@@ -373,6 +374,7 @@ const 事务列表 = {
         {
           value =this.$更新数据时间戳(value)
           value.attrs[属性名]=预设项目.attrs[属性名]&&预设项目.attrs[属性名]!=="byref" ?预设项目.attrs[属性名]:value.attrs[属性名]
+          this.$事件总线.$emit("保存数据",true)
         }))
   
   }

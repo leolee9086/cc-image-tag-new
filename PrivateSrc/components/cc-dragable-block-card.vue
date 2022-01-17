@@ -1,6 +1,6 @@
 <template>
   <vue-draggable-resizable
-    v-show="!hide"
+    v-if="!hide"
     ref="container"
     @click="鼠标点击($event)"
     :resizable="显示控制柄"
@@ -440,7 +440,7 @@ module.exports = {
         let 新数据 = JSON.parse(JSON.stringify($event || {}));
         旧数据.updated = "";
         新数据.updated = "";
-        if (JSON.stringify(旧数据) !== JSON.stringify(新数据)) {
+        if (旧数据 !== 新数据) {
           this.对象数据 = $event;
         }
       }
