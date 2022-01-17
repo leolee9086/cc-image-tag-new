@@ -92,6 +92,9 @@ module.exports = {
       $event.target.getAttribute("class") == "cardscontainer layer"
         ? this.$事件总线.$emit("点击画板空白处", $event)
         : null;
+      $event.target.getAttribute("data-type") == "block-ref"
+        ? this.$窗口内打开思源块($event.target.getAttribute("data-id"))
+        : null;
     },
     黏贴内容: function ($event) {
       let clipboardData = $event.clipboardData;

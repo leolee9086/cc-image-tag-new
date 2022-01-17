@@ -334,6 +334,7 @@ module.exports = {
         attrs.offsety + "" == "NAN" ? (attrs.offsety = 0) : null;
         if (this.def_block != val.attrs.def_block);
         {
+          this.def_block = val.attrs.def_block;
           this.生成html();
         }
         let 拷贝对象 = JSON.parse(JSON.stringify(val));
@@ -371,6 +372,7 @@ module.exports = {
         this.对象数据 = this.$更新数据时间戳(this.对象数据);
         this.$事件总线.$emit("反激活数据", this.对象数据);
         this.正在编辑 = false;
+        this.生成html();
       }
     },
     正在编辑(val) {
@@ -446,6 +448,7 @@ module.exports = {
       }
     },
     生成html: async function () {
+      let that = this;
       let el = window.document.createElement("div");
       el.innerHTML = await Vditor.md2html(this.对象数据.markdown);
       let images = el.querySelectorAll("img");

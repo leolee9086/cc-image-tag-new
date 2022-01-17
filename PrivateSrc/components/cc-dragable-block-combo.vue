@@ -73,6 +73,7 @@ module.exports = {
     this.$事件总线.$on("选集变化", ($event) => (this.数据id数组 = $event));
     this.$事件总线.$on("保存卡片", ($event) => this.判断id($event));
     this.$事件总线.$on("保存链接", ($event) => this.判断id($event));
+    this.$事件总线.$on("移动卡片", ($event) => this.判断id($event));
     this.$事件总线.$on("窗口缩放", ($event) => this.计算边界框($event));
     this.$事件总线.$on("定位至卡片", ($event) => this.计算边界框($event));
   },
@@ -96,7 +97,7 @@ module.exports = {
     },
   },
   methods: {
-    统一属性: async function (参数) {
+    统一属性: function (参数) {
       if (参数 == "left") {
         for (i in this.数据数组) {
           let 现状数据 = this.数据数组[i];
@@ -160,13 +161,14 @@ module.exports = {
         let 数据 = this.数据数组[i];
         try {
           let 数据类型 = 数据.type + "s";
-          await this.$数据库[数据类型].put(数据);
-          if (数据类型 == "cards") {
-            this.$事件总线.$emit("保存卡片", 数据);
-          }
-          if (数据类型 == "links") {
-            this.$事件总线.$emit("保存链接", 数据);
-          }
+          this.$数据库[数据类型].put(数据).then(() => {
+            if (数据类型 == "cards") {
+              this.$事件总线.$emit("保存卡片", 数据);
+            }
+            if (数据类型 == "links") {
+              this.$事件总线.$emit("保存链接", 数据);
+            }
+          });
         } catch (e) {
           console.log(e);
         }
@@ -177,6 +179,7 @@ module.exports = {
       if ($event && this.数据id数组.length > 1) {
         this.数据数组.forEach((element) => {
           if (element && element.id == $event.id) {
+            element = $event;
             this.计算边界框();
           }
         });
@@ -194,7 +197,7 @@ module.exports = {
         }
       }
       this.数据数组 = Array.from(new Set(数据数组));
-      this.数据数组.length == this.数据id数组.length ? this.计算边界框() : null;
+      this.计算边界框();
     },
     计算边界框: function () {
       let 左上角点 = { x: 10000000000, y: 100000000000 };
