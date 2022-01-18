@@ -601,7 +601,6 @@ module.exports = {
       let links = {};
       cards = 版本数据.cards;
       links = 版本数据.links;
-      let zip = new JSZip();
       for (i in cards) {
         try {
           let yaml = this.生成yaml(cards[i]);
@@ -620,10 +619,13 @@ module.exports = {
           //   console.log(i, links[i]["id"], e);
         }
       }
+      let zip = new JSZip();
+
       zip.generateAsync({ type: "blob" }).then((content) => {
         that.保存(content, `${that.当前画板命名}-${that.当前画板id}.zip`);
       });
     },
+
     导出版本数据: async function (版本数据) {
       let that = this;
       let JSON数据 = 版本数据;
