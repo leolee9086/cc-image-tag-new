@@ -332,8 +332,8 @@ module.exports = {
         attrs.height + "" == "NAN" ? (attrs.height = 100) : null;
         attrs.offsetx + "" == "NAN" ? (attrs.offsetx = 0) : null;
         attrs.offsety + "" == "NAN" ? (attrs.offsety = 0) : null;
-        if (this.def_block != val.attrs.def_block);
-        {
+        if (this.def_block + "" != val.attrs.def_block + "") {
+       //   console.log(this.def_block, val.attrs.def_block);
           this.def_block = val.attrs.def_block;
           this.生成html();
         }
@@ -357,9 +357,11 @@ module.exports = {
       handler: function (val) {
         if (val) {
           this.显示控制柄 = false;
+          this.生成html();
         } else {
           try {
             this.显示控制柄 = true;
+            this.生成html();
           } catch (e) {}
         }
         this.保存数据();
@@ -371,6 +373,7 @@ module.exports = {
         //   console.log(this.对象数据);
         this.对象数据 = this.$更新数据时间戳(this.对象数据);
         this.$事件总线.$emit("激活数据", this.对象数据);
+        this.生成html();
       } else {
         this.对象数据 = this.$更新数据时间戳(this.对象数据);
         this.$事件总线.$emit("反激活数据", this.对象数据);
@@ -496,7 +499,7 @@ module.exports = {
         if (this.对象数据.attrs) {
           this.对象数据.attrs.trashed = true;
         }
-        console.log("删除");
+        //console.log("删除");
 
         this.$事件总线.$emit("删除数据", this.对象数据);
       }

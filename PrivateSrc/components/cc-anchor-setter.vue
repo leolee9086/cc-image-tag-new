@@ -84,7 +84,7 @@ module.exports = {
       handler: async function (val) {
         if (val[`${this.位置}_anchor_size`] && this.对象数据.id) {
           let 数据表名 = this.对象数据.type + "s";
-          console.log(数据表名);
+          //console.log(数据表名);
           await this.$数据库[数据表名]
             .filter((data) => {
               return data.id == this.对象数据.id;

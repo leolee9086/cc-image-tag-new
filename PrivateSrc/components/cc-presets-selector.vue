@@ -35,7 +35,7 @@ module.exports = {
   },
   methods: {
     判断id: function (数据, 预设名) {
-      console.log("aaa", 数据, 预设名);
+     // console.log("aaa", 数据, 预设名);
       if (数据.id == this.数据id && 预设名 != this.预设名) {
         this.预设名 = 预设名;
         this.应用预设();
@@ -43,9 +43,9 @@ module.exports = {
     },
     获取预设: async function () {
       let 预设表名 = this.数据表名.replace("s", "presets");
-      console.log(预设表名);
+     // console.log(预设表名);
       this.预设列表 = await this.$获取预设表(预设表名);
-      console.log(this.预设列表);
+     // console.log(this.预设列表);
       if (this.预设名) {
         this.预设 = await this.$获取预设(预设表名, this.预设名);
       }
@@ -57,9 +57,9 @@ module.exports = {
         ? (this.$当前窗口状态.current_cardpreset_name = this.预设名 || "一般概念")
         : (this.$当前窗口状态.current_linkpreset_name = this.预设名 || "属于");
       this.预设表名 = this.数据表名.replace("s", "presets");
-      console.log(this.预设表名);
+     // console.log(this.预设表名);
       this.预设列表 = await this.$数据库[this.预设表名].toArray();
-      console.log(this.预设列表);
+     // console.log(this.预设列表);
       this.当前预设 = await this.$获取预设(this.预设表名, this.预设名);
     },
     应用预设: function () {

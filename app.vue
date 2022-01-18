@@ -55,12 +55,12 @@ module.exports = {
     window.addEventListener("scroll", this.计算坐标);
 
     this.主界面 = window.parent.document;
-    console.log(this.主界面);
+    //console.log(this.主界面);
     this.思源伺服ip = window.location.host;
-    console.log(this.思源伺服ip);
-    console.log(this.$数据库);
+    // console.log(this.思源伺服ip);
+    //  console.log(this.$数据库);
     let url参数 = this.$解析url(window.location.href);
-    console.log(url参数);
+    // console.log(url参数);
     if (this.$挂件模式()) {
       this.挂件自身元素 = self.frameElement.parentElement.parentElement;
     }
@@ -86,7 +86,7 @@ module.exports = {
   },
   watch: {
     数据源id: async function (val, oldval) {
-      console.log("new", val, "old", oldval);
+      //  console.log("new", val, "old", oldval);
       if (val != oldval && val && oldval) {
         this.初始化(val);
       }

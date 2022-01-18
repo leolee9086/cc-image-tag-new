@@ -31,95 +31,44 @@
             </el-input>
             <el-card>
               <cc-block-list
-                :blocklist="当前反向链接列表['backlinks']"
                 title="反向链接"
+                :blocklist="当前反向链接列表['backlinks']"
                 :count="当前反向链接列表['linkRefsCount']"
+                buttonicon="el-icon-plus"
+                :clickcallback="
+                  (data) => {
+                    思源链接上图(data, '链接', true);
+                  }
+                "
+                buttontip="上图"
               >
-                <el-tooltip
-                  slot="action_doc"
-                  slot-scope="item"
-                  effect="dark"
-                  content="上图"
-                  placement="top-start"
-                >
-                  <span
-                    class="el-icon-plus"
-                    @click="思源链接上图(item.data, '链接', true)"
-                  ></span>
-                </el-tooltip>
-                <el-tooltip
-                  slot="action_child"
-                  slot-scope="item"
-                  effect="dark"
-                  content="上图"
-                  placement="top-start"
-                >
-                  <span
-                    class="el-icon-plus"
-                    @click="思源链接上图(item.data, '链接', true)"
-                  ></span>
-                </el-tooltip>
               </cc-block-list>
 
               <cc-block-list
                 :blocklist="当前反向链接列表['backmentions']"
                 :count="当前反向链接列表['mentionsCount']"
                 title="提及"
+                buttonicon="el-icon-plus"
+                :clickcallback="
+                  (data) => {
+                    思源链接上图(data, '链接', true);
+                  }
+                "
+                buttontip="上图"
               >
-                <el-tooltip
-                  slot="action_doc"
-                  slot-scope="item"
-                  effect="dark"
-                  content="上图"
-                  placement="top-start"
-                >
-                  <span
-                    class="el-icon-plus"
-                    @click="思源链接上图(item.data, '提及', true)"
-                  ></span>
-                </el-tooltip>
-                <el-tooltip
-                  slot="action_child"
-                  slot-scope="item"
-                  effect="dark"
-                  content="上图"
-                  placement="top-start"
-                >
-                  <span
-                    class="el-icon-plus"
-                    @click="思源链接上图(item.data, '提及', true)"
-                  ></span>
-                </el-tooltip>
               </cc-block-list>
               <cc-block-list
                 :blocklist="当前正向链接列表"
                 :count="当前正向链接列表.length"
                 title="正向链接"
+                buttonicon="el-icon-plus"
+                :clickcallback="
+                  (data) => {
+                    思源链接上图(data, '链接', true);
+                  }
+                "
+                buttontip="上图"
               >
-                <el-tooltip
-                  slot="action_doc"
-                  slot-scope="item"
-                  effect="dark"
-                  content="上图"
-                  placement="top-start"
-                >
-                  <span
-                    class="el-icon-plus"
-                    @click="思源链接上图(item.data, '链接')"
-                  ></span>
-                </el-tooltip>
-                <el-tooltip
-                  slot="action_child"
-                  slot-scope="item"
-                  effect="dark"
-                  content="上图"
-                  placement="top-start"
-                >
-                  <span
-                    class="el-icon-plus"
-                    @click="思源链接上图(item.data, '链接')"
-                  ></span>
-                </el-tooltip>
               </cc-block-list>
             </el-card>
           </el-collapse-item>
@@ -530,7 +479,7 @@ module.exports = {
           this.当前反向链接列表 = [];
           this.当前正向链接列表 = [];
         }
-        console.log(this.当前反向链接列表, this.当前正向链接列表);
+      //  console.log(this.当前反向链接列表, this.当前正向链接列表);
       },
     },
     最小化窗口: {
@@ -565,11 +514,11 @@ module.exports = {
         top: 属性对象.top,
         left: 属性对象.left + 属性对象.width + 200,
       });
-      console.log(待发送数据);
+     // console.log(待发送数据);
 
       待发送数据.attrs.def_block = id;
       let 卡片数组 = [];
-      console.log(this.当前对象数据);
+     // console.log(this.当前对象数据);
       if (!反向) {
         卡片数组 = [this.当前对象数据, 待发送数据];
       } else {
@@ -581,7 +530,7 @@ module.exports = {
           this.$事件总线.$emit("添加卡片", 待发送数据);
         })
         .then(() => {
-          console.log("链接", 卡片数组);
+        //  console.log("链接", 卡片数组);
           this.$事件总线.$emit("连接卡片", 卡片数组, 类型.replace("正向", ""));
         });
     },

@@ -88,7 +88,7 @@ module.exports = {
   computed: {},
   methods: {
     点击画板: function ($event) {
-      console.log($event.target);
+    //  console.log($event.target);
       $event.target.getAttribute("class") == "cardscontainer layer"
         ? this.$事件总线.$emit("点击画板空白处", $event)
         : null;
