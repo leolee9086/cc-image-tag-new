@@ -223,14 +223,16 @@ module.exports = {
         let 数据 = this.数据数组[i];
         try {
           let 数据类型 = 数据.type + "s";
-          await this.$数据库[数据类型].put(数据).then(() => {
-            if (数据类型 == "cards") {
-              this.$事件总线.$emit("保存卡片", 数据);
-            }
-            if (数据类型 == "links") {
-              this.$事件总线.$emit("保存链接", 数据);
-            }
-          });
+          if (!数据.attrs.trashed) {
+            await this.$数据库[数据类型].put(数据).then(() => {
+              if (数据类型 == "cards") {
+                this.$事件总线.$emit("保存卡片", 数据);
+              }
+              if (数据类型 == "links") {
+                this.$事件总线.$emit("保存链接", 数据);
+              }
+            });
+          }
         } catch (e) {
           console.log(e);
         }

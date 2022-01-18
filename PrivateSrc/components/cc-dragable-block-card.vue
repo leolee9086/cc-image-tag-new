@@ -255,7 +255,7 @@ module.exports = {
 
   watch: {
     value: {
-      handler: async function (val, oldval) {
+      handler: function (val, oldval) {
         if (JSON.stringify(val) == JSON.stringify(oldval)) {
           return null;
         }
@@ -341,7 +341,10 @@ module.exports = {
         let 拷贝旧对象 = JSON.parse(JSON.stringify(oldval || "{}"));
         拷贝对象.updated = "";
         拷贝旧对象.updated = "";
-        if (JSON.stringify(拷贝对象) != JSON.stringify(拷贝旧对象)) {
+        if (
+          JSON.stringify(拷贝对象) != JSON.stringify(拷贝旧对象) &&
+          !val.attrs.trashed
+        ) {
           this.保存数据();
         }
 
@@ -442,7 +445,7 @@ module.exports = {
         let 新数据 = JSON.parse(JSON.stringify($event || {}));
         旧数据.updated = "";
         新数据.updated = "";
-        if (旧数据 !== 新数据) {
+        if (旧数据 !== 新数据 && !新数据.attrs.trashed && !旧数据.trashed) {
           this.对象数据 = $event;
         }
       }
@@ -493,7 +496,8 @@ module.exports = {
         if (this.对象数据.attrs) {
           this.对象数据.attrs.trashed = true;
         }
-        this.$emit("delete", this.index);
+        console.log("删除");
+
         this.$事件总线.$emit("删除数据", this.对象数据);
       }
     },

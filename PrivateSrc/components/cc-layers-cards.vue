@@ -39,8 +39,8 @@
       数据类型="link"
       :窗口缩放倍数="$当前窗口状态.缩放倍数"
     ></cc-dragable-block-card>
-    <cc-dragable-block-combo :窗口缩放倍数="$当前窗口状态.缩放倍数" style="z-index: 600">
-    </cc-dragable-block-combo>
+    <!-- <cc-dragable-block-combo :窗口缩放倍数="$当前窗口状态.缩放倍数" style="z-index: 600">
+    </cc-dragable-block-combo>-->
   </div>
 </template>
 <script>
