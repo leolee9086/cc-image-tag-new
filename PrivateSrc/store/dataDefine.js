@@ -319,3 +319,4 @@ Vue.prototype.$获取预设 = async function(预设表名,预设名){
     current_linkpreset_name:"",
   };
   Vue.prototype.$当前窗口状态 = 窗口状态对象;
+  

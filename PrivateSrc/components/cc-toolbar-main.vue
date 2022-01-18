@@ -14,6 +14,8 @@
     "
   >
     <el-row>
+      <el-button @click="file()"> </el-button>
+
       <el-col :span="21">
         <el-col :span="8">
           <el-popover trigger="click">
@@ -429,6 +431,9 @@ module.exports = {
     },
   },
   methods: {
+    file() {
+      window.file();
+    },
     获取当前元素数据: function ($event) {
       if ($event) {
         if ($event.id == this.卡片数据id || $event.id == this.链接数据id) {
