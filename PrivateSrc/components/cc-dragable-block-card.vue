@@ -185,8 +185,8 @@
           <cc-link-siyuan
             v-if="对象数据.attrs.def_block"
             :style="`color:${对象数据.attrs.color};`"
-            锚文本=""
             :链接id="对象数据.attrs.def_block"
+            :最大文字长度="23"
           ></cc-link-siyuan>
         </div>
         <div class="cc-card-content">
