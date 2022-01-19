@@ -108,8 +108,8 @@ Vue.prototype.$用Lute生成时间戳=function(){
 }
 Vue.prototype.$生成毫秒时间戳=function(){
   
- let str = moment().format("YYYYMMDDHHmmssSS")
-  return str+"00"
+ let str = moment().format("YYYYMMDDHHmmssSSSS")
+  return str
 }
 Vue.prototype.$更新数据时间戳=function(数据){
   数据.updated = this.$生成毫秒时间戳()

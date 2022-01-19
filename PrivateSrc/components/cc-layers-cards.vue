@@ -39,8 +39,8 @@
       数据类型="link"
       :窗口缩放倍数="$当前窗口状态.缩放倍数"
     ></cc-dragable-block-card>
-    <!-- <cc-dragable-block-combo :窗口缩放倍数="$当前窗口状态.缩放倍数" style="z-index: 600">
-    </cc-dragable-block-combo>-->
+    <cc-dragable-block-combo :窗口缩放倍数="$当前窗口状态.缩放倍数" style="z-index: 600">
+    </cc-dragable-block-combo>
   </div>
 </template>
 <script>
@@ -88,7 +88,7 @@ module.exports = {
   computed: {},
   methods: {
     点击画板: function ($event) {
-    //  console.log($event.target);
+      //  console.log($event.target);
       $event.target.getAttribute("class") == "cardscontainer layer"
         ? this.$事件总线.$emit("点击画板空白处", $event)
         : null;

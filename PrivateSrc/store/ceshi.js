@@ -5,7 +5,8 @@ const window = {
   WebSocket: self.WebSocket,
 }
 importScripts("/widgets/cc-baselib/static/dexie.min.js")
-const 数据库 = new Dexie('datas');
+importScripts("/widgets/cc-baselib/static/dexie.min.js")
+
 数据库.version(3).stores({
   cards: 'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs', 
   links:'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs',
@@ -15,6 +16,12 @@ const 数据库 = new Dexie('datas');
   cardpresets:"id,parent_id,root_id,hash,box,path,&name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs",
   linkpresets:"id,parent_id,root_id,hash,box,path,&name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs",
 });
+
+const 画板元数据库 = new Dexie("cc_whiteboardfiles");
+画板元数据库.version(4).stores({
+  boards: 'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs', 
+});
+画板元数据库.open()
 
 
 

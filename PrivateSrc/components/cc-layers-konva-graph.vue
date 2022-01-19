@@ -67,6 +67,9 @@ module.exports = {
     this.$事件总线.$on("移动卡片", ($event) => (this.当前数据 = $event));
     this.$事件总线.$on("激活数据", ($event) => (this.当前数据 = $event));
     this.$事件总线.$on("缩放卡片", ($event) => (this.当前数据 = $event));
+    this.$事件总线.$on("保存数据", ($event) =>
+      $event.id == this.当前数据.id ? (this.当前数据 = $event) : null
+    );
   },
 
   computed: {
@@ -104,7 +107,7 @@ module.exports = {
         height: (attrs ? attrs.height : null || 1000) + 10,
         fill: "transparent",
         stroke: "darkblue",
-        strokeWidth: 5,
+        strokeWidth: 4,
         radius: 5,
         scaleX: this.$当前窗口状态.缩放倍数,
         scaleY: this.$当前窗口状态.缩放倍数,

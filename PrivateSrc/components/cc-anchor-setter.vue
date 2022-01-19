@@ -63,17 +63,17 @@ module.exports = {
     当前对象数据: {
       handler: function (val) {
         if (val && val.attrs) {
-          this.标记大小 = val.attrs[`${this.位置}_anchor_size`]
-            ? val.attrs[`${this.位置}_anchor_size`]
+          let attrs = val.attrs;
+          this.标记大小 = attrs[`${this.位置}_anchor_size`]
+            ? attrs[`${this.位置}_anchor_size`]
             : 20;
-          this.标记图像路径 = val.attrs[`${this.位置}_anchor_image`];
+          this.标记图像路径 = attrs[`${this.位置}_anchor_image`];
 
           this.标记自动旋转 =
-            val.attrs[`${this.位置}_anchor_rotate`] &&
-            val.attrs[`${this.位置}_anchor_rotate`]
+            attrs[`${this.位置}_anchor_rotate`] && attrs[`${this.位置}_anchor_rotate`]
               ? 1
               : 0;
-          this.标记旋转角度 = val.attrs[`${this.位置}_anchor_rotate_offset`];
+          this.标记旋转角度 = attrs[`${this.位置}_anchor_rotate_offset`];
           this.updated = val.updated;
         }
       },
@@ -110,10 +110,11 @@ module.exports = {
   computed: {
     标记属性对象() {
       let obj = {};
-      obj[`${this.位置}_anchor_size`] = this.标记大小;
-      obj[`${this.位置}_anchor_image`] = this.标记图像路径;
-      obj[`${this.位置}_anchor_rotate`] = this.标记自动旋转;
-      obj[`${this.位置}_anchor_rotate_offset`] = this.标记旋转角度;
+      let 位置 = this.位置;
+      obj[`${位置}_anchor_size`] = this.标记大小;
+      obj[`${位置}_anchor_image`] = this.标记图像路径;
+      obj[`${位置}_anchor_rotate`] = this.标记自动旋转;
+      obj[`${位置}_anchor_rotate_offset`] = this.标记旋转角度;
       return obj;
     },
   },

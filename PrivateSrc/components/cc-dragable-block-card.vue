@@ -333,7 +333,7 @@ module.exports = {
         attrs.offsetx + "" == "NAN" ? (attrs.offsetx = 0) : null;
         attrs.offsety + "" == "NAN" ? (attrs.offsety = 0) : null;
         if (this.def_block + "" != val.attrs.def_block + "") {
-       //   console.log(this.def_block, val.attrs.def_block);
+          //   console.log(this.def_block, val.attrs.def_block);
           this.def_block = val.attrs.def_block;
           this.生成html();
         }
@@ -371,8 +371,9 @@ module.exports = {
     激活(val) {
       if (val) {
         //   console.log(this.对象数据);
-        this.对象数据 = this.$更新数据时间戳(this.对象数据);
         this.$事件总线.$emit("激活数据", this.对象数据);
+
+        this.对象数据 = this.$更新数据时间戳(this.对象数据);
         this.生成html();
       } else {
         this.对象数据 = this.$更新数据时间戳(this.对象数据);
@@ -384,6 +385,8 @@ module.exports = {
     正在编辑(val) {
       if (val) {
         //console.log(this.对象数据);
+      } else {
+        this.生成html();
       }
     },
   },
@@ -435,11 +438,15 @@ module.exports = {
       this.$事件总线.$emit("打开发送对话框", this.对象数据);
     },
     鼠标点击($event) {
-      $event.ctrlKey ? this.$事件总线.$emit("ctrl加鼠标点击卡片", this.对象数据) : null;
+      console.log($event);
+      $event.stopPropagation();
+      this.$事件总线.$emit("鼠标点击卡片", this.对象数据, $event.ctrlKey);
     },
     判断id: function ($event) {
       let that = this;
-
+      if ($event.attrsproxy) {
+        return null;
+      }
       if (
         $event.id == this.对象数据.id &&
         parseInt($event.updated) >= parseInt(this.对象数据.updated)
@@ -511,16 +518,26 @@ module.exports = {
       this.$emit("callbacklink", this.对象数据.attrs.def_block);
     },
     计算坐标: async function (x, y) {
+      let 窗口缩放倍数 = this.窗口缩放倍数;
+      let attrs = this.对象数据.attrs;
+      let top = attrs.top;
+      let left = attrs.left;
+      let offsetx = attrs.offsetx;
+      let offsety = attrs.offsety;
       if (this.数据类型 == "card") {
-        this.对象数据.attrs.top = y / this.窗口缩放倍数;
-        this.对象数据.attrs.left = x / this.窗口缩放倍数;
-        this.对象数据.attrs.offsety = 0;
-        this.对象数据.attrs.offsetx = 0;
+        top = y / 窗口缩放倍数;
+        left = x / 窗口缩放倍数;
+        offsety = 0;
+        offsetx = 0;
       }
       if (this.数据类型 == "link") {
-        this.对象数据.attrs.offsety = y / this.窗口缩放倍数 - this.对象数据.attrs.top;
-        this.对象数据.attrs.offsetx = x / this.窗口缩放倍数 - this.对象数据.attrs.left;
+        offsety = y / 窗口缩放倍数 - top;
+        offsetx = x / 窗口缩放倍数 - left;
       }
+      this.对象数据.attrs.top = top;
+      this.对象数据.attrs.left = left;
+      this.对象数据.attrs.offsetx = offsetx;
+      this.对象数据.attrs.offsety = offsety;
     },
     dragging: function (x, y) {
       this.计算坐标(x, y);
@@ -566,30 +583,35 @@ module.exports = {
     计算可见性: async function () {
       this.hide = true;
       let 对象数据 = this.对象数据;
+
       if (!对象数据.attrs) {
         this.删除();
         return null;
       }
       let $当前窗口状态 = this.$当前窗口状态;
+      let 缩放倍数 = $当前窗口状态.缩放倍数;
+
       if (this.对象数据 && this.对象数据.attrs.top < 0) {
         this.对象数据.attrs.top = 0;
       }
       if (this.对象数据 && this.对象数据.attrs.left < 0) {
         this.对象数据.attrs.left = 0;
       }
+      let pageYOffset = window.pageYOffset;
+      let pageXOffset = window.pageXOffset;
+      let innerHeight = window.innerHeight;
+      let innerWidth = window.innerWidth;
+      let top = 对象数据.attrs.top;
+      let left = 对象数据.attrs.left;
+      let offsety = 对象数据.attrs.offsety;
+      let offsetx = 对象数据.attrs.offsetx;
+      let height = 对象数据.attrs.height;
+      let width = 对象数据.attrs.width;
       if (
-        window.pageYOffset >
-          (对象数据.attrs.top + 对象数据.attrs.offsety + 对象数据.attrs.height) *
-            $当前窗口状态.缩放倍数 ||
-        window.pageYOffset + window.innerHeight <
-          (对象数据.attrs.top + 对象数据.attrs.offsety) * $当前窗口状态.缩放倍数 ||
-        window.pageXOffset >
-          (对象数据.attrs.left + 对象数据.attrs.offsetx + 对象数据.attrs.width) *
-            $当前窗口状态.缩放倍数 ||
-        (window.pageXOffset + window.innerWidth <
-          (对象数据.attrs.left + 对象数据.attrs.offsetx) * $当前窗口状态.缩放倍数 &&
-          对象数据.attrs.left > 0 &&
-          对象数据.top > 0)
+        pageYOffset > (top + offsety + height) * 缩放倍数 ||
+        pageYOffset + innerHeight < (top + offsety) * 缩放倍数 ||
+        pageXOffset > (left + offsetx + width) * 缩放倍数 ||
+        (pageXOffset + innerWidth < (left + offsetx) * 缩放倍数 && left > 0 && top > 0)
       ) {
         // 不可见标记数组.push(标记);
         this.hide = true;

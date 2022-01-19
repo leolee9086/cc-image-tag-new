@@ -145,7 +145,7 @@ module.exports = {
         offsetY: (this.起点标记大小 / 2) * this.缩放倍数 || 0,
         width: this.起点标记大小 * this.缩放倍数,
         height: this.起点标记大小 * this.缩放倍数,
-
+        fill: "transparent",
         image: this.起始节点图片元素,
         rotation:
           this.起始节点偏移.rotation + this.起始标记角度偏移 ||
@@ -172,6 +172,8 @@ module.exports = {
         width: this.终点标记大小 * this.缩放倍数,
         height: this.终点标记大小 * this.缩放倍数,
         image: this.结束节点图片元素,
+        fill: "transparent",
+
         rotation:
           this.结束节点偏移.rotation + this.结束标记角度偏移 ||
           this.结束节点偏移.rotation,
@@ -197,6 +199,8 @@ module.exports = {
         width: this.中间标记大小 * this.缩放倍数,
         height: this.中间标记大小 * this.缩放倍数,
         image: this.中间节点图片元素,
+        fill: "transparent",
+
         rotation:
           this.中间节点偏移.rotation + this.中间标记角度偏移 ||
           this.中间节点偏移.rotation,
@@ -274,7 +278,7 @@ module.exports = {
         拷贝对象.updated = "";
         拷贝旧对象.updated = "";
         if (JSON.stringify(拷贝对象) !== JSON.stringify(拷贝旧对象)) {
-          console.log("aaa", val);
+          //  console.log("aaa", val);
           this.$事件总线.$emit("保存链接", val);
         }
       },

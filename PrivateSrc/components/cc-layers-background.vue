@@ -8,14 +8,15 @@
     width: ${窗口大小.width / $当前窗口状态.缩放倍数}px; 
     height: ${窗口大小.height / $当前窗口状态.缩放倍数}px;
     transform-origin:0% 0%; 
-    z-index:-1`"
+    z-index:-1;
+    background-color:${当前背景色}`"
   >
     <div
-    
       v-if="图像模式 == '重复'"
       :style="`
     background-image:url(${图像路径});
     background-repeat:repeat;
+    background-size:${图像宽度 * 图像缩放倍数}px; 
     width: 100%; 
     height:100%;
     `"
@@ -25,7 +26,10 @@
       :src="图像路径"
       fit="scale-down"
       ref="image"
-      :style="`transform:scale(${图像缩放倍数}); 
+      :style="`
+          width: ${图像宽度}px; 
+
+      transform:scale(${图像缩放倍数}); 
          transform-origin:0% 0%; 
      `"
     >
@@ -41,6 +45,9 @@ module.exports = {
       图像路径: "",
       图像缩放倍数: 1,
       图像模式: "",
+      当前背景色: "",
+      图像宽度: 100,
+      图像高度: 100,
     };
   },
   mounted() {
@@ -53,6 +60,24 @@ module.exports = {
     });
     this.$事件总线.$on("缩放背景", ($event) => (this.图像缩放倍数 = $event));
     this.$事件总线.$on("改变背景图像模式", ($event) => (this.图像模式 = $event));
+    this.$事件总线.$on("背景色改变", ($event) => (this.当前背景色 = $event));
+  },
+  watch: {
+    图像路径: {
+      handler(val) {
+        if (val) {
+          let img = new window.Image();
+          img.src = val;
+          img.onload = function () {
+            // 打印
+            this.图像宽度 = img.width;
+            this.图像高度 = img.height;
+            console.log(this.图像大小);
+          };
+        }
+      },
+      immediate: true,
+    },
   },
 };
 </script>

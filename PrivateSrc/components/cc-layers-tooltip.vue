@@ -29,15 +29,16 @@ module.exports = {
   },
   methods: {
     读取提示($event) {
-      if ($event.target.getAttribute("aria-label")) {
-        this.当前提示内容 = $event.target.getAttribute("aria-label");
-      } else if ($event.target.parentElement) {
-        if ($event.target.parentElement.getAttribute("aria-label")) {
+      let target = $event.target;
+      if (target.getAttribute("aria-label")) {
+        this.当前提示内容 = target.getAttribute("aria-label");
+      } else if (target.parentElement) {
+        if (target.parentElement.getAttribute("aria-label")) {
           try {
-            this.当前提示内容 = $event.target.parentElement.getAttribute("aria-label");
+            this.当前提示内容 = target.parentElement.getAttribute("aria-label");
           } catch (error) {}
-        } else if ($event.target.parentElement.parentElement) {
-          this.当前提示内容 = $event.target.parentElement.parentElement.getAttribute(
+        } else if (target.parentElement.parentElement) {
+          this.当前提示内容 = target.parentElement.parentElement.getAttribute(
             "aria-label"
           );
         }

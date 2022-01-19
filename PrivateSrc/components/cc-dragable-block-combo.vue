@@ -1,6 +1,6 @@
 <template>
   <vue-draggable-resizable
-    v-if="显示 && 数据id数组[1]"
+    v-if="显示 && 数据数组[1]"
     ref="container"
     :resizable="false"
     :draggable="false"
@@ -14,6 +14,21 @@
   >
     <div class="cc-card-combo-drawer"></div>
     <div
+      v-if="数据数组[1] && 卡片.attrs"
+      v-for="卡片 in 数据数组"
+      :style="`
+      position:absolute;
+      top:${(卡片.attrs.top + 卡片.attrs.offsety) * 窗口缩放倍数 - y + 5}px;
+      left:${(卡片.attrs.left + 卡片.attrs.offsetx) * 窗口缩放倍数 - x + 5}px;
+      width:${卡片.attrs.width * 窗口缩放倍数 + 5}px;
+      height:${卡片.attrs.height * 窗口缩放倍数 + 5}px;
+      
+      `"
+    >
+      <div class="cc-card-combo-drawer"></div>
+    </div>
+    <div
+      v-if="数据数组[1]"
       class="cc-card-toolbar combo"
       :style="`
       transform:scale(${窗口缩放倍数}) 
@@ -97,7 +112,10 @@ module.exports = {
     };
   },
   mounted() {
-    this.$事件总线.$on("选集变化", ($event) => (this.数据id数组 = $event));
+    this.$事件总线.$on("选集增加", ($event) => this.增加数据($event));
+    this.$事件总线.$on("清理选择", this.清理选择);
+    this.$事件总线.$on("清理选集", this.清理选择);
+
     this.$事件总线.$on("保存卡片", ($event) => this.判断id($event));
     this.$事件总线.$on("保存链接", ($event) => this.判断id($event));
     this.$事件总线.$on("保存数据", ($event) => this.判断id($event));
@@ -105,17 +123,6 @@ module.exports = {
     this.$事件总线.$on("定位至卡片", ($event) => this.计算边界框($event));
   },
   watch: {
-    数据id数组: {
-      handler(val) {
-        //console.log("当前选集", val.length);
-        val[0] ? (this.显示 = true) : (this.显示 = false);
-
-        if (val.length > 1) {
-          this.获取数据();
-        }
-      },
-      deep: true,
-    },
     窗口缩放倍数: {
       handler(val) {
         //console.log("当前选集", val.length);
@@ -149,7 +156,7 @@ module.exports = {
             this.数据数组[i] = 现状数据;
           } else {
             现状数据.attrs.offsetx =
-              this.x + this.width - 现状数据.left - 现状数据.attrs.width;
+              this.x + this.width - 现状数据.attrs.left - 现状数据.attrs.width;
             现状数据 = this.$更新数据时间戳(现状数据);
             this.数据数组[i] = 现状数据;
           }
@@ -163,7 +170,7 @@ module.exports = {
             现状数据 = this.$更新数据时间戳(现状数据);
             this.数据数组[i] = 现状数据;
           } else {
-            现状数据.attrs.offsetx = this.y - 现状数据.attrs.top;
+            现状数据.attrs.offsety = this.y - 现状数据.attrs.top;
             现状数据 = this.$更新数据时间戳(现状数据);
             this.数据数组[i] = 现状数据;
           }
@@ -177,8 +184,8 @@ module.exports = {
             现状数据 = this.$更新数据时间戳(现状数据);
             this.数据数组[i] = 现状数据;
           } else {
-            现状数据.attrs.offsetx =
-              this.y + this.height - 现状数据.top - 现状数据.attrs.height;
+            现状数据.attrs.offsety =
+              this.y + this.height - 现状数据.attrs.top - 现状数据.attrs.height;
             现状数据 = this.$更新数据时间戳(现状数据);
             this.数据数组[i] = 现状数据;
           }
@@ -198,6 +205,7 @@ module.exports = {
       if (参数 == "xspace" || 参数 == "yspace") {
         let 长度属性 = 参数 == "xspace" ? "width" : "height";
         let 坐标属性 = 参数 == "xspace" ? "left" : "top";
+        let 偏移属性 = 参数 == "xspace" ? "offsetx" : "offsety";
         let 总宽度 = this[长度属性];
         this.数据数组 = this.数据数组.sort(function (a, b) {
           return a.attrs[坐标属性] - b.attrs[坐标属性];
@@ -223,14 +231,10 @@ module.exports = {
         let 数据 = this.数据数组[i];
         try {
           let 数据类型 = 数据.type + "s";
-          if (!数据.attrs.trashed) {
+          //console.log(数据类型);
+          if (!数据.attrs.trashed && !数据.attrsproxy) {
             await this.$数据库[数据类型].put(数据).then(() => {
-              if (数据类型 == "cards") {
-                this.$事件总线.$emit("保存卡片", 数据);
-              }
-              if (数据类型 == "links") {
-                this.$事件总线.$emit("保存链接", 数据);
-              }
+              this.$事件总线.$emit("保存数据", 数据);
             });
           }
         } catch (e) {
@@ -240,30 +244,31 @@ module.exports = {
     },
 
     判断id: function ($event) {
-      if ($event && this.数据id数组.length > 1) {
-        for (i = 0; i < this.数据数组.length; i++) {
-          let element = this.数据数组[i];
-          if (element && element.id == $event.id) {
-            this.数据数组[i] = $event;
+      let 数据数组 = JSON.parse(JSON.stringify(this.数据数组));
+
+      if ($event && 数据数组[0]) {
+        for (i = 0; i < 数据数组.length; i++) {
+          let element = 数据数组[i];
+          if (
+            element &&
+            element.id == $event.id &&
+            element.updated <= $event.updated &&
+            $event.attrs &&
+            !数据.attrs.trashed
+          ) {
+            数据数组[i] = $event;
           }
         }
       }
-      this.计算边界框();
+      this.数据去重(数据数组);
     },
-
-    获取数据: async function () {
-      let 数据数组 = [];
-      let 原始数据 = {};
-      let 现状数据 = {};
-      let 数据id数组 = Array.from(new Set(this.数据id数组));
-      for (i in 数据id数组) {
-        if (数据id数组[i]) {
-          原始数据 = 数据id数组[i];
-          现状数据 = (await this.$数据库.cards.get(原始数据.id)) || 原始数据;
-          现状数据 = (await this.$数据库.links.get(原始数据.id)) || 现状数据;
-          数据数组.push(现状数据);
-        }
-      }
+    清理选择: function () {
+      this.显示 = false;
+      this.数据数组 = [];
+    },
+    增加数据: function ($event) {
+      let 数据数组 = JSON.parse(JSON.stringify(this.数据数组));
+      数据数组.push($event);
       this.数据去重(数据数组);
     },
     数据去重: function (待去重数组) {
@@ -283,9 +288,14 @@ module.exports = {
           this.数据数组.push(待去重数组[i]);
         }
       }
+      if (!this.数据数组[0]) {
+        return null;
+      }
       this.计算边界框();
+      this.显示 = true;
     },
     计算边界框: function () {
+      //console.log(this.数据数组);
       if (!this.数据数组) {
         return null;
       }
@@ -299,15 +309,21 @@ module.exports = {
         数据 = this.数据数组[i];
         if (数据 && 数据.attrs) {
           let 属性数据 = 数据.attrs;
-          let bottom = 属性数据.top + 属性数据.height;
-          let right = 属性数据.left + 属性数据.width;
+          let bottom = 属性数据.top + 属性数据.height + 属性数据.offsety;
+          let right = 属性数据.left + 属性数据.width + 属性数据.offsetx;
           bottom > 右下角点.y ? (右下角点.y = bottom) : null;
           right > 右下角点.x ? (右下角点.x = right) : null;
-          属性数据.top < 左上角点.y ? (左上角点.y = 属性数据.top) : null;
-          属性数据.left < 左上角点.x ? (左上角点.x = 属性数据.left) : null;
+          属性数据.top + 属性数据.offsety < 左上角点.y
+            ? (左上角点.y = 属性数据.top + 属性数据.offsety)
+            : null;
+          属性数据.left + 属性数据.offsetx < 左上角点.x
+            ? (左上角点.x = 属性数据.left + 属性数据.offsetx)
+            : null;
         }
       }
       if (左上角点.x * this.窗口缩放倍数 - 10 > 100000) {
+        this.显示 = false;
+
         return null;
       }
       this.x = 左上角点.x * this.窗口缩放倍数 || this.x;

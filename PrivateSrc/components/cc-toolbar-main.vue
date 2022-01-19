@@ -137,7 +137,12 @@
           <div class="el-icon-help" @click="聚焦到卡片(对象数据)"></div>
 
           <span class="el-icon-browser" @click="$窗口内打开超链接(画板超链接)"></span>
-          <el-popover :width="300">
+          <el-popover :width="350">
+            <cc-color-pane
+              v-model="背景色"
+              :自定义颜色数组="自定义颜色数组"
+            ></cc-color-pane>
+
             <el-row>
               <el-col :span="12">
                 <cc-assets-selector
@@ -154,20 +159,15 @@
                 </el-select>
               </el-col>
             </el-row>
-
             <el-input v-model="背景图片源" size="mini"></el-input>
-            <el-input-number
-              size="mini"
-              v-if="背景图像模式 == '填充'"
-              v-model="背景图像缩放倍数"
-            ></el-input-number>
+            <el-input-number size="mini" v-model="背景图像缩放倍数"></el-input-number>
             <el-switch
               v-model="背景图像模式"
-              active-text="填充"
-              inactive-text="重复"
-              active-value="填充"
-              inactive-value="重复"
+              active-text="重复"
+              active-value="重复"
+              inactive-value="填充"
             ></el-switch>
+
             <span slot="reference" class="el-icon-picture"></span>
           </el-popover>
         </el-col>
@@ -209,6 +209,7 @@
         </el-tooltip>
       </el-col>
     </el-row>
+
     <el-drawer :modal="false" title="历史版本" :visible.sync="显示历史面板">
       <el-timeline>
         <el-timeline-item
@@ -262,6 +263,7 @@ module.exports = {
   components: componentsList,
   data() {
     return {
+      背景色: "",
       当前预设名: "",
       apitoken: "",
       数据源id: {},
@@ -312,6 +314,18 @@ module.exports = {
       this.$数据库.metadata.put({ key: "backgroundImage", value: "" });
     }
     try {
+      this.自定义颜色数组 = (await this.$数据库.metadata.get("customcolors")).value;
+    } catch (e) {
+      this.自定义颜色数组 = [];
+      this.$数据库.metadata.put({ key: "customcolors", value: [] });
+    }
+    try {
+      this.背景色 = (await this.$数据库.metadata.get("backgroundColor")).value;
+    } catch (e) {
+      this.背景色 = "var(--b3-theme-background)";
+      this.$数据库.metadata.put({ key: "customcolors", value: [] });
+    }
+    try {
       this.背景图像缩放倍数 = (await this.$数据库.metadata.get("backgroundscale")).value;
     } catch (e) {
       this.背景图像缩放倍数 = 1;
@@ -352,8 +366,22 @@ module.exports = {
     this.timer = setInterval(() => {
       this.保存计数 = this.保存计数 + 1;
     }, 1000);
+    this.$事件总线.$on("自定义颜色改变", ($event) => (this.自定义颜色数组 = $event));
   },
   watch: {
+    背景色(val) {
+      this.$事件总线.$emit("背景色改变", val);
+      this.$当前窗口状态.backgroundColor = val;
+      this.$数据库.metadata.put({ key: "backgroundColor", value: val });
+    },
+    自定义颜色数组: {
+      handler(val) {
+        this.$事件总线.$emit("自定义颜色改变", val);
+        this.$数据库.metadata.put({ key: "customcolors", value: val });
+        console.log(val);
+      },
+      deep: true,
+    },
     保存时间间隔: async function (val) {
       if (val) {
         await this.$数据库.metadata.put({ key: "autosaveinteger", value: val });

@@ -246,7 +246,11 @@
                   </el-row>
 
                   <el-divider></el-divider>
-                  <cc-color-pane v-model="属性对象.path_color" :显示web命名颜色="true">
+                  <cc-color-pane
+                    v-model="属性对象.path_color"
+                    :显示web命名颜色="true"
+                    :自定义颜色数组="自定义颜色数组"
+                  >
                   </cc-color-pane>
                 </el-tab-pane>
                 <el-tab-pane label="起点标记" name="起点标记">
@@ -420,7 +424,7 @@ module.exports = {
     for (属性名 in this.$卡片预设属性默认值) {
       this.属性列表.push(属性名);
     }
-    console.log(this.属性列表);
+    //console.log(this.属性列表);
     this.获取预设();
     this.$事件总线.$on(
       "激活卡片",
@@ -430,9 +434,17 @@ module.exports = {
       "激活链接",
       ($event) => (this.当前对象数据 = $event || this.当前对象数据)
     );
+    this.$事件总线.$on("自定义颜色改变", ($event) => (this.自定义颜色数组 = $event));
   },
 
   watch: {
+    自定义颜色数组: {
+      handler(val) {
+        this.$事件总线.$emit("自定义颜色改变", val);
+        this.$数据库.metadata.put({ key: "customcolors", value: val });
+      },
+      deep: true,
+    },
     预设名: {
       handler: async function (val, oldval) {
         let 数据表名 = this.当前对象数据.type + "s" || "cards";
@@ -479,7 +491,7 @@ module.exports = {
           this.当前反向链接列表 = [];
           this.当前正向链接列表 = [];
         }
-      //  console.log(this.当前反向链接列表, this.当前正向链接列表);
+        //  console.log(this.当前反向链接列表, this.当前正向链接列表);
       },
     },
     最小化窗口: {
@@ -514,11 +526,11 @@ module.exports = {
         top: 属性对象.top,
         left: 属性对象.left + 属性对象.width + 200,
       });
-     // console.log(待发送数据);
+      // console.log(待发送数据);
 
       待发送数据.attrs.def_block = id;
       let 卡片数组 = [];
-     // console.log(this.当前对象数据);
+      // console.log(this.当前对象数据);
       if (!反向) {
         卡片数组 = [this.当前对象数据, 待发送数据];
       } else {
@@ -530,7 +542,7 @@ module.exports = {
           this.$事件总线.$emit("添加卡片", 待发送数据);
         })
         .then(() => {
-        //  console.log("链接", 卡片数组);
+          //  console.log("链接", 卡片数组);
           this.$事件总线.$emit("连接卡片", 卡片数组, 类型.replace("正向", ""));
         });
     },
@@ -718,7 +730,7 @@ module.exports = {
       this.工具栏宽度 = w;
     },
     设定链接(link) {
-      this.$数据库.links.put(link);
+      //  this.$数据库.links.put(link);
     },
     以id获取反向链接: async function (id) {
       let that = this;

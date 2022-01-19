@@ -76,13 +76,7 @@ const 事务列表 = {
       .delete(链接数据.id)
       .then(() => this.$数据库.cards.put(新数据));
   },
-  ctrl加鼠标点击卡片: function (卡片数据) {
-    this.$当前窗口状态.current_cardid_array.push(卡片数据);
-    this.$当前窗口状态.current_cardid_array = Array.from(
-      new Set(this.$当前窗口状态.current_cardid_array)
-    );
-    this.$事件总线.$emit("选集变化", this.$当前窗口状态.current_cardid_array);
-  },
+  
 
   添加卡片: async function (卡片数据, def) {
     await this.$数据库.cards.put(卡片数据);
@@ -135,6 +129,7 @@ const 事务列表 = {
     }
   },
   删除数据: function (传入数据) {
+   // console.log(传入数据)
     if (传入数据.attrs) {
       传入数据.type == "card"
         ? this.$事件总线.$emit("删除卡片", 传入数据)
@@ -142,17 +137,19 @@ const 事务列表 = {
     }
     let id = 传入数据.id;
     let 数据表名=传入数据.type+"s"
+    if(!传入数据.attrs){传入数据.attrs={}}
     传入数据.attrs.trashed = true;
+    if(!传入数据.type){return null}
     this.$数据库[数据表名].put(传入数据).then(() => {
       this.$数据库[数据表名].delete(id).then(() => {
         this.$数据库.links
           .filter((data) => {
-            if (data.attrs.from_id == id || data.attrs.to_id == id) {
+            if (data&&(data.attrs.from_id == id || data.attrs.to_id == id)) {
               return true;
             }
           })
-          .toArray((array) =>
-            array.forEach((data) => this.$事件总线.$emit("删除数据", data))
+          .toArray((array) =>{array[0]?
+            array.forEach((data) =>this.$事件总线.$emit("删除数据", data)):null}
           );
       });
     });
@@ -205,8 +202,14 @@ const 事务列表 = {
         window.innerHeight / 2
     );
   },
-  激活数据: function (数据) {
+  清理选集:function (){
+    //console.log("选集清空")
+    this.$当前窗口状态.current_cardid_array=[]
+  },
+  激活数据: function (数据,ctrl键被按下) {
     let 数据类型 = 数据.type;
+
+    
     // console.log(数据类型)
     数据类型 == "card"
       ? this.$事件总线.$emit("激活卡片", 数据)
@@ -215,18 +218,13 @@ const 事务列表 = {
   激活卡片: async function (数据) {
     this.$当前窗口状态.current_linkid = "";
     this.$当前窗口状态.current_cardid = 数据.id;
-    if (this.$当前窗口状态.current_cardid_array[0]) {
-    } else {
-      this.$当前窗口状态.current_cardid_array.push(数据);
-      this.$事件总线.$emit("选集变化", this.$当前窗口状态.current_cardid_array);
-    }
+   
     if (this.$当前窗口状态.等待连接卡片id) {
       let 等待连接卡片id = this.$当前窗口状态.等待连接卡片id;
       let 等待连接卡片 =
         (await this.$数据库.cards.get(等待连接卡片id)) ||
         (await this.$数据库.links.get(等待连接卡片id));
       this.$事件总线.$emit("连接卡片", [等待连接卡片, 数据]);
-      this.$当前窗口状态.等待连接卡片id = null;
     }
     await this.$数据库.states.put(this.$当前窗口状态);
   },
@@ -239,26 +237,31 @@ const 事务列表 = {
       let 等待连接卡片 =
         (await this.$数据库.cards.get(等待连接卡片id)) ||
         (await this.$数据库.links.get(等待连接卡片id));
-      this.$事件总线.$emit("连接卡片", [等待连接卡片, 数据]);
-      this.$当前窗口状态.等待连接卡片id = null;
+     this.$事件总线.$emit("连接卡片", [等待连接卡片, 数据]);
+     
     }
     await this.$数据库.states.put(this.$当前窗口状态);
   },
-  连接卡片: function (卡片数组, 链接类型) {
+  连接卡片:async function (卡片数组, 链接类型) {
+    this.$当前窗口状态.等待连接卡片id = null;
+    
     let 起始卡片 = 卡片数组[0];
     let 结束卡片 = 卡片数组[1];
-
+    let 属性对象 ={}
     if (起始卡片 && 结束卡片) {
-      let 属性对象 = {
+      属性对象 = {
         from_id: 起始卡片.id,
         to_id: 结束卡片.id,
       };
+
+    if(属性对象.from_id==属性对象.to_id){return null}
       let 新链接 = this.$根据属性生成链接(属性对象);
       if (链接类型) {
         新链接.subtype = 链接类型;
       }
     //  console.log(新链接);
-      this.$数据库.links
+
+     await  this.$数据库.links
         .put(新链接)
         .then(() => this.$事件总线.$emit("保存链接", 新链接))
         .then(() => {
@@ -301,6 +304,7 @@ const 事务列表 = {
     }
   },
   清理选择: function () {
+    console.log("选择清空")
     this.$当前窗口状态.current_cardid = "";
     this.$当前窗口状态.current_linkid = "";
     this.$当前窗口状态.current_linkid_array = [];
@@ -316,6 +320,27 @@ const 事务列表 = {
       y: (window.pageXOffset + $event.clientX) / this.$当前窗口状态.缩放倍数,
     };
     this.$事件总线.$emit("开始选择", 鼠标点击坐标);
+  },
+  鼠标点击卡片:function(数据,ctrl键被按下){
+    let id数组  = this.$当前窗口状态.current_cardid_array
+    //console.log(id数组)
+    let flag = true
+    id数组.forEach(id=>id==数据.id?flag=false:null)
+    if (id数组[0]) {
+      if(!ctrl键被按下){
+       // console.log(id数组,数据.id)
+        flag?this.$事件总线.$emit("清理选集"):null;
+
+      }else{
+        this.$当前窗口状态.current_cardid_array.push(数据.id);
+
+      this.$事件总线.$emit("选集增加", 数据);
+    }
+
+    } else {
+      this.$当前窗口状态.current_cardid_array.push(数据.id);
+      this.$事件总线.$emit("选集增加", 数据);
+    }
   },
   双击画板: function ($event) {
     if ($event.target.className != "cardscontainer layer") {
