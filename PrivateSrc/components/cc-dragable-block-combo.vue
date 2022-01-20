@@ -3,16 +3,16 @@
     v-if="显示 && 数据数组[1]"
     ref="container"
     :resizable="false"
-    :draggable="false"
     :y="y - 10"
     :w="width + 20 || 100"
     :h="height + 20 || 100"
     :x="x - 10"
     :z="600"
+    @dragging="dragging"
     class-name-handle="resizer"
     class-name="cc-card-combo-container"
   >
-    <div class="cc-card-combo-drawer"></div>
+    <div class="cc-card-combo-drawer" aria-label="拖动同步移动卡片"></div>
     <div
       v-if="数据数组[1] && 卡片.attrs"
       v-for="卡片 in 数据数组"
@@ -109,6 +109,8 @@ module.exports = {
       x: -200,
       y: -200,
       显示: false,
+      移动距离x: 0,
+      移动距离y: 0,
     };
   },
   mounted() {
@@ -128,6 +130,16 @@ module.exports = {
         //console.log("当前选集", val.length);
         this.计算边界框();
       },
+    },
+    x(val, oldval) {
+      if (val && oldval) {
+        this.移动距离x = val - oldval;
+      }
+    },
+    y(val, oldval) {
+      if (val && oldval) {
+        this.移动距离y = val - oldval;
+      }
     },
   },
   methods: {
@@ -327,9 +339,46 @@ module.exports = {
         return null;
       }
       this.x = 左上角点.x * this.窗口缩放倍数 || this.x;
-      this.y = 左上角点.y * this.窗口缩放倍数 || this.x;
+      this.y = 左上角点.y * this.窗口缩放倍数 || this.y;
       this.width = (右下角点.x - 左上角点.x) * this.窗口缩放倍数 || this.width;
       this.height = (右下角点.y - 左上角点.y) * this.窗口缩放倍数 || this.width;
+    },
+    dragging: function (x, y) {
+      let 窗口缩放倍数 = this.窗口缩放倍数;
+
+      if (!this.数据数组) {
+        return null;
+      }
+      // console.log(1, x, y);
+      // console.log(2, this.x, this.y);
+      let 移动距离y = (y - this.y) / 窗口缩放倍数;
+      let 移动距离x = (x - this.x) / 窗口缩放倍数;
+      // console.log(3, 移动距离x, 移动距离y);
+
+      this.数据数组.forEach((数据) => {
+        if (数据 && 数据.attrs) {
+          let attrs = 数据.attrs;
+          let { top, left, offsetx, offsety } = attrs;
+          let 数据类型 = 数据.type;
+          if (数据类型 == "card") {
+            // console.log(4, 移动距离x, 移动距离y);
+            // console.log(5, 数据.attrs.left, 数据.attrs.top);
+
+            数据.attrs.top = 数据.attrs.top + 移动距离y + 10;
+            数据.attrs.left = 数据.attrs.left + 移动距离x + 10;
+            // console.log(6, 数据.attrs.left, 数据.attrs.top);
+          } else {
+            数据.attrs.offsetx = 数据.attrs.offsetx + 移动距离y + 10;
+            数据.attrs.offsety = 数据.attrs.offsety + 移动距离x + 10;
+          }
+          // console.log(7, 数据.attrs.top, 数据.attrs.left);
+        }
+      });
+      移动距离x = 0;
+      移动距离y = 0;
+      this.x = x;
+      this.y = y;
+      this.数据数组.forEach((数据) => this.$事件总线.$emit("保存数据", 数据));
     },
   },
 };
