@@ -29,13 +29,16 @@ module.exports = {
     this.$事件总线.$on("保存卡片", (event) => this.判断id(event));
     this.$事件总线.$on("保存链接", (event) => this.判断id(event));
     this.$事件总线.$on("窗口缩放", (event) => (this.缩放倍数 = event));
-
-    this.代理起始标记 =
-      (await this.$数据库.cards.get(this.链接.attrs.from_id)) ||
-      (await this.$数据库.links.get(this.链接.attrs.from_id));
-    this.代理结束标记 =
-      (await this.$数据库.cards.get(this.链接.attrs.to_id)) ||
-      (await this.$数据库.links.get(this.链接.attrs.to_id));
+    this.链接.attrs.from_id
+      ? (this.代理起始标记 =
+          (await this.$数据库.cards.get(this.链接.attrs.from_id)) ||
+          (await this.$数据库.links.get(this.链接.attrs.from_id)))
+      : null;
+    this.链接.attrs.to_id
+      ? (this.代理结束标记 =
+          (await this.$数据库.cards.get(this.链接.attrs.to_id)) ||
+          (await this.$数据库.links.get(this.链接.attrs.to_id)))
+      : null;
     if (!this.代理起始标记 || !this.代理结束标记) {
       this.$事件总线.$emit("删除链接", this.link);
     }
