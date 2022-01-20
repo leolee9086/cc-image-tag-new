@@ -8,7 +8,13 @@
         :key="链接数组[i].id + 'label'"
         :画布原点="画布原点"
       ></cc-graph-link-path-konva>
-      <v-arrow v-if="显示虚拟连接" :config="虚拟连接设定"></v-arrow>
+      <v-arrow v-if="显示虚拟连接" :config="虚拟连接设定"> </v-arrow>
+      <cc-graph-link-path-konva
+        v-for="数据 in 当前数据集合"
+        :link="生成父子连接线(数据)"
+        v-if="数据.id != 数据.parent_id"
+        :画布原点="画布原点"
+      ></cc-graph-link-path-konva>
     </v-layer>
     <v-layer ref="layer-tips">
       <v-rect
@@ -45,6 +51,7 @@ module.exports = {
       当前卡片id: this.$当前窗口状态.current_cardid,
       当前链接id: this.$当前窗口状态.current_linkid,
       当前网格大小: this.$当前窗口状态.gridsize,
+      当前数据集合: [],
     };
   },
 
@@ -61,6 +68,8 @@ module.exports = {
         this.卡片数组 = result;
       },
     });
+    this.$事件总线.$on("选中数据集合", (event) => (this.当前数据集合 = event));
+    this.$事件总线.$on("清理选择", (event) => (this.当前数据集合 = []));
 
     this.$事件总线.$on("开始连接", (event) => this.生成虚拟连接(event));
     this.$事件总线.$on("结束连接", () => (this.显示虚拟连接 = false));
@@ -132,6 +141,21 @@ module.exports = {
         y: $event.attrs.top,
       };
       this.显示虚拟连接 = true;
+    },
+    生成父子连接线(数据) {
+      let 属性对象 = {
+        from_id: 数据.parent_id,
+        to_id: 数据.id,
+      };
+      let 虚拟连接 = this.$根据属性生成链接(属性对象);
+      虚拟连接 = this.$填充默认值(虚拟连接);
+      虚拟连接.virtual = true;
+      虚拟连接.attrs.path_type = "简单曲线";
+      虚拟连接.attrs.path_dash = [15, 10, 5, 10, 15];
+      虚拟连接.attrs.path_color = "lightblue";
+      虚拟连接.attrs.mid_anchor_image = "none";
+      虚拟连接.id = 数据.parent_id + 数据.id;
+      return 虚拟连接;
     },
   },
 };

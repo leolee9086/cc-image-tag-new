@@ -153,6 +153,18 @@ const 事务列表 = {
           );
       });
     });
+    if(传入数据.attrs.collection){
+      this.$数据库.cards.filter(
+        data=>{return data.parent_id==传入数据.id}
+        ).toArray(
+          array.forEach(
+            data=>{
+              data.parent_id = 传入数据.parent_id
+              this.$事件总线.$emit("保存数据",传入数据)
+            }
+          )
+        )
+    }
   },
   
   保存链接: async function (传入数据) {
@@ -289,6 +301,7 @@ const 事务列表 = {
   },
   点击画板空白处: function ($event) {
     if (!this.$当前窗口状态.等待连接卡片id) {
+      console.log($event.target)
       this.$事件总线.$emit("清理选择");
     } else {
       let 卡片数据 = this.$根据属性生成卡片({
@@ -328,10 +341,12 @@ const 事务列表 = {
     id数组.forEach(id=>id==数据.id?flag=false:null)
     if (id数组[0]) {
       if(!ctrl键被按下){
-       // console.log(id数组,数据.id)
+        console.log(id数组,数据.id)
         flag?this.$事件总线.$emit("清理选集"):null;
 
       }else{
+        console.log(id数组,数据.id)
+
         this.$当前窗口状态.current_cardid_array.push(数据.id);
 
       this.$事件总线.$emit("选集增加", 数据);

@@ -39,7 +39,18 @@
       数据类型="link"
       :窗口缩放倍数="$当前窗口状态.缩放倍数"
     ></cc-dragable-block-card>
-    <cc-dragable-block-combo :窗口缩放倍数="$当前窗口状态.缩放倍数" style="z-index: 600">
+    <cc-dragable-block-combo
+      :窗口缩放倍数="$当前窗口状态.缩放倍数"
+      style="z-index: 600"
+      :blockList="当前卡片集合数据"
+      :collection="true"
+    >
+    </cc-dragable-block-combo>
+    <cc-dragable-block-combo
+      :窗口缩放倍数="$当前窗口状态.缩放倍数"
+      style="z-index: 600"
+      :blockList="当前选集数据"
+    >
     </cc-dragable-block-combo>
   </div>
 </template>
@@ -62,6 +73,9 @@ module.exports = {
       卡片订阅器: {},
       链接获取器: {},
       链接订阅器: {},
+      当前选集数据: [],
+      当前卡片集合数据: [],
+      当前激活数据: [],
     };
   },
   mounted() {
@@ -77,6 +91,10 @@ module.exports = {
         this.链接数组 = result;
       },
     });
+    this.$事件总线.$on("选集增加", ($event) => this.增加数据($event));
+    this.$事件总线.$on("清理选择", this.清理选择);
+    this.$事件总线.$on("清理选集", this.清理选集);
+    this.$事件总线.$on("激活数据", ($event) => this.判定归属($event));
   },
   watch: {
     当前激活标签id: {
@@ -87,6 +105,34 @@ module.exports = {
   },
   computed: {},
   methods: {
+    判定归属(数据) {
+      if (数据 && 数据.attrs && 数据.parent_id) {
+        this.$数据库[数据.type + "s"]
+          .filter((data) => {
+            return (
+              data.parent_id == 数据.parent_id ||
+              data.id == 数据.parent_id ||
+              data.parent_id == 数据.id
+            );
+          })
+          .toArray((array) => {
+            this.当前卡片集合数据 = array || [];
+            this.$事件总线.$emit("选中数据集合", this.当前卡片集合数据);
+          });
+        this.当前选集数据 = [];
+      }
+    },
+    清理选择: function () {
+      console.log("清理");
+      this.当前选集数据 = [];
+      this.当前卡片集合数据 = [];
+    },
+    清理选集: function () {
+      this.当前选集数据 = [];
+    },
+    增加数据: function ($event) {
+      this.当前选集数据.push($event);
+    },
     点击画板: function ($event) {
       //  console.log($event.target);
       $event.target.getAttribute("class") == "cardscontainer layer"

@@ -7,7 +7,11 @@
     <v-path v-if="链接['attrs'] && 显示引线" :config="引线设定"></v-path>
     <v-image v-if="链接['attrs'] && 结束节点图片元素" :config="结束节点设定"> </v-image>
     <v-image v-if="链接['attrs'] && 起始节点图片元素" :config="起始节点设定"> </v-image>
-    <v-image v-if="链接['attrs'] && 中间节点图片元素" :config="中间节点设定"> </v-image>
+    <v-image
+      v-if="链接['attrs'] && 中间节点图片元素 && !链接.virtual"
+      :config="中间节点设定"
+    >
+    </v-image>
   </v-group>
 </template>
 <script>
@@ -219,6 +223,7 @@ module.exports = {
         fill: "transparent",
         scaleX: this.缩放倍数,
         scaleY: this.缩放倍数,
+        dash: this.链接.attrs.path_dash,
       };
     },
     引线设定: function () {
@@ -279,7 +284,7 @@ module.exports = {
         拷贝旧对象.updated = "";
         if (JSON.stringify(拷贝对象) !== JSON.stringify(拷贝旧对象)) {
           //  console.log("aaa", val);
-          this.$事件总线.$emit("保存链接", val);
+          !val.virtual ? this.$事件总线.$emit("保存链接", val) : null;
         }
       },
       deep: true,
@@ -546,7 +551,7 @@ module.exports = {
         }
 
         this.链接 = this.$更新数据时间戳(this.链接);
-        this.$事件总线.$emit("保存链接", this.链接);
+        !this.链接.virtual ? this.$事件总线.$emit("保存链接", this.链接) : null;
 
         this.监听 = true;
       }

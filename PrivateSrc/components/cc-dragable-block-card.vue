@@ -548,7 +548,7 @@ module.exports = {
       this.计算坐标(x, y);
 
       this.保存数据(true);
-      this.$事件总线.$emit("缩放卡片", this.对象数据);
+      this.$事件总线.$emit("移动卡片", this.对象数据);
     },
     resizing: function (x, y, width, height) {
       this.计算坐标(x, y);

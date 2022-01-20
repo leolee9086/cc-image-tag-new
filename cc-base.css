@@ -8,6 +8,12 @@
   z-index:700;
   background-color: rgba(135, 206, 250, 0.253);
 }
+.cc-card-combo-drawer.collection{
+  border:dashed rgb(17, 42, 75) 3px; 
+}
+.cc-card-combo-drawer.collection_item{
+  border:dashed rgb(17, 42, 75) 3px; 
+}
 /*卡片外容器样式*/
 .cc-card-container{
   position: absolute;
@@ -309,6 +315,15 @@ html,body,#app{
   background-size: contain;
 }
 .el-icon-yspace::before {
+  content: "\8d3a";
+  font-size: 14px;
+  visibility: hidden;
+}
+.el-icon-explode {
+  background: url("/widgets/cc-baselib/icons/explode.svg") center no-repeat;
+  background-size: contain;
+}
+.el-icon-explode::before {
   content: "\8d3a";
   font-size: 14px;
   visibility: hidden;

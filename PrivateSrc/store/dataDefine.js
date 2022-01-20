@@ -211,7 +211,6 @@ Vue.prototype.$根据属性生成链接=function(属性对象){
   for (属性名 in  属性对象){
     空标签[属性名]?null:空标签.attrs[属性名]=属性对象[属性名]
   }
-  console.log(空标签)
   return 空标签
 },
 Vue.prototype.$从数据生成文件= function (数据, 文件类型, 文件名) {
