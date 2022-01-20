@@ -44,6 +44,7 @@
       style="z-index: 600"
       :blockList="当前卡片集合数据"
       :collection="true"
+      :选集主id="当前选集主id"
     >
     </cc-dragable-block-combo>
     <cc-dragable-block-combo
@@ -74,6 +75,7 @@ module.exports = {
       链接获取器: {},
       链接订阅器: {},
       当前选集数据: [],
+      当前选集主id: "",
       当前卡片集合数据: [],
       当前激活数据: [],
     };
@@ -106,14 +108,19 @@ module.exports = {
   computed: {},
   methods: {
     判定归属(数据) {
-      if (数据 && 数据.attrs && 数据.parent_id) {
+      if ((数据 && 数据.attrs && 数据.parent_id) || 数据.attrs.collection) {
+        if (!数据.attrs.collection) {
+          this.当前选集主id = 数据.parent_id;
+        } else {
+          this.当前选集主id = 数据.id;
+        }
         this.$数据库[数据.type + "s"]
           .filter((data) => {
-            return (
-              data.parent_id == 数据.parent_id ||
-              data.id == 数据.parent_id ||
-              data.parent_id == 数据.id
-            );
+            return data
+              ? data.parent_id == 数据.parent_id ||
+                  data.id == 数据.parent_id ||
+                  data.parent_id == 数据.id
+              : null;
           })
           .toArray((array) => {
             this.当前卡片集合数据 = array || [];

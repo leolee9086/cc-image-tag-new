@@ -124,7 +124,7 @@
 <script>
 module.exports = {
   name: "cc-dragable-block-combo",
-  props: ["卡片集合", "窗口缩放倍数", "blocklist", "collection"],
+  props: ["卡片集合", "窗口缩放倍数", "blocklist", "collection", "主id"],
   data() {
     return {
       卡片集合获取器: "",
@@ -192,6 +192,9 @@ module.exports = {
 
   methods: {
     判断坐标: function (数据) {
+      if (!数据) {
+        return null;
+      }
       let 真实y = (数据.attrs.top + 数据.attrs.offsety) * this.窗口缩放倍数;
       let 真实x = (数据.attrs.left + 数据.attrs.offsetx) * this.窗口缩放倍数;
       if (
@@ -201,7 +204,12 @@ module.exports = {
         真实y < this.y + this.height
       ) {
         let 数据数组 = JSON.parse(JSON.stringify(this.数据数组));
-        let 父id = 数据数组[0]["parent_id"] || 数据数组[1]["parent_id"];
+        let 父id =
+          this.父id || 数据数组[0]
+            ? 数据数组[0]["parent_id"]
+            : null || 数据数组[1]
+            ? 数据数组[1]["parent_id"]
+            : null;
         if (数据.id != 父id && 数据.parent_id != 父id) {
           数据.parent_id = 父id;
           this.$事件总线.$emit("保存数据", 数据);
@@ -313,6 +321,7 @@ module.exports = {
         let 长度属性 = 参数 == "xspace" ? "width" : "height";
         let 坐标属性 = 参数 == "xspace" ? "left" : "top";
         let 偏移属性 = 参数 == "xspace" ? "offsetx" : "offsety";
+        let 主坐标属性 = 参数 == "xspace" ? "x" : "y";
         let 总宽度 = this[长度属性];
         数据数组 = 数据数组.sort(function (a, b) {
           return a.attrs[坐标属性] - b.attrs[坐标属性];
@@ -332,9 +341,18 @@ module.exports = {
               间隔宽度;
           }
         }
+
+        for (i = 0; i < this.数据数组.length; i++) {
+          let 数据 = this.数据数组[i];
+          if (数据.attrs.collection) {
+            数据.attrs[坐标属性] =
+              this[主坐标属性] / this.窗口缩放倍数 +
+              (总卡片宽度 + 总空隙宽度 - 数据.attrs[长度属性]) / 2;
+          }
+        }
       }
 
-      for (i in 数据数组) {
+      for (i in this.数据数组) {
         let 数据 = 数据数组[i];
         try {
           let 数据类型 = 数据.type + "s";
