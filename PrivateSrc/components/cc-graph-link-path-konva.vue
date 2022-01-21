@@ -435,12 +435,18 @@ module.exports = {
       return 象限;
     },
     加载节点图片: async function (图片源, 参数名) {
-      let image = new window.Image();
-      image.src = 图片源;
-      image.onload = () => {
-        // set image only when it is loaded
-        this[参数名] = image;
-      };
+      if (图片源 == "none") {
+        return null;
+      }
+      try {
+        let image = new window.Image();
+        image.src = 图片源;
+
+        image.onload = () => {
+          // set image only when it is loaded
+          this[参数名] = image;
+        };
+      } catch (e) {}
     },
     判断id: function ($event) {
       let that = this;
