@@ -147,6 +147,7 @@ module.exports = {
         from_id: 数据.parent_id,
         to_id: 数据.id,
       };
+
       let 虚拟连接 = this.$根据属性生成链接(属性对象);
       虚拟连接 = this.$填充默认值(虚拟连接);
       虚拟连接.virtual = true;

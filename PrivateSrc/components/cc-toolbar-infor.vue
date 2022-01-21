@@ -37,7 +37,7 @@
                 buttonicon="el-icon-plus"
                 :clickcallback="
                   (data) => {
-                    思源链接上图(data, '链接', true);
+                    思源链接上图(data.id, '链接', true);
                   }
                 "
                 buttontip="上图"
@@ -51,7 +51,7 @@
                 buttonicon="el-icon-plus"
                 :clickcallback="
                   (data) => {
-                    思源链接上图(data, '链接', true);
+                    思源链接上图(data.id, '链接', true);
                   }
                 "
                 buttontip="上图"
@@ -64,7 +64,7 @@
                 buttonicon="el-icon-plus"
                 :clickcallback="
                   (data) => {
-                    思源链接上图(data, '链接', true);
+                    思源链接上图(data.id, '链接', true);
                   }
                 "
                 buttontip="上图"
@@ -74,31 +74,44 @@
           </el-collapse-item>
           <el-collapse-item>
             <strong slot="title">图上连接</strong>
-            <el-collapse-item title="出链">
-              <el-collapse-item v-for="(outgoinglink, i) in 当前图上正向链接列表">
-                <el-row slot="title">
-                  <el-select
-                    v-model="outgoinglink.subtype"
-                    @change="设定链接(outgoinglink)"
-                  >
-                    <el-option
-                      v-for="item in 链接类型列表"
-                      :label="item"
-                      :value="item"
-                    ></el-option>
-                  </el-select>
-                </el-row>
-                <el-input v-model="outgoinglink.markdown" size="mini">
-                  <div slot="prepend">标记</div>
-                </el-input>
-                <span>{{ outgoinglink.markdown }}</span>
-              </el-collapse-item>
-            </el-collapse-item>
-            <el-collapse-item title="入链">
-              <el-collapse-item v-for="(backlink, i) in 当前图上反向链接列表">
-                <span>{{ backlink.markdown }}</span>
-              </el-collapse-item>
-            </el-collapse-item>
+            <cc-block-list
+              :blocklist="当前图上正向链接列表"
+              :count="当前图上正向链接列表.length"
+              title="出链"
+              buttonicon="el-icon-plus"
+              buttontip="显示/隐藏链接提示"
+              type="cc"
+            >
+              <template slot="parent" slot-scope="链接">
+                <span @click="$事件总线.$emit('定位至卡片', 链接.data)">{{
+                  链接.data.name
+                }}</span>
+              </template>
+            </cc-block-list>
+            <cc-block-list
+              :blocklist="当前图上反向链接列表"
+              :count="当前图上反向链接列表.length"
+              title="入链"
+              buttonicon="el-icon-plus"
+              :clickcallback="
+                (data) => {
+                  this.$事件总线.$emit('切换链接显示', data);
+                }
+              "
+              type="cc"
+              buttontip="显示/隐藏链接提示"
+            >
+              <template slot="parent" slot-scope="链接">
+                <strong
+                  aria-label="定位"
+                  @click="$事件总线.$emit('定位至卡片', 链接.data)"
+                  >{{ 链接.data.name }}
+                </strong>
+                <span aria-label="定位" @click="$事件总线.$emit('定位至卡片', 链接.data)"
+                  >{{ 链接.data.subtype }}
+                </span>
+              </template>
+            </cc-block-list>
           </el-collapse-item>
         </el-collapse>
       </el-tab-pane>
@@ -473,7 +486,8 @@ module.exports = {
         this.预设名 = val.subtype;
         await this.获取预设();
         this.当前思源块id = val.attrs.def_block;
-
+        this.当前图上反向链接列表 = await this.以id获取图上反向链接(val.id);
+        this.当前图上正向链接列表 = await this.以id获取图上正向链接(val.id);
         this.当前数据类型 = val.type;
         this.属性对象 = val.attrs || this.属性对象;
       },
@@ -740,9 +754,31 @@ module.exports = {
         return 原始反向链接列表["data"];
       }
     },
+    以id获取图上反向链接: async function (id) {
+      if (id) {
+        return (
+          (await this.$数据库.links
+            .filter((data) => {
+              return data.attrs ? data.attrs.to_id == id : null;
+            })
+            .toArray()) || []
+        );
+      }
+    },
+    以id获取图上正向链接: async function (id) {
+      if (id) {
+        return (
+          (await this.$数据库.links
+            .filter((data) => {
+              return data.attrs ? data.attrs.from_id == id : null;
+            })
+            .toArray()) || []
+        );
+      }
+    },
     以id获取正向链接: async function (id) {
       this.思源伺服ip = window.location.host;
-      let obj = {};
+      let obj = [];
 
       let sql = `
       select * from
@@ -753,7 +789,7 @@ module.exports = {
         or block_id in (select id from blocks where parent_id='${id}')
         )`;
       obj = await 以sql向思源请求块数据(this.思源伺服ip, this.apitoken, sql);
-      // console.log(obj);
+      console.log("正向链接", obj);
       return obj || {};
     },
   },

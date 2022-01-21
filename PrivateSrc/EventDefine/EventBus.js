@@ -166,7 +166,14 @@ const 事务列表 = {
         )
     }
   },
-  
+  切换链接显示:function(传入数据){
+    console.log(传入数据)
+
+    if(!传入数据){return null}
+    if(!传入数据.attrs){return null}
+    传入数据.attrs.hidetag=!传入数据.attrs.hidetag?true:false
+    this.$事件总线.$emit("保存数据",传入数据)
+  },
   保存链接: async function (传入数据) {
     if (!传入数据) {
       return null;

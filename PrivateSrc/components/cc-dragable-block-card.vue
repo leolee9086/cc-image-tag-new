@@ -474,6 +474,7 @@ module.exports = {
         });
       }
       this.预览HTML = el.innerHTML;
+      this.对象数据.content = el.innerText;
       if (this.def_block) {
         let 思源块内容 = await 以id获取文档聚焦内容(
           window.location.host,
@@ -617,6 +618,9 @@ module.exports = {
         this.hide = true;
       } else {
         this.hide = false;
+      }
+      if (对象数据.type == "link" && 对象数据.attrs.hidetag) {
+        this.hide = true;
       }
       if (对象数据) {
         setTimeout(this.计算可见性, 500);
