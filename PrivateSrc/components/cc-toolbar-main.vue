@@ -570,48 +570,7 @@ module.exports = {
       await this.$数据库.linkpresets.clear();
     },
     应用版本数据: async function (版本数据) {
-      await this.保存历史();
-      await this.清空画板();
-      let historycards = 版本数据.cards;
-      for (i in historycards) {
-        try {
-          await this.$数据库.cards.add(historycards[i]);
-        } catch (e) {
-          //    console.log(historycards[i], i, e);
-        }
-      }
-      let historylinks = 版本数据.links;
-      for (j in historycards) {
-        try {
-          await this.$数据库.links.add(historylinks[j]);
-        } catch (e) {
-          //  console.log(historylinks[j], j, e);
-        }
-      }
-      let historymeta = 版本数据.metadata;
-      for (j in historymeta) {
-        try {
-          await this.$数据库.metadata.add(historymeta[j]);
-        } catch (e) {
-          //  console.log(historylinks[j], j, e);
-        }
-      }
-      let historycardpresets = 版本数据.cardpresets;
-      for (j in historycardpresets) {
-        try {
-          await this.$数据库.cardpresets.add(historycardpresets[j]);
-        } catch (e) {
-          //  console.log(historylinks[j], j, e);
-        }
-      }
-      let historylinkpresets = 版本数据.linkpresets;
-      for (j in historylinkpresets) {
-        try {
-          await this.$数据库.linkpresets.add(historylinkpresets[j]);
-        } catch (e) {
-          //  console.log(historylinks[j], j, e);
-        }
-      }
+      await this.$应用版本数据(版本数据);
     },
     下载当前版本: async function () {
       let JSON数据 = {};

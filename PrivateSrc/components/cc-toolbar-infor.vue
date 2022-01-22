@@ -801,12 +801,3 @@ module.exports = {
   },
 };
 </script>
-<style scoped>
-.el-drawer__wrapper {
-  width: 30vw !important;
-  position: fixed;
-  left: 70vw;
-  top: 0;
-  float: right;
-}
-</style>

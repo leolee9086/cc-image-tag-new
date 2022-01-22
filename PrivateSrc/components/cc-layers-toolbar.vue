@@ -1,19 +1,31 @@
 <template>
   <div class="layout">
     <div class="drawer-button-container">
-      <el-button
-        @click="当前面板名 != '详情' ? (当前面板名 = '详情') : (当前面板名 = '')"
-        circle
-        icon="el-icon-edit"
-        aria-label="展开|关闭面板"
-      >
-      </el-button>
-      <el-button
-        @click="当前面板名 != '连接' ? (当前面板名 = '连接') : (当前面板名 = '')"
-        circle
-        icon="el-icon-edit"
-        aria-label="展开|关闭面板"
-      ></el-button>
+      <div class="drawer-button">
+        <span
+          @click="当前面板名 != '详情' ? (当前面板名 = '详情') : (当前面板名 = '')"
+          circle
+          class="el-icon-edit"
+          aria-label="展开|关闭面板"
+        >
+        </span>
+      </div>
+      <div class="drawer-button">
+        <span
+          @click="当前面板名 != '历史' ? (当前面板名 = '历史') : (当前面板名 = '')"
+          circle
+          class="el-icon-time"
+          aria-label="展开|关闭面板"
+        ></span>
+      </div>
+      <div class="drawer-button">
+        <span
+          @click="当前面板名 != '连接' ? (当前面板名 = '连接') : (当前面板名 = '')"
+          circle
+          class="el-icon-link"
+          aria-label="展开|关闭面板"
+        ></span>
+      </div>
     </div>
     <cc-toolbar-main
       :思源伺服ip="思源伺服ip"
@@ -26,6 +38,8 @@
       :卡片数据id="当前卡片数据id"
       :链接数据id="当前链接数据id"
     ></cc-toolbar-infor>
+    <cc-toolbar-history :显示="当前面板名 == '历史'"> </cc-toolbar-history>
+    <cc-toolbar-link :显示="当前面板名 == '连接'"> </cc-toolbar-link>
     <cc-toolbar-view></cc-toolbar-view>
     <cc-sydoc-searcher :思源伺服ip="思源伺服ip" :apitoken="''"></cc-sydoc-searcher>
   </div>
