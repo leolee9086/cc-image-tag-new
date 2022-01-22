@@ -63,7 +63,7 @@
     <cc-block-list
       :blocklist="当前子文档列表"
       :count="当前子文档列表.length"
-      title="子块"
+      title="子文档"
       buttonicon="el-icon-plus"
       :clickcallback="
         (data) => {
@@ -102,6 +102,14 @@ module.exports = {
         let obj = await 以sql向思源请求块数据(this.思源伺服ip, this.apitoken, sql);
         return obj;
       }
+      if (obj && obj[0]) {
+        for (let i = 0; i < obj.length; i++) {
+          let el = obj[i];
+          if (el) {
+            el.children = await this.以id获取子块(el.id);
+          }
+        }
+      }
     },
     以id获取子文档: async function (id) {
       this.思源伺服ip = window.location.host;
@@ -111,7 +119,12 @@ module.exports = {
         obj = await 以sql向思源请求块数据(this.思源伺服ip, this.apitoken, sql);
       }
       if (obj && obj[0]) {
-        for (let i = 0; i < obj.length; i++) {}
+        for (let i = 0; i < obj.length; i++) {
+          let el = obj[i];
+          if (el) {
+            el.children = await this.以id获取子文档(el.id);
+          }
+        }
       }
       return obj;
     },
