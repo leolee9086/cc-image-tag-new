@@ -2,12 +2,18 @@
   <div class="layout">
     <div class="drawer-button-container">
       <el-button
-        @click="显示详情面板 = !显示详情面板"
+        @click="当前面板名 != '详情' ? (当前面板名 = '详情') : (当前面板名 = '')"
         circle
-        icon="el-icon-share"
+        icon="el-icon-edit"
         aria-label="展开|关闭面板"
       >
       </el-button>
+      <el-button
+        @click="当前面板名 != '连接' ? (当前面板名 = '连接') : (当前面板名 = '')"
+        circle
+        icon="el-icon-edit"
+        aria-label="展开|关闭面板"
+      ></el-button>
     </div>
     <cc-toolbar-main
       :思源伺服ip="思源伺服ip"
@@ -15,7 +21,7 @@
       :链接数据id="当前链接数据id"
     ></cc-toolbar-main>
     <cc-toolbar-infor
-      :显示="显示详情面板"
+      :显示="当前面板名 == '详情'"
       :思源伺服ip="思源伺服ip"
       :卡片数据id="当前卡片数据id"
       :链接数据id="当前链接数据id"
@@ -45,6 +51,7 @@ module.exports = {
       数据获取器: "",
       /*操作面板显示*/
       显示详情面板: false,
+      当前面板名: "",
     };
   },
   mounted() {

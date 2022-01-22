@@ -83,9 +83,12 @@
               type="cc"
             >
               <template slot="parent" slot-scope="链接">
-                <span @click="$事件总线.$emit('定位至卡片', 链接.data)">{{
-                  链接.data.name
-                }}</span>
+                <cc-graphlink-infor
+                  v-if="链接.data"
+                  :linkdata="链接.data"
+                  :cardid="链接.data.attrs ? 链接.data.attrs.to_id : null"
+                >
+                </cc-graphlink-infor>
               </template>
             </cc-block-list>
             <cc-block-list
@@ -110,6 +113,9 @@
                 <span aria-label="定位" @click="$事件总线.$emit('定位至卡片', 链接.data)"
                   >{{ 链接.data.subtype }}
                 </span>
+                <div>
+                  {{ 链接.data.content }}
+                </div>
               </template>
             </cc-block-list>
           </el-collapse-item>
