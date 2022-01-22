@@ -235,9 +235,12 @@ const 事务列表 = {
       : this.$事件总线.$emit("激活链接", 数据);
   },
   激活卡片: async function (数据) {
+    console.log(数据)
     this.$当前窗口状态.current_linkid = "";
     this.$当前窗口状态.current_cardid = 数据.id;
-   
+    this.$当前窗口状态.current_link = ""
+    this.$当前窗口状态.current_card =数据
+    
     if (this.$当前窗口状态.等待连接卡片id) {
       let 等待连接卡片id = this.$当前窗口状态.等待连接卡片id;
       let 等待连接卡片 =
@@ -250,6 +253,9 @@ const 事务列表 = {
   激活链接: async function (数据) {
     this.$当前窗口状态.current_cardid = "";
     this.$当前窗口状态.current_linkid = 数据.id;
+    this.$当前窗口状态.current_card = ""
+    this.$当前窗口状态.current_link =数据
+
     if (this.$当前窗口状态.等待连接卡片id) {
       let 等待连接卡片id = this.$当前窗口状态.等待连接卡片id;
 

@@ -305,8 +305,11 @@ Vue.prototype.$获取预设 = async function(预设表名,预设名){
 
   const 窗口状态对象 = {
     current_linkid: "",
-    editMode: "",
     current_cardid: "",
+    current_card:"",
+    current_link:"",
+    editMode: "",
+
     lastviewcentter: "",
     等待连接卡片id: "",
     缩放倍数:1,
