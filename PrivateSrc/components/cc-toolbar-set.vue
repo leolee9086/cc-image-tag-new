@@ -73,8 +73,8 @@
         </el-upload>
       </el-col>
     </el-row>
-
     <el-divider></el-divider>
+    <cc-background-setter></cc-background-setter>
   </el-drawer>
 </template>
 <script>
