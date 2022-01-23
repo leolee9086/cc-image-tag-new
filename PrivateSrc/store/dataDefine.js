@@ -310,7 +310,6 @@ Vue.prototype.$获取预设 = async function(预设表名,预设名){
     current_card:"",
     current_link:"",
     editMode: "",
-
     lastviewcentter: "",
     等待连接卡片id: "",
     缩放倍数:1,
@@ -329,4 +328,44 @@ Vue.prototype.$获取预设 = async function(预设表名,预设名){
     await this.$数据库.metadata.clear();
     await this.$数据库.cardpresets.clear();
     await this.$数据库.linkpresets.clear();
+  }
+  Vue.prototype.$保存历史=async function(){
+      let data = {};
+      data.cards = await this.$数据库.cards.toArray();
+      data.links = await this.$数据库.links.toArray();
+      data.metadata = await this.$数据库.metadata.toArray();
+      data.states = await this.$数据库.states.toArray();
+      data.linkpresets = await this.$数据库.linkpresets.toArray();
+      data.cardpresets = await this.$数据库.cardpresets.toArray();
+      data.timestamp = this.$用Lute生成时间戳();
+      let 文件历史列表 = await this.$数据库.history.toArray()
+      await this.$数据库.history.put(data);
+
+  }
+  Vue.prototype.$增量导入JSON数据=async function(JSON数据){
+      let cards = JSON数据.cards;
+      let links = JSON数据.links;
+      let metadata = JSON数据.metadata;
+      let cardpresets = JSON数据.cardpresets;
+      let linkpresets = JSON数据.linkpresets;
+
+      try {
+        for (i in cards) {
+          await this.$数据库.cards.add(cards[i]);
+        }
+        for (i in links) {
+          await this.$数据库.links.add(links[i]);
+        }
+        for (i in metadata) {
+          await this.$数据库.metadata.add(metadata[i]);
+        }
+        for (i in linkpresets) {
+          await this.$数据库.linkpresets.add(linkpresets[i]);
+        }
+        for (i in cardpresets) {
+          await this.$数据库.cardpresets.add(cardpresets[i]);
+        }
+      } catch (e) {
+        alert("导入出错", e);
+      }
   }

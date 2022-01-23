@@ -46,13 +46,7 @@
       `"
     >
       <span :aria-label="`选中了${数据数组.length}个元素`">{{ 数据数组.length }}</span>
-      <span
-        @click="统一属性('left')"
-        size="mini"
-        circle
-        class="el-icon-leftalign"
-        aria-label="向左对齐元素"
-      ></span>
+      <span @click="统一属性('left')" size="mini" circle class="el-icon-leftalign" aria-label="向左对齐元素"></span>
       <span
         @click="统一属性('right')"
         size="mini"
@@ -60,48 +54,12 @@
         class="el-icon-rightalign"
         aria-label="向右对齐元素"
       ></span>
-      <span
-        @click="统一属性('up')"
-        size="mini"
-        circle
-        class="el-icon-upalign"
-        aria-label="向上对齐元素"
-      ></span>
-      <span
-        @click="统一属性('down')"
-        size="mini"
-        circle
-        class="el-icon-downalign"
-        aria-label="向下对齐元素"
-      ></span>
-      <span
-        @click="统一属性('width')"
-        size="mini"
-        circle
-        class="el-icon-width"
-        aria-label="统一宽度"
-      ></span>
-      <span
-        @click="统一属性('height')"
-        size="mini"
-        circle
-        class="el-icon-height"
-        aria-label="统一高度"
-      ></span>
-      <span
-        @click="统一属性('xspace')"
-        size="mini"
-        circle
-        class="el-icon-xspace"
-        aria-label="横向分布"
-      ></span>
-      <span
-        @click="统一属性('yspace')"
-        size="mini"
-        circle
-        class="el-icon-yspace"
-        aria-label="竖向分布"
-      ></span>
+      <span @click="统一属性('up')" size="mini" circle class="el-icon-upalign" aria-label="向上对齐元素"></span>
+      <span @click="统一属性('down')" size="mini" circle class="el-icon-downalign" aria-label="向下对齐元素"></span>
+      <span @click="统一属性('width')" size="mini" circle class="el-icon-width" aria-label="统一宽度"></span>
+      <span @click="统一属性('height')" size="mini" circle class="el-icon-height" aria-label="统一高度"></span>
+      <span @click="统一属性('xspace')" size="mini" circle class="el-icon-xspace" aria-label="横向分布"></span>
+      <span @click="统一属性('yspace')" size="mini" circle class="el-icon-yspace" aria-label="竖向分布"></span>
       <span
         @click="设置集合()"
         size="mini"
@@ -208,8 +166,8 @@ module.exports = {
           this.父id || 数据数组[0]
             ? 数据数组[0]["parent_id"]
             : null || 数据数组[1]
-            ? 数据数组[1]["parent_id"]
-            : null;
+              ? 数据数组[1]["parent_id"]
+              : null;
         if (数据.id != 父id && 数据.parent_id != 父id) {
           数据.parent_id = 父id;
           this.$事件总线.$emit("保存数据", 数据);
@@ -246,6 +204,13 @@ module.exports = {
     },
     统一属性: async function (参数) {
       let 数据数组 = this.数据数组.filter((data) => !data.attrs.collection);
+      for (i in 数据数组) {
+        let 现状数据 = 数据数组[i];
+
+
+        现状数据 = this.$更新数据时间戳(现状数据);
+
+      }
       if (参数 == "left") {
         for (i in 数据数组) {
           let 现状数据 = 数据数组[i];
@@ -348,6 +313,8 @@ module.exports = {
             数据.attrs[坐标属性] =
               this[主坐标属性] / this.窗口缩放倍数 +
               (总卡片宽度 + 总空隙宽度 - 数据.attrs[长度属性]) / 2;
+                          数据 = this.$更新数据时间戳(数据);
+
           }
         }
       }
@@ -358,7 +325,10 @@ module.exports = {
           let 数据类型 = 数据.type + "s";
           //console.log(数据类型);
           if (!数据.attrs.trashed && !数据.attrsproxy) {
+            数据 = this.$更新数据时间戳(数据);
+
             await this.$数据库[数据类型].put(数据).then(() => {
+
               this.$事件总线.$emit("保存数据", 数据);
             });
           }
@@ -366,6 +336,7 @@ module.exports = {
           console.log(e);
         }
       }
+      this.dragging(this.x,this.y)
     },
 
     判断id: function ($event) {

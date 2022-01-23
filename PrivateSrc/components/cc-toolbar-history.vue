@@ -77,7 +77,7 @@ module.exports = {
     await this.初始化();
     this.获取历史();
     this.timer = setInterval(() => {
-      this.保存计数 = this.保存计数 + 1;
+    this.保存计数 = this.保存计数 + 1;
     }, 1000);
   },
   methods: {
@@ -163,7 +163,7 @@ module.exports = {
         that.$数据库.metadata.put({ key: "maxhistorycount", value: 30 });
       }
       try {
-        await that.保存历史();
+        await that.保存并刷新历史();
         await that.从思源块加载数据(that.$baseid);
       } catch (error) {
         console.log("加载出错", error);
@@ -171,7 +171,7 @@ module.exports = {
       }
     },
     保存数据: async function () {
-      await this.保存历史();
+      await this.保存并刷新历史();
 
       this.$事件总线.$emit("上传当前画板文件数据到思源");
     },
@@ -196,12 +196,15 @@ module.exports = {
           //   console.log(err);
         });
     },
+    覆盖导入旧版JSON数据:async function(旧版数据){
+      await this.保存并刷新历史()
+      await this.$清空画板()
+      await this.$导入旧版JSON数据(旧版数据)
+    },
     导入旧版JSON数据: async function (data) {
       let that = this;
-      await that.保存历史();
-      await this.清空画板();
-
-      // console.log("aaa", data.file);
+      await that.保存并刷新历史();
+      await this.$清空画板();
       var reader = new FileReader(data.file);
       reader.onload = function (evt) {
         that.解析旧版JSON数据(JSON.parse(evt.target.result));
@@ -214,16 +217,13 @@ module.exports = {
           that.解析旧版JSON数据(JSON.parse(result));
         })
         .catch((err) => {
-          //  console.log(err);
         });
     },
-
+    //可以拆分到数据i定义
     解析旧版JSON数据: async function (旧版JSON数据) {
-      //   console.log(旧版JSON数据);
       for (标记序号 in 旧版JSON数据.tagarray) {
         let 标记 = 旧版JSON数据.tagarray[标记序号];
         let 空标签 = this.$根据属性生成卡片();
-        //   console.log(空标签);
         空标签.name = 标记.anchor;
         空标签.attrs.backgroundColor = 标记.backgroundColor;
         空标签.attrs.borderColor = 标记.borderColor;
@@ -234,33 +234,9 @@ module.exports = {
         await this.$数据库.cards.put(空标签);
       }
     },
+    //可以拆分到数据定义
     增量导入JSON数据: async function (JSON数据) {
-      //   console.log(JSON数据);
-      let cards = JSON数据.cards;
-      let links = JSON数据.links;
-      let metadata = JSON数据.metadata;
-      let cardpresets = JSON数据.cardpresets;
-      let linkpresets = JSON数据.linkpresets;
-
-      try {
-        for (i in cards) {
-          await this.$数据库.cards.add(cards[i]);
-        }
-        for (i in links) {
-          await this.$数据库.links.add(links[i]);
-        }
-        for (i in metadata) {
-          await this.$数据库.metadata.add(metadata[i]);
-        }
-        for (i in linkpresets) {
-          await this.$数据库.linkpresets.add(linkpresets[i]);
-        }
-        for (i in cardpresets) {
-          await this.$数据库.cardpresets.add(cardpresets[i]);
-        }
-      } catch (e) {
-        alert("导入出错", e);
-      }
+      await this.$增量导入JSON数据(JSON数据)
     },
     获取历史: async function () {
       this.文件历史列表 = (await this.$数据库.history.toArray()) || [];
@@ -322,15 +298,8 @@ module.exports = {
     清空画板: async function () {
       await this.$清空画板();
     },
-    保存历史: async function () {
-      let data = {};
-      data.cards = await this.$数据库.cards.toArray();
-      data.links = await this.$数据库.links.toArray();
-      data.metadata = await this.$数据库.metadata.toArray();
-      data.states = await this.$数据库.states.toArray();
-      data.linkpresets = await this.$数据库.linkpresets.toArray();
-      data.cardpresets = await this.$数据库.cardpresets.toArray();
-      data.timestamp = this.$用Lute生成时间戳();
+    保存并刷新历史: async function () {
+      
       let 历史版本数量 = this.文件历史列表.length;
       if (历史版本数量 > this.历史版本数量上限) {
         await this.$数据库.history
@@ -339,7 +308,7 @@ module.exports = {
           .offset(this.历史版本数量上限 - 1)
           .delete();
       }
-      await this.$数据库.history.put(data);
+      await this.$保存历史()
       this.文件历史列表 = await this.$数据库.history.toArray();
     },
     保存: function (blob, filename) {
@@ -377,8 +346,8 @@ module.exports = {
       URL.revokeObjectURL(url);
     },
     应用版本数据: async function (版本数据) {
-      await this.保存历史();
-      await this.清空画板();
+      await this.保存并刷新历史();
+      await this.$清空画板();
       let historycards = 版本数据.cards;
       for (i in historycards) {
         try {

@@ -84,23 +84,7 @@
           </el-col>
         </el-row>
       </el-col>
-      <el-col :span="3">
-        <el-tooltip content="折叠时是否显示类型">
-          <el-switch
-            size="mini"
-            @change="$当前窗口状态.showsubtype = $event"
-            v-model="折叠时显示名称"
-          ></el-switch>
-        </el-tooltip>
-        <el-tooltip content="折叠时是否显示名称">
-          <el-switch
-            area-label="折叠时是否显示名称"
-            @change="$当前窗口状态.showname = $event"
-            size="mini"
-            v-model="折叠时显示类别"
-          ></el-switch>
-        </el-tooltip>
-      </el-col>
+    
     </el-row>
   </div>
 </template>
@@ -126,8 +110,7 @@ module.exports = {
       当前对象名称: "",
       timer: {},
       使用svg渲染: false,
-      折叠时显示名称: true,
-      折叠时显示类别: true,
+    
     };
   },
   async mounted() {

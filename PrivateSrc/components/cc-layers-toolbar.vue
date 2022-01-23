@@ -5,7 +5,7 @@
         <span
           @click="当前面板名 != '详情' ? (当前面板名 = '详情') : (当前面板名 = '')"
           circle
-          class="el-icon-edit"
+          class="el-icon-postcard"
           aria-label="展开|关闭面板"
         >
         </span>
@@ -45,6 +45,26 @@
           class="el-icon-setting"
           aria-label="展开|关闭面板"
         ></span>
+         
+      </div>
+      <div class="drawer-button">
+       <span
+          @click="
+            当前面板名 != '画板列表' ? (当前面板名 = '画板列表') : (当前面板名 = '')
+          "
+          circle
+          class="el-icon-data-board"
+          aria-label="展开|关闭面板"
+        ></span>
+      </div>
+      <div class="drawer-button">
+        <span
+          @click="当前面板名 != '绘制' ? (当前面板名 = '绘制') : (当前面板名 = '')"
+          circle
+          class="el-icon-edit"
+          aria-label="展开|关闭面板"
+        >
+        </span>
       </div>
     </div>
     <cc-toolbar-main

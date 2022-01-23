@@ -75,6 +75,22 @@
     </el-row>
     <el-divider></el-divider>
     <cc-background-setter></cc-background-setter>
+    <el-divider></el-divider>
+    <el-tooltip content="折叠时是否显示类型">
+      <el-switch
+        size="mini"
+        @change="$当前窗口状态.showsubtype = $event"
+        v-model="折叠时显示名称"
+      ></el-switch>
+    </el-tooltip>
+    <el-tooltip content="折叠时是否显示名称">
+      <el-switch
+        area-label="折叠时是否显示名称"
+        @change="$当前窗口状态.showname = $event"
+        size="mini"
+        v-model="折叠时显示类别"
+      ></el-switch>
+    </el-tooltip>
   </el-drawer>
 </template>
 <script>
@@ -87,6 +103,8 @@ module.exports = {
       JSON文件列表: [],
       思源伺服ip: "",
       apitoken: "",
+      折叠时显示名称: true,
+      折叠时显示类别: true,
     };
   },
   methods: {
