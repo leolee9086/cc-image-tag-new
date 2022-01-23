@@ -84,7 +84,9 @@
           </el-col>
         </el-row>
       </el-col>
-    
+      <el-col :span="3">
+        <el-button circle><span class="el-icon-edit"></span></el-button>
+      </el-col>
     </el-row>
   </div>
 </template>

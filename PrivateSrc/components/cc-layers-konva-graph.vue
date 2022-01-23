@@ -22,6 +22,7 @@
         :config="激活块提示设定"
       >
       </v-rect>
+
     </v-layer>
   </v-stage>
 </template>
