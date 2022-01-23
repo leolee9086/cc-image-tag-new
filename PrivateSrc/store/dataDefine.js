@@ -292,6 +292,7 @@ Vue.prototype.$填充默认值=function(数据) {
 Vue.prototype.$获取预设表 =async function(预设表名){
   return await this.$数据库[预设表名].toArray()
 }
+
 Vue.prototype.$获取预设 = async function(预设表名,预设名){
   let 预设数组  = await this.$数据库[预设表名]
           .filter((data) => {
@@ -302,7 +303,14 @@ Vue.prototype.$获取预设 = async function(预设表名,预设名){
           .toArray();
   return 预设数组[0]||null
   }
+  Vue.$prototype.$清空画板= async function(){
+    await this.$数据库.cards.clear();
+    await this.$数据库.links.clear();
+    await this.$数据库.metadata.clear();
+    await this.$数据库.cardpresets.clear();
+    await this.$数据库.linkpresets.clear();
 
+  }
   const 窗口状态对象 = {
     current_linkid: "",
     current_cardid: "",
