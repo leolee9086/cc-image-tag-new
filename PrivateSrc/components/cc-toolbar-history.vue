@@ -73,10 +73,103 @@ module.exports = {
       保存计数: 1,
     };
   },
-  mounted() {
+  async mounted() {
+    await this.初始化();
     this.获取历史();
+    this.timer = setInterval(() => {
+      this.保存计数 = this.保存计数 + 1;
+    }, 1000);
   },
   methods: {
+    从思源块加载数据: async function (id) {
+      let that = this;
+      let filepath = `assets/data-${id}.cccards`;
+      if (this.$挂件模式()) {
+        this.挂件自身元素 = window.frameElement.parentElement.parentElement;
+
+        filepath =
+          this.挂件自身元素.getAttribute("data-assets") ||
+          this.挂件自身元素.getAttribute("custom-data-assets") ||
+          `assets/data-${this.挂件自身元素.getAttribute("data-node-id")}.cccards`;
+      }
+      let url = "http://" + this.思源伺服ip + "/" + filepath;
+      //  console.log(url);
+      let 文件数据 = {};
+      try {
+        await axios.get(url).then((res) => {
+          文件数据 = res.data;
+          if (文件数据["cardarray"]) {
+            try {
+              this.图片缩放倍数 = parseFloat(文件数据.resize).toFixed(2);
+            } catch (e) {
+              //    console.log(e);
+            }
+          }
+        });
+      } catch (e) {
+        alert("文件不存在,将在附件中新建文件");
+        this.$事件总线.$emit("上传当前画板文件数据到思源");
+      }
+      if (文件数据) {
+        let 卡片数组 = 文件数据["cards"];
+        let 链接数组 = 文件数据["links"];
+        let metadata = 文件数据["metadata"];
+        let 卡片预设 = 文件数据["cardpresets"];
+        let 链接预设 = 文件数据["linkpresets"];
+        if (卡片数组) {
+          for (i in 卡片数组) {
+            await this.$数据库.cards.put(卡片数组[i]);
+          }
+        }
+        if (链接数组) {
+          for (i in 链接数组) {
+            await this.$数据库.links.put(链接数组[i]);
+          }
+        }
+        if (metadata) {
+          for (i in metadata) {
+            await this.$数据库.metadata.put(metadata[i]);
+          }
+        }
+        if (卡片预设) {
+          for (i in 卡片预设) {
+            await this.$数据库.cardpresets.put(卡片预设[i]);
+          }
+        }
+        if (链接预设) {
+          for (i in 链接预设) {
+            await this.$数据库.linkpresets.put(链接预设[i]);
+          }
+        }
+      }
+      //     console.log("加载完成");
+    },
+    初始化: async function () {
+      let that = this;
+      try {
+        that.保存时间间隔 = (await that.$数据库.metadata.get("autosaveinteger")).value;
+      } catch (e) {
+        console.log(e);
+        that.保存时间间隔 = 5;
+        that.$数据库.metadata.put({ key: "autosaveinteger", value: 5 });
+      }
+      try {
+        that.历史版本数量上限 = (
+          await that.$数据库.metadata.get("maxhistorycount")
+        ).value;
+      } catch (e) {
+        console.log(e);
+        that.历史版本数量上限 = 30;
+        that.$数据库.metadata.put({ key: "maxhistorycount", value: 30 });
+      }
+      try {
+        await that.保存历史();
+        await that.从思源块加载数据(that.$baseid);
+      } catch (error) {
+        console.log("加载出错", error);
+        alert("加载挂件块数据失败,注意手动保存数据");
+      }
+    },
     保存数据: async function () {
       await this.保存历史();
 

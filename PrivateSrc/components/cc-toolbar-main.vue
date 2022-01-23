@@ -17,42 +17,10 @@
       <el-col :span="21">
         <el-col :span="8">
           <el-popover trigger="click">
-            <el-row>
-              <el-col :span="24">
-                <el-input v-model="当前画板命名" size="mini">
-                  <span slot="prepend">画板命名</span>
-                </el-input>
-              </el-col>
-            </el-row>
-            <el-row :gutter="20" type="flex" justify="space-between">
-              <el-col :span="12">
-                <el-upload
-                  class="upload-demo"
-                  accept=".cctag"
-                  :http-request="导入旧版JSON数据"
-                  :action="`http://${思源伺服ip}/api/asset/upload`"
-                  :headers="{ Authorization: 'Token' + apitoken }"
-                  :flile-list="JSON文件列表"
-                  :multiple="false"
-                >
-                  <el-button
-                    area-label="导入文件"
-                    slot="trigger"
-                    size="mini"
-                    class="el-icon-upload"
-                    >导入旧版文件</el-button
-                  >
-                </el-upload>
-              </el-col>
-            </el-row>
-
-            <div slot="reference" class="el-icon-setting"></div>
-          </el-popover>
-          <el-popover trigger="click">
             <span>打开画板</span>
             <el-select v-model="当前画板id" size="mini">
               <el-option
-                v-for="(item, i) in this.画板列表"
+                v-for="(item, i) in 画板列表"
                 :label="item.name || item.id"
                 :value="item.id"
               >
@@ -64,27 +32,6 @@
             <div slot="reference" class="el-icon-folder"></div>
           </el-popover>
           <span class="el-icon-download" @click="下载当前版本()"></span>
-          <el-popover trigger="click">
-            <el-upload
-              class="upload-demo"
-              drag
-              accept=".cccards"
-              :http-request="覆盖导入JSON数据"
-              :action="`http://${思源伺服ip}/api/asset/upload`"
-              :headers="{ Authorization: 'Token' + apitoken }"
-              :flile-list="JSON文件列表"
-              :multiple="false"
-            >
-              <i class="el-icon-upload"></i>
-              <div class="el-upload__text">
-                将文件拖到此处，或
-                <em>点击上传</em>
-              </div>
-              <div class="el-upload__tip" slot="tip">只能上传cccards|cctags文件</div>
-            </el-upload>
-
-            <div slot="reference" class="el-icon-upload"></div>
-          </el-popover>
 
           <el-popover trigger="click" placement="top" :height="500">
             <el-input v-model="搜索关键词" @input="搜索()" size="mini"></el-input>
@@ -113,38 +60,7 @@
 
           <span class="el-icon-browser" @click="$窗口内打开超链接(画板超链接)"></span>
           <el-popover :width="350">
-            <cc-color-pane
-              v-model="背景色"
-              :自定义颜色数组="自定义颜色数组"
-            ></cc-color-pane>
-
-            <el-row>
-              <el-col :span="12">
-                <cc-assets-selector
-                  v-model="背景图片源"
-                  :apitoken="apitoken"
-                  :思源伺服ip="思源伺服ip"
-                  :k="背景图片格式"
-                ></cc-assets-selector>
-              </el-col>
-              <el-col :span="12">
-                <el-select v-model="背景图片格式" size="mini" allow-create filterable>
-                  <el-option
-                    v-for="格式 in 图片格式列表"
-                    :label="格式"
-                    :value="格式"
-                  ></el-option>
-                </el-select>
-              </el-col>
-            </el-row>
-            <el-input v-model="背景图片源" size="mini"></el-input>
-            <el-input-number size="mini" v-model="背景图像缩放倍数"></el-input-number>
-            <el-switch
-              v-model="背景图像模式"
-              active-text="重复"
-              active-value="重复"
-              inactive-value="填充"
-            ></el-switch>
+            <cc-background-setter></cc-background-setter>
 
             <span slot="reference" class="el-icon-picture"></span>
           </el-popover>
@@ -195,13 +111,11 @@ module.exports = {
   components: componentsList,
   data() {
     return {
-      背景色: "",
       当前预设名: "",
       apitoken: "",
       数据源id: {},
       属性对象: {},
       对象数据: {},
-      自定义颜色数组: [],
       搜索关键词: "",
       搜索结果id: "",
       搜索结果列表: "",
@@ -209,60 +123,23 @@ module.exports = {
       画板列表: [],
       当前画板命名: "",
       画板超链接: `http://${this.思源伺服ip}/widgets/cc-image-tag-new/?baseid=${this.$baseid}`,
-      显示历史面板: false,
-      文件历史列表: [],
       当前对象名称: "",
-      JSON文件列表: [],
       timer: {},
-      图片格式列表: ["jpg", "png", "jpeg", "svg"],
-      背景图片格式: "jpg",
-      背景图片源: "",
-      背景图像缩放倍数: 1,
-      背景图像模式: "填充",
       使用svg渲染: false,
       折叠时显示名称: true,
       折叠时显示类别: true,
     };
   },
   async mounted() {
+    await this.加载数据();
     this.$事件总线.$on("保存卡片", ($event) => this.获取当前元素数据($event));
     this.$事件总线.$on("保存链接", ($event) => this.获取当前元素数据($event));
     this.$事件总线.$on("激活卡片", ($event) => this.获取当前元素数据($event));
     this.$事件总线.$on("激活链接", ($event) => this.获取当前元素数据($event));
-
-    this.timer = setInterval(() => {
-      this.保存计数 = this.保存计数 + 1;
-    }, 1000);
-    this.$事件总线.$on("自定义颜色改变", ($event) => (this.自定义颜色数组 = $event));
   },
   watch: {
-    背景色(val) {
-      this.$事件总线.$emit("背景色改变", val);
-      this.$当前窗口状态.backgroundColor = val;
-      this.$数据库.metadata.put({ key: "backgroundColor", value: val });
-    },
-    自定义颜色数组: {
-      handler(val) {
-        this.$事件总线.$emit("自定义颜色改变", val);
-        this.$数据库.metadata.put({ key: "customcolors", value: val });
-        console.log(val);
-      },
-      deep: true,
-    },
-
     使用svg渲染: function (val) {
       this.$当前窗口状态.使用svg = val;
-    },
-    背景图像模式: function (val) {
-      this.$事件总线.$emit("改变背景图像模式", val);
-      this.$数据库.metadata.put({ key: "backgroundtype", value: val });
-    },
-    背景图像缩放倍数: function (val) {
-      this.$事件总线.$emit("缩放背景", val);
-      this.$数据库.metadata.put({ key: "backgroundscale", value: val });
-    },
-    背景图片源: function (val) {
-      this.$数据库.metadata.put({ key: "backgroundImage", value: val });
     },
 
     当前画板命名: {
@@ -298,70 +175,25 @@ module.exports = {
     },
   },
   methods: {
-    加载数据: function (数据) {
+    加载数据: async function () {
+      let that = this;
       try {
-        this.当前画板命名 = (await this.$数据库.metadata.get("name")).value;
+        that.当前画板命名 = (await that.$数据库.metadata.get("name")).value;
       } catch (e) {
-        this.当前画板命名 = "未命名";
-        this.$数据库.metadata.put({ key: "name", value: "未命名" });
+        that.当前画板命名 = "未命名";
+        that.$数据库.metadata.put({ key: "name", value: "未命名" });
       }
 
       try {
-        this.背景图片源 = (await this.$数据库.metadata.get("backgroundImage")).value;
+        that.背景色 = (await that.$数据库.metadata.get("backgroundColor")).value;
       } catch (e) {
-        this.背景图片源 = "";
-        this.$数据库.metadata.put({ key: "backgroundImage", value: "" });
-      }
-      try {
-        this.自定义颜色数组 = (await this.$数据库.metadata.get("customcolors")).value;
-      } catch (e) {
-        this.自定义颜色数组 = [];
-        this.$数据库.metadata.put({ key: "customcolors", value: [] });
-      }
-      try {
-        this.背景色 = (await this.$数据库.metadata.get("backgroundColor")).value;
-      } catch (e) {
-        this.背景色 = "var(--b3-theme-background)";
-        this.$数据库.metadata.put({ key: "customcolors", value: [] });
-      }
-      try {
-        this.背景图像缩放倍数 = (await this.$数据库.metadata.get("backgroundscale")).value;
-      } catch (e) {
-        this.背景图像缩放倍数 = 1;
-
-        this.$数据库.metadata.put({ key: "backgroundscale", value: 1 });
-      }
-      try {
-        this.背景图像模式 = (await this.$数据库.metadata.get("backgroundtype")).value;
-      } catch (e) {
-        this.背景图像模式 = "填充";
-        this.$数据库.metadata.put({ key: "backgroundtype", value: "填充" });
-      }
-      try {
-        this.保存时间间隔 = (await this.$数据库.metadata.get("autosaveinteger")).value;
-      } catch (e) {
-        console.log(e);
-        this.保存时间间隔 = 5;
-        this.$数据库.metadata.put({ key: "autosaveinteger", value: 5 });
-      }
-      try {
-        this.历史版本数量上限 = (await this.$数据库.metadata.get("maxhistorycount")).value;
-      } catch (e) {
-        console.log(e);
-        this.历史版本数量上限 = 30;
-        this.$数据库.metadata.put({ key: "maxhistorycount", value: 30 });
+        that.背景色 = "var(--b3-theme-background)";
+        that.$数据库.metadata.put({ key: "customcolors", value: [] });
       }
 
-      this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}`;
-      this.画板列表 = await this.$画板元数据库.boards.toArray();
-      // console.log(this.画板列表);
-      try {
-        await this.保存历史();
-        await this.从思源块加载数据(this.$baseid);
-      } catch (error) {
-        console.log("加载出错", error);
-        alert("加载挂件块数据失败,注意手动保存数据");
-      }
+      that.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${that.对象数据.id}&baseid=${that.$baseid}`;
+      that.画板列表 = await that.$画板元数据库.boards.toArray();
+      // console.log(that.画板列表);
     },
     获取当前元素数据: function ($event) {
       if ($event) {

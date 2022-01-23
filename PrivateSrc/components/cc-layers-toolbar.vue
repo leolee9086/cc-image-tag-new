@@ -36,6 +36,16 @@
           aria-label="展开|关闭面板"
         ></span>
       </div>
+      <div class="drawer-button">
+        <span
+          @click="
+            当前面板名 != '画板设置' ? (当前面板名 = '画板设置') : (当前面板名 = '')
+          "
+          circle
+          class="el-icon-setting"
+          aria-label="展开|关闭面板"
+        ></span>
+      </div>
     </div>
     <cc-toolbar-main
       :思源伺服ip="思源伺服ip"
@@ -51,6 +61,7 @@
     <cc-toolbar-history :显示="当前面板名 == '历史'"> </cc-toolbar-history>
     <cc-toolbar-link :显示="当前面板名 == '图上连接'"> </cc-toolbar-link>
     <cc-toolbar-ref :显示="当前面板名 == '连接'"> </cc-toolbar-ref>
+    <cc-toolbar-set :显示="当前面板名 == '画板设置'"> </cc-toolbar-set>
 
     <cc-toolbar-view></cc-toolbar-view>
     <cc-sydoc-searcher :思源伺服ip="思源伺服ip" :apitoken="''"></cc-sydoc-searcher>
@@ -78,7 +89,12 @@ module.exports = {
       /*操作面板显示*/
       显示详情面板: false,
       当前面板名: "",
-      面板位置设定: {},
+      面板位置设定: {
+        leftTop: {},
+        leftBottom: {},
+        rightTop: {},
+        rightBootom: {},
+      },
     };
   },
   mounted() {
