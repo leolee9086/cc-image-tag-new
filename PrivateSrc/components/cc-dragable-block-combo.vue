@@ -313,7 +313,7 @@ module.exports = {
             数据.attrs[坐标属性] =
               this[主坐标属性] / this.窗口缩放倍数 +
               (总卡片宽度 + 总空隙宽度 - 数据.attrs[长度属性]) / 2;
-                          数据 = this.$更新数据时间戳(数据);
+            数据 = this.$更新数据时间戳(数据);
 
           }
         }
@@ -336,7 +336,6 @@ module.exports = {
           console.log(e);
         }
       }
-      this.dragging(this.x,this.y)
     },
 
     判断id: function ($event) {

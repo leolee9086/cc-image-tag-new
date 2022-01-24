@@ -72,18 +72,18 @@
       </el-tooltip>
     </el-row>
     <el-switch
-          area-label="折叠时是否显示名称"
-          @change="$当前窗口状态.showmarkdown = $event"
-          size="mini"
-          v-model="优先显示markdown"
-          active-text="优先显示markdown"
+      area-label="折叠时是否显示名称"
+      @change="$当前窗口状态.showmarkdown = $event"
+      size="mini"
+      v-model="优先显示markdown"
+      active-text="优先显示markdown"
     ></el-switch>
     <el-switch
-          area-label="链接是否默认显示标记"
-          @change="$当前窗口状态.showmarkdown = $event"
-          size="mini"
-          v-model="是否默认显示链接标记"
-          active-text="是否默认显示链接标记"
+      area-label="链接是否默认显示标记"
+      @change="$当前窗口状态.showmarkdown = $event"
+      size="mini"
+      v-model="是否默认显示链接标记"
+      active-text="是否默认显示链接标记"
     ></el-switch>
   </el-drawer>
 </template>
@@ -99,14 +99,37 @@ module.exports = {
       apitoken: "",
       折叠时显示名称: true,
       折叠时显示类别: true,
-      优先显示markdown:false,
+      优先显示markdown: false,
+      是否默认显示链接标记: true,
     };
   },
+  async mounted() {
+    await this.加载数据()
+  },
   methods: {
+    加载数据: async function () {
+      let that =this
+      try {
+        that.当前画板命名 = (await that.$数据库.metadata.get("name")).value;
+      } catch (e) {
+        that.当前画板命名 = "未命名";
+        that.$数据库.metadata.put({ key: "name", value: "未命名" });
+      }
+      that.画板列表 = await that.$画板元数据库.boards.toArray();
+
+    },
     导入旧版JSON数据() { },
     覆盖导入JSON数据() { },
     覆盖导入mardown数据() { },
   },
+  watch:{
+    是否默认显示链接标记(val){
+      this.$当前窗口状态.show_tag_by_default = val?true:false
+    },
+    是否默认优先显示markdown(val){
+      this.$当前窗口状态.show_markdown_by_default = val?true:false
+    }
+  }
 };
 </script>
 <style></style>

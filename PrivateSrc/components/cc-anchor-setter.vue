@@ -48,9 +48,7 @@ module.exports = {
   },
   methods: {
     判断id($event) {
-      if ($event.id === this.对象数据.id && $event.updated >= this.对象数据.updated) {
-        this.当前对象数据 = $event;
-      }
+        this.当前对象数据= this.$根据时间戳更新本地数据($event,this.当前对象数据)
     },
   },
   watch: {

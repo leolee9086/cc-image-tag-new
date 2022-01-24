@@ -227,7 +227,7 @@ const 事务列表 = {
   },
   激活数据: function (数据,ctrl键被按下) {
     let 数据类型 = 数据.type;
-
+    this.$当前窗口状态.current_cardpreset_name=数据.subtype
     
     // console.log(数据类型)
     数据类型 == "card"

@@ -74,9 +74,9 @@ module.exports = {
 
     this.$事件总线.$on("开始连接", (event) => this.生成虚拟连接(event));
     this.$事件总线.$on("结束连接", () => (this.显示虚拟连接 = false));
-    this.$事件总线.$on("移动卡片", ($event) => (this.当前数据 = $event));
-    this.$事件总线.$on("激活数据", ($event) => (this.当前数据 = $event));
-    this.$事件总线.$on("缩放卡片", ($event) => (this.当前数据 = $event));
+    this.$事件总线.$on("移动卡片", ($event) => ($event?this.当前数据 = $event:null));
+    this.$事件总线.$on("激活数据", ($event) => ($event?this.当前数据 = $event:null));
+    this.$事件总线.$on("缩放卡片", ($event) => ($event?this.当前数据 = $event:null));
     this.$事件总线.$on("保存数据", ($event) =>
       $event.id == this.当前数据.id ? (this.当前数据 = $event) : null
     );

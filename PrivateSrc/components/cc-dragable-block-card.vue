@@ -197,10 +197,10 @@
             @html-change="预览HTML = $event"
             :toolbarconfig="{ hide: false }"
           ></cc-vditor-vue>
-          <div v-if="!正在编辑 && !思源HTML" v-html="预览HTML"></div>
+          <div v-if="!正在编辑 && !(思源HTML&&!$当前窗口状态.show_markdown_by_default)" v-html="预览HTML"></div>
           <div
             class="protyle-wysiwyg protyle-wysiwyg--attr"
-            v-if="思源HTML"
+            v-if="思源HTML&&!$当前窗口状态.show_markdown_by_default"
             v-html="思源HTML"
           ></div>
         </div>
@@ -229,6 +229,7 @@ module.exports = {
       思源HTML: "",
       def_block: "",
       预设: "",
+      绘制: "",
     };
   },
   beforeMount() {
@@ -493,7 +494,6 @@ module.exports = {
               }
             });
           }
-
           this.思源HTML = el.innerHTML;
         } else this.思源HTML = "获取思源块内容失败";
       }
@@ -571,9 +571,7 @@ module.exports = {
       $event ? (this.对象数据.name = $event) : null;
       this.对象数据 = this.$更新数据时间戳(this.对象数据);
       let 数据表名 = this.对象数据.type + "s";
-      this.数据类型 == "card"
-        ? this.$事件总线.$emit("保存卡片", this.对象数据, flag)
-        : this.$事件总线.$emit("保存链接", this.对象数据, flag);
+      this.$事件总线.$emit("保存数据",this.对象数据)
     },
     转化为卡片: function () {
       let 新数据 = JSON.parse(JSON.stringify(this.对象数据));
@@ -621,6 +619,10 @@ module.exports = {
       }
       if (对象数据.type == "link" && 对象数据.attrs.hidetag) {
         this.hide = true;
+      }
+      if (对象数据.type == "link" &&typeof  对象数据.attrs.hidetag=="undefined"){
+        this.hide = !this.$当前窗口状态.show_tag_by_default
+        
       }
       if (对象数据) {
         setTimeout(this.计算可见性, 500);

@@ -1,17 +1,10 @@
 <template>
-  <v-group
-    @click="$事件总线.$emit('激活链接', 链接)"
-    v-if="链接 && 代理起始标记 && 代理结束标记"
-  >
+  <v-group @click="$事件总线.$emit('激活链接', 链接)" v-if="链接 && 代理起始标记 && 代理结束标记">
     <v-path v-if="链接['attrs']" :config="链接设定"></v-path>
-    <v-path v-if="链接['attrs'] && 显示引线" :config="引线设定"></v-path>
-    <v-image v-if="链接['attrs'] && 结束节点图片元素" :config="结束节点设定"> </v-image>
-    <v-image v-if="链接['attrs'] && 起始节点图片元素" :config="起始节点设定"> </v-image>
-    <v-image
-      v-if="链接['attrs'] && 中间节点图片元素 && !链接.virtual"
-      :config="中间节点设定"
-    >
-    </v-image>
+    <v-path v-if="链接['attrs'] && 显示引线 && 中点可见性" :config="引线设定"></v-path>
+    <v-image v-if="链接['attrs'] && 结束节点图片元素" :config="结束节点设定"></v-image>
+    <v-image v-if="链接['attrs'] && 起始节点图片元素" :config="起始节点设定"></v-image>
+    <v-image v-if="链接['attrs'] && 中间节点图片元素 && !链接.virtual && 中点可见性" :config="中间节点设定"></v-image>
   </v-group>
 </template>
 <script>
@@ -31,13 +24,13 @@ module.exports = {
     this.$事件总线.$on("窗口缩放", (event) => (this.缩放倍数 = event));
     this.链接.attrs.from_id
       ? (this.代理起始标记 =
-          (await this.$数据库.cards.get(this.链接.attrs.from_id)) ||
-          (await this.$数据库.links.get(this.链接.attrs.from_id)))
+        (await this.$数据库.cards.get(this.链接.attrs.from_id)) ||
+        (await this.$数据库.links.get(this.链接.attrs.from_id)))
       : null;
     this.链接.attrs.to_id
       ? (this.代理结束标记 =
-          (await this.$数据库.cards.get(this.链接.attrs.to_id)) ||
-          (await this.$数据库.links.get(this.链接.attrs.to_id)))
+        (await this.$数据库.cards.get(this.链接.attrs.to_id)) ||
+        (await this.$数据库.links.get(this.链接.attrs.to_id)))
       : null;
     if (!this.代理起始标记 || !this.代理结束标记) {
       this.$事件总线.$emit("删除链接", this.link);
@@ -67,6 +60,7 @@ module.exports = {
       终点: {},
       中点: {},
       路径类型: "",
+      中点可见性: true,
       缩放倍数: this.$当前窗口状态.缩放倍数 || 1,
       真实画布原点: "",
 
@@ -90,6 +84,7 @@ module.exports = {
     };
   },
   computed: {
+
     结束节点偏移: function () {
       let obj = {};
       if (this.代理结束标记 && this.代理结束标记.attrs) {
@@ -270,7 +265,9 @@ module.exports = {
     },
     link: {
       handler: function (val, oldval) {
-        // console.log(this.路径类型);
+        console.log(this.路径类型);
+        this.计算中点可见性()
+
         this.判断时间并计算链接(val, oldval);
       },
       deep: true,
@@ -281,6 +278,7 @@ module.exports = {
         if (!val.attrs) {
           return null;
         }
+        this.计算中点可见性()
         let 拷贝对象 = JSON.parse(JSON.stringify(val));
         let 拷贝旧对象 = JSON.parse(JSON.stringify(oldval || "{}"));
         拷贝对象.updated = "";
@@ -292,8 +290,21 @@ module.exports = {
       },
       deep: true,
     },
+    
   },
   methods: {
+    计算中点可见性() {
+      if (this.链接 && this.链接.attrs) {
+        if (typeof this.链接.attrs.hidetag !== "undefined") {
+          console.log("bbb", this.$当前窗口状态.show_tag_by_default)
+          this.中点可见性 = this.链接.attrs.hidetag ? false : true
+        }
+        else {
+          console.log("bbb", this.$当前窗口状态.show_tag_by_default)
+          this.中点可见性 = this.$当前窗口状态.show_tag_by_default
+        }
+      }
+    },
     判断时间并计算链接: function (val, oldval) {
       if (parseInt(val.updated) <= parseInt(oldval.updated)) {
         return null;
@@ -446,7 +457,7 @@ module.exports = {
           // set image only when it is loaded
           this[参数名] = image;
         };
-      } catch (e) {}
+      } catch (e) { }
     },
     判断id: function ($event) {
       let that = this;
@@ -626,11 +637,9 @@ module.exports = {
       define = `
             M ${起始节点.x} ${起始节点.y}
             l ${-this.起始节点偏移.x * 2} ${-this.起始节点偏移.y * 2}
-            C ${起始节点.x - this.起始节点偏移.x * 20} ${
-        起始节点.y - this.起始节点偏移.y * 20
-      } ${结束节点.x - this.结束节点偏移.x * 20} ${
-        结束节点.y - this.结束节点偏移.y * 20
-      } ${结束节点.x - this.结束节点偏移.x * 2} ${结束节点.y - this.结束节点偏移.y * 2}
+            C ${起始节点.x - this.起始节点偏移.x * 20} ${起始节点.y - this.起始节点偏移.y * 20
+        } ${结束节点.x - this.结束节点偏移.x * 20} ${结束节点.y - this.结束节点偏移.y * 20
+        } ${结束节点.x - this.结束节点偏移.x * 2} ${结束节点.y - this.结束节点偏移.y * 2}
 
             L ${结束节点.x} ${结束节点.y}
             `;
@@ -676,7 +685,7 @@ module.exports = {
         let 反转方向矢量 = 几何定义.矢量乘标量(方向矢量, -1);
         方向矢量 = 几何定义.矢量乘标量(方向矢量, 1);
         let 起始节点 = this.矩形与矢量交点(代理起始标记, 方向矢量);
-        let 结束节点 = this.矩形与矢量交点(代理结束标记, 反转方向矢量);        
+        let 结束节点 = this.矩形与矢量交点(代理结束标记, 反转方向矢量);
         let 路径线段 = { 起点: 起始节点, 终点: 结束节点 };
         return 路径线段;
       } else {
@@ -716,7 +725,7 @@ module.exports = {
         矩形.fixed_anchor ? (y偏移 = 0) : null;
       }
       //别问我为什么不用math.sign  反正不要用
-      
+
       if (矢量.x > 0) {
         交点.x = 矩形中心.x + x偏移;
       } else {

@@ -319,6 +319,7 @@ Vue.prototype.$获取预设 = async function(预设表名,预设名){
     current_cardid_array:[],
     current_cardpreset_name:"",
     current_linkpreset_name:"",
+    show_tag_by_default:true,
   };
   Vue.prototype.$当前窗口状态 = 窗口状态对象;
   
@@ -368,4 +369,15 @@ Vue.prototype.$获取预设 = async function(预设表名,预设名){
       } catch (e) {
         alert("导入出错", e);
       }
+  }
+  Vue.prototype.$根据时间戳更新本地数据=function(传入数据,本地数据){
+    if(!传入数据){return 本地数据}
+    else if(传入数据.id!=本地数据.id){return 本地数据}
+    else if(!传入数据.attrs){return 本地数据}
+    else if(parseInt(传入数据.updated)<=parseInt(本地数据.updated)){
+      return 本地数据
+    }
+    else {
+      return 传入数据
+    }
   }

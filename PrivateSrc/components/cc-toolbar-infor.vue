@@ -7,16 +7,9 @@
     :wrapper-closable="false"
   >
     <el-row slot="title">
-      <div>
-        {{ `节点信息:${$当前窗口状态.current_cardid || $当前窗口状态.current_linkid}` }}
-      </div>
+      <div>{{ `节点信息:${$当前窗口状态.current_cardid || $当前窗口状态.current_linkid}` }}</div>
       <strong>预设类型</strong>
-      <cc-presets-selector
-        :数据id="当前对象数据.id || ''"
-        :数据表名="当前对象数据.type + 's' || ''"
-        v-model="预设名"
-      >
-      </cc-presets-selector>
+      <cc-presets-selector :数据id="当前对象数据.id || ''" :数据表名="当前对象数据.type + 's' || ''" v-model="预设名"></cc-presets-selector>
     </el-row>
     <el-tabs v-model="当前面板">
       <el-tab-pane label="样式" name="样式">
@@ -35,12 +28,7 @@
                       <span class="el-icon-copy-document"></span>
                     </el-tooltip>
                   </span>
-                  <cc-color-pane
-                    v-model="属性对象.borderColor"
-                    :显示web命名颜色="true"
-                    :自定义颜色数组="自定义颜色数组"
-                  >
-                  </cc-color-pane>
+                  <cc-color-pane v-model="属性对象.borderColor" :显示web命名颜色="true" :自定义颜色数组="自定义颜色数组"></cc-color-pane>
                 </el-tab-pane>
                 <el-tab-pane label="背景色" name="背景色">
                   <span slot="label">
@@ -56,29 +44,20 @@
                     v-model="属性对象.backgroundColor"
                     :显示web命名颜色="true"
                     :自定义颜色数组="自定义颜色数组"
-                  >
-                  </cc-color-pane>
+                  ></cc-color-pane>
                 </el-tab-pane>
 
                 <el-tab-pane label="文字色" name="文字色">
                   <span slot="label">
                     文字色
-                    <el-tooltip
-                      v-if="预设.attrs.color != 'byref'"
-                      content="这是一个预设值,修改后会修改所有同类型元素"
-                    >
+                    <el-tooltip v-if="预设.attrs.color != 'byref'" content="这是一个预设值,修改后会修改所有同类型元素">
                       <span class="el-icon-copy-document"></span>
                     </el-tooltip>
                   </span>
-                  <cc-color-pane
-                    v-model="属性对象.color"
-                    :显示web命名颜色="true"
-                    :自定义颜色数组="自定义颜色数组"
-                  >
-                  </cc-color-pane>
+                  <cc-color-pane v-model="属性对象.color" :显示web命名颜色="true" :自定义颜色数组="自定义颜色数组"></cc-color-pane>
                 </el-tab-pane>
                 <el-tab-pane label="几何设置" name="几何设置">
-                  <span slot="label"> 边框和锚点 </span>
+                  <span slot="label">边框和锚点</span>
                   <el-row>
                     <el-tooltip
                       v-if="预设.attrs.fixed_anchor != 'byref'"
@@ -123,8 +102,7 @@
                         v-for="(item, i) in 边框线型对照表"
                         :label="item.label"
                         :value="item.value"
-                      >
-                      </el-option>
+                      ></el-option>
                     </el-select>
                   </el-row>
                 </el-tab-pane>
@@ -144,10 +122,7 @@
                   </span>
                   <el-row>
                     <el-col :span="15">
-                      <el-slider
-                        v-model="属性对象.path_width"
-                        @change="属性对象.path_width = $event"
-                      ></el-slider>
+                      <el-slider v-model="属性对象.path_width" @change="属性对象.path_width = $event"></el-slider>
                     </el-col>
                     <el-col :span="9">
                       <el-select v-model="属性对象.path_type" size="mini">
@@ -155,19 +130,13 @@
                           v-for="(item, i) in [`直线`, `折线`, '简单曲线']"
                           :label="item"
                           :value="item"
-                        >
-                        </el-option>
+                        ></el-option>
                       </el-select>
                     </el-col>
                   </el-row>
 
                   <el-divider></el-divider>
-                  <cc-color-pane
-                    v-model="属性对象.path_color"
-                    :显示web命名颜色="true"
-                    :自定义颜色数组="自定义颜色数组"
-                  >
-                  </cc-color-pane>
+                  <cc-color-pane v-model="属性对象.path_color" :显示web命名颜色="true" :自定义颜色数组="自定义颜色数组"></cc-color-pane>
                 </el-tab-pane>
                 <el-tab-pane label="起点标记" name="起点标记">
                   <span slot="label">
@@ -252,8 +221,8 @@
               ></el-button>
             </div>
             <el-row v-for="(属性名, i) in 属性列表">
-              <el-col :span="20"
-                ><span>{{ 属性名 }}</span>
+              <el-col :span="20">
+                <span>{{ 属性名 }}</span>
               </el-col>
               <el-col :span="4">
                 <el-tooltip
@@ -261,27 +230,20 @@
                   content="设为实例值,设为实例值之后,改变某一个引用不会改变所有使用了预设的元素"
                 >
                   <div slot="content">
-                    设为实例值,<br />改变某一个引用时<br />不会改变其他元素项目
+                    设为实例值,
+                    <br />改变某一个引用时
+                    <br />不会改变其他元素项目
                   </div>
 
-                  <span
-                    class="el-icon-delete"
-                    size="mini"
-                    @click="设为实例值(属性名, 预设项目)"
-                  ></span>
+                  <span class="el-icon-delete" size="mini" @click="设为实例值(属性名, 预设项目)"></span>
                 </el-tooltip>
-                <el-tooltip
-                  v-if="预设项目.attrs && 'byref' == 预设项目.attrs[属性名]"
-                  content=""
-                >
+                <el-tooltip v-if="预设项目.attrs && 'byref' == 预设项目.attrs[属性名]" content>
                   <div slot="content">
-                    设为预设值,<br />改变某一个引用时<br />会改变所有使用了预设的元素
+                    设为预设值,
+                    <br />改变某一个引用时
+                    <br />会改变所有使用了预设的元素
                   </div>
-                  <span
-                    class="el-icon-check"
-                    size="mini"
-                    @click="设为预设值(属性名, 预设项目)"
-                  ></span>
+                  <span class="el-icon-check" size="mini" @click="设为预设值(属性名, 预设项目)"></span>
                 </el-tooltip>
               </el-col>
             </el-row>
@@ -289,6 +251,7 @@
         </el-collapse>
       </el-tab-pane>
     </el-tabs>
+    <div v-if="开发模式" v-html="JSON.stringify(当前对象数据)"></div>
   </el-drawer>
 </template>
 <script>
@@ -297,6 +260,7 @@ module.exports = {
   props: ["卡片数据id", "链接数据id", "思源伺服ip", "显示"],
   data() {
     return {
+      开发模式: true,
       当前面板: "样式",
       apitoken: "",
       当前对象数据: "",
@@ -337,15 +301,8 @@ module.exports = {
     }
     //console.log(this.属性列表);
     this.获取预设();
-    this.$事件总线.$on(
-      "激活卡片",
-      ($event) => (this.当前对象数据 = $event || this.当前对象数据)
-    );
-    this.$事件总线.$on(
-      "激活链接",
-      ($event) => (this.当前对象数据 = $event || this.当前对象数据)
-    );
-    this.$事件总线.$on("自定义颜色改变", ($event) => (this.自定义颜色数组 = $event));
+    this.添加监听器()
+
   },
 
   watch: {
@@ -415,6 +372,25 @@ module.exports = {
   },
 
   methods: {
+    添加监听器: function () {
+      this.$事件总线.$on(
+        "激活卡片",
+        ($event) => (this.当前对象数据 = $event || this.当前对象数据)
+      );
+      this.$事件总线.$on(
+        "激活链接",
+        ($event) => (this.当前对象数据 = $event || this.当前对象数据)
+      );
+      this.$事件总线.$on("自定义颜色改变", ($event) => (this.自定义颜色数组 = $event));
+      this.$事件总线.$on("保存数据",($event)=>(this.判断id($event)))
+    },
+    判断id($event){
+      if($event&&$event.attrs){
+        if($event==this.当前对象数据.id&&$event.updated>this.当前对象数据.updated){
+          !$event.attrs.trashed?this.当前对象数据=$event:null
+        }
+      }
+    },
     删除预设: function (预设项目) {
       let 预设表名 = this.当前对象数据.type + "presets";
       this.$事件总线.$emit("删除预设", 预设项目, 预设表名, this.获取预设);

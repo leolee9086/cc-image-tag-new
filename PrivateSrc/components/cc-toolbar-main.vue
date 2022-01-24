@@ -112,7 +112,6 @@ module.exports = {
       当前对象名称: "",
       timer: {},
       使用svg渲染: false,
-    
     };
   },
   async mounted() {
@@ -162,12 +161,6 @@ module.exports = {
   methods: {
     加载数据: async function () {
       let that = this;
-      try {
-        that.当前画板命名 = (await that.$数据库.metadata.get("name")).value;
-      } catch (e) {
-        that.当前画板命名 = "未命名";
-        that.$数据库.metadata.put({ key: "name", value: "未命名" });
-      }
 
       try {
         that.背景色 = (await that.$数据库.metadata.get("backgroundColor")).value;
@@ -177,7 +170,6 @@ module.exports = {
       }
 
       that.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${that.对象数据.id}&baseid=${that.$baseid}`;
-      that.画板列表 = await that.$画板元数据库.boards.toArray();
       // console.log(that.画板列表);
     },
     获取当前元素数据: function ($event) {
