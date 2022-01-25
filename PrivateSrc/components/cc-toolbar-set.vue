@@ -9,7 +9,7 @@
     </el-row>
     <el-divider></el-divider>
     <el-row :gutter="20" type="flex" justify="space-around">
-      <el-col :span="8">
+      <el-col :span="6">
         <el-upload
           class="upload-demo"
           accept=".cctag"
@@ -22,7 +22,7 @@
           <el-button area-label="导入文件" slot="trigger" size="mini" class="el-icon-upload">导入旧版文件</el-button>
         </el-upload>
       </el-col>
-      <el-col :span="8">
+      <el-col :span="6">
         <el-upload
           class="upload-demo"
           accept=".cccards"
@@ -35,7 +35,7 @@
           <el-button area-label="导入文件" slot="trigger" size="mini" class="el-icon-upload">导入文件</el-button>
         </el-upload>
       </el-col>
-      <el-col :span="8">
+      <el-col :span="6">
         <el-upload
           class="upload-demo"
           accept=".cccards"
@@ -48,9 +48,19 @@
           <el-button area-label="导入文件" slot="trigger" size="mini" class="el-icon-upload">导入markdown</el-button>
         </el-upload>
       </el-col>
+
     </el-row>
+     <el-row>
+     <el-col :span="12">
+      <strong>当前工作空间:{{工作空间名}}</strong>
+     </el-col> 
+     <el-col :span="12">
+     <cc-loader-file @filechange="设定工作空间($event)"></cc-loader-file>
+     </el-col>
+     </el-row> 
+
     <el-divider></el-divider>
-    <cc-background-setter></cc-background-setter>
+    <cc-setter-board-background></cc-setter-board-background>
     <el-divider></el-divider>
     <el-row>
       <el-col :span="12">
@@ -101,12 +111,25 @@ module.exports = {
       折叠时显示类别: true,
       优先显示markdown: false,
       是否默认显示链接标记: true,
+      工作空间名:"",
+      工作空间列表:"",
     };
   },
   async mounted() {
     await this.加载数据()
   },
   methods: {
+    设定工作空间:async function($event){
+      let obj = {
+        id:00000,
+        name:$event.name,
+        value:$event
+      }
+      await this.$画板元数据库.workspace.put(obj)
+      this.工作空间名=$event.name
+      this.$事件总线.$emit("设定工作空间",$event,false)
+      console.log($event)
+    },
     加载数据: async function () {
       let that =this
       try {

@@ -259,7 +259,7 @@ module.exports = {
       links = 版本数据.links;
       for (i in cards) {
         try {
-          let yaml = this.生成yaml(cards[i]);
+          let yaml = this.$生成yaml(cards[i]);
           let markdown = yaml + cards[i]["markdown"];
           zip.file(`${"卡片" + i + cards[i]["name"]}.md`, markdown);
         } catch (e) {
@@ -268,7 +268,7 @@ module.exports = {
       }
       for (i in links) {
         try {
-          let yaml = this.生成yaml(links[i]);
+          let yaml = this.$生成yaml(links[i]);
           let markdown = yaml + links[i]["markdown"];
           zip.file(`${"关系" + i + links[i]["name"]}.md`, markdown);
         } catch (e) {

@@ -28,7 +28,7 @@
 </template>
 <script>
 module.exports = {
-  name: "cc-backgound-setter",
+  name: "cc-setter-board-background",
   props: [],
   data() {
     return {

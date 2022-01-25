@@ -192,9 +192,8 @@
         <div class="cc-card-content">
           <div :style="`color:${对象数据.attrs.color};`"></div>
           <cc-vditor-vue
-            v-model="对象数据.markdown"
+            v-model="markdown"
             v-if="正在编辑"
-            @html-change="预览HTML = $event"
             :toolbarconfig="{ hide: false }"
           ></cc-vditor-vue>
           <div v-if="!正在编辑 && !(思源HTML&&!$当前窗口状态.show_markdown_by_default)" v-html="预览HTML"></div>
@@ -230,6 +229,7 @@ module.exports = {
       def_block: "",
       预设: "",
       绘制: "",
+      markdown:"",
     };
   },
   beforeMount() {
@@ -338,6 +338,9 @@ module.exports = {
           this.def_block = val.attrs.def_block;
           this.生成html();
         }
+        if (this.markdown != val.markdown){
+          this.markdown =  val.markdown
+        }
         let 拷贝对象 = JSON.parse(JSON.stringify(val));
         let 拷贝旧对象 = JSON.parse(JSON.stringify(oldval || "{}"));
         拷贝对象.updated = "";
@@ -390,6 +393,11 @@ module.exports = {
         this.生成html();
       }
     },
+    markdown(val){
+        this.对象数据.markdown = val
+        this.对象数据= this.$更新数据时间戳(this.对象数据)
+        this.生成html();
+    }
   },
   computed: {
     top: function () {
@@ -419,7 +427,7 @@ module.exports = {
     获取预设: async function (预设名) {
       let 预设表名 = this.对象数据.type + "presets";
       this.预设 = await this.$获取预设(预设表名, 预设名);
-
+      
       if (!this.预设) {
         return null;
       } else {

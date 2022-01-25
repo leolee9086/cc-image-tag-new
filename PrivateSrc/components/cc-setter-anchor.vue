@@ -26,7 +26,7 @@
 </template>
 <script>
 module.exports = {
-  name: "cc-anchor-setter",
+  name: "cc-setter-anchor",
   props: ["位置", "对象数据", "思源伺服ip", "预设", "bref"],
   data() {
     return {

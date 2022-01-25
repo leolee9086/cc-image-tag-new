@@ -56,7 +56,9 @@ const 事务列表 = {
         }
       });
   },
-
+  设定工作空间:function(工作空间句柄){
+    this.$当前窗口状态.current_workspace_handle=工作空间句柄
+  },
   链接转化为卡片: async function (链接数据) {
     let 新数据 = JSON.parse(JSON.stringify(链接数据));
     新数据.id = Lute.NewNodeID();
@@ -102,6 +104,7 @@ const 事务列表 = {
     传入数据.type == "card"
       ? this.$事件总线.$emit("保存卡片", 传入数据)
       : this.$事件总线.$emit("保存链接", 传入数据);
+    
   },
   保存卡片: async function (传入数据) {
     if (!传入数据) {
@@ -126,7 +129,11 @@ const 事务列表 = {
       if (原始数据) {
         await this.$数据库[数据表名].put(传入数据);
       }
+      if(this.$当前窗口状态.current_workspace_handle){
+        await this.$保存markdown卡片数据(传入数据,this.$当前窗口状态.current_workspace_handle)
+      }
     }
+    
   },
   删除数据: function (传入数据) {
    // console.log(传入数据)
@@ -225,7 +232,7 @@ const 事务列表 = {
     //console.log("选集清空")
     this.$当前窗口状态.current_cardid_array=[]
   },
-  激活数据: function (数据,ctrl键被按下) {
+  激活数据: function (数据) {
     let 数据类型 = 数据.type;
     this.$当前窗口状态.current_cardpreset_name=数据.subtype
     
@@ -284,20 +291,18 @@ const 事务列表 = {
       if (链接类型) {
         新链接.subtype = 链接类型;
       }
-    //  console.log(新链接);
-
      await  this.$数据库.links
         .put(新链接)
         .then(() => this.$事件总线.$emit("保存链接", 新链接))
         .then(() => {
           if (this.$当前窗口状态.current_linkpreset_name) {
-            //   console.log(this.$当前窗口状态.current_linkpreset_name)
             this.$事件总线.$emit(
               "改变数据预设",
               新链接,
               this.$当前窗口状态.current_linkpreset_name
             );
           }
+          
           this.$事件总线.$emit("保存链接", 新链接);
           this.$事件总线.$emit("结束连接");
         });
@@ -510,6 +515,12 @@ const 事务列表 = {
       await this.$数据库[预设表名].put(新预设数据);
     }
   },
+  当前预设改变:function(预设数据,预设类型){
+    if(预设数据&&预设类型){
+      预设类型=="card"?this.$当前窗口状态.current_cardpreset=预设数据:this.$当前窗口状态.current_linkpreset=预设数据
+    }
+  },
+  窗口状态初始化:function(){}
 };
 
 for (let item in 事务列表) {

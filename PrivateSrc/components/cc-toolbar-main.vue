@@ -60,7 +60,7 @@
 
           <span class="el-icon-browser" @click="$窗口内打开超链接(画板超链接)"></span>
           <el-popover :width="350">
-            <cc-background-setter></cc-background-setter>
+            <cc-setter-board-background></cc-setter-board-background>
 
             <span slot="reference" class="el-icon-picture"></span>
           </el-popover>
@@ -116,6 +116,7 @@ module.exports = {
   },
   async mounted() {
     await this.加载数据();
+    await this.$画板元数据库.workspace.get(00000).then(data=>console.log(data))
     this.$事件总线.$on("保存卡片", ($event) => this.获取当前元素数据($event));
     this.$事件总线.$on("保存链接", ($event) => this.获取当前元素数据($event));
     this.$事件总线.$on("激活卡片", ($event) => this.获取当前元素数据($event));
@@ -159,9 +160,10 @@ module.exports = {
     },
   },
   methods: {
+    
     加载数据: async function () {
       let that = this;
-
+      await this.从思源块加载数据()
       try {
         that.背景色 = (await that.$数据库.metadata.get("backgroundColor")).value;
       } catch (e) {
@@ -194,8 +196,8 @@ module.exports = {
           this.挂件自身元素.getAttribute("custom-data-assets") ||
           `assets/data-${this.挂件自身元素.getAttribute("data-node-id")}.cccards`;
       }
-      let url = "http://" + this.思源伺服ip + "/" + filepath;
-      //  console.log(url);
+      let url = this.思源伺服ip?`http://${this.思源伺服ip}/${filepath}`:`localhost:6806/${filepath}`;
+        console.log(url);
       let 文件数据 = {};
       try {
         await axios.get(url).then((res) => {
@@ -204,11 +206,13 @@ module.exports = {
             try {
               this.图片缩放倍数 = parseFloat(文件数据.resize).toFixed(2);
             } catch (e) {
-              //    console.log(e);
+                  console.log(e);
             }
           }
         });
       } catch (e) {
+                console.log(e);
+
         alert("文件不存在,将在附件中新建文件");
         this.$事件总线.$emit("上传当前画板文件数据到思源");
       }

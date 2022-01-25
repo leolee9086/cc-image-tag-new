@@ -25,7 +25,8 @@ const 数据库 = new Dexie(Vue.prototype.$baseid);
 });
 
 const 画板元数据库 = new Dexie("cc_whiteboardfiles");
-画板元数据库.version(4).stores({
+画板元数据库.version(5).stores({
+  workspace:'id,name,handle',
   boards: 'id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs', 
 });
 画板元数据库.open()
@@ -380,4 +381,44 @@ Vue.prototype.$获取预设 = async function(预设表名,预设名){
     else {
       return 传入数据
     }
+  }
+  Vue.prototype.$保存markdown卡片数据=async function(卡片数据,工作空间句柄){
+    let markdown数据=await this.$生成卡片markdown(卡片数据)
+    let 文件名 =  卡片数据.id+"-"+卡片数据.name+".md"
+    let 卡片文件句柄 =await 工作空间句柄.getFileHandle(文件名,{create:true})
+    let 写入管线 = await 卡片文件句柄.createWritable()
+    try{ await 写入管线.seek(0)
+    await 写入管线.truncate(0)
+    await 写入管线.write(markdown数据)
+    await 写入管线.close()}catch(e){}
+  }
+  Vue.prototype.$生成卡片markdown=function(卡片数据){
+    let markdown= 卡片数据.markdown 
+    let yaml = this.$生成卡片yaml(卡片数据)
+    return yaml + markdown
+  }
+  Vue.prototype.$生成卡片yaml=function(对象数据){
+        let yaml = `---
+id:"${对象数据.id}"
+parent_id:"${对象数据.parent_id}"
+root_id:"${对象数据.root_id}"
+hash:"${对象数据.hash}"
+box:"${对象数据.box}"
+path:"${对象数据.path}"
+name:"${对象数据.name}"
+alias:"${对象数据.alias}"
+memo:"${对象数据.memo}"
+content:"${对象数据.content}"
+length:"${对象数据.length}"
+type:"${对象数据.type}"
+subtype:"${对象数据.subtype}"
+ial:"${对象数据.ial}"
+sort:"${对象数据.sort}"
+created:"${对象数据.created}"
+updated:"${对象数据.updated}"
+attrs:'${JSON.stringify(对象数据.attrs)}'
+---
+        `;
+        return yaml;
+
   }
