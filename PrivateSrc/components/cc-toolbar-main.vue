@@ -73,6 +73,13 @@
           <el-col :span="12">
             <el-input v-model="当前对象名称" size="mini" @input="修改对象名称()">
               <span slot="prepend">名称</span>
+              <span
+                v-if="对象数据.attrs && 对象数据.attrs.def_block"
+                slot="append"
+                @click="添加卡片名称到思源块别名()"
+                aria-label="发送为别名"
+                >A</span
+              >
             </el-input>
           </el-col>
           <el-col :span="9">
@@ -116,7 +123,7 @@ module.exports = {
   },
   async mounted() {
     await this.加载数据();
-    await this.$画板元数据库.workspace.get(00000).then(data=>console.log(data))
+    await this.$画板元数据库.workspace.get(00000).then((data) => console.log(data));
     this.$事件总线.$on("保存卡片", ($event) => this.获取当前元素数据($event));
     this.$事件总线.$on("保存链接", ($event) => this.获取当前元素数据($event));
     this.$事件总线.$on("激活卡片", ($event) => this.获取当前元素数据($event));
@@ -160,10 +167,30 @@ module.exports = {
     },
   },
   methods: {
-    
+    添加卡片名称到思源块别名: async function () {
+      let 卡片名称 = this.当前对象名称;
+      let 思源块内容 = await 以id获取思源块信息(
+        this.思源伺服ip,
+        this.apitoken,
+        this.对象数据.attrs.def_block
+      );
+      let alias = 思源块内容.alias;
+      let 别名数组 = [];
+      alias ? (别名数组 = alias.split(",")) : [];
+      别名数组.push(卡片名称.replace(",", ""));
+      别名数组 = Array.from(new Set(别名数组));
+      alias = 别名数组.join(",");
+      await 设置思源块属性(
+        this.思源伺服ip,
+        this.apitoken,
+        this.对象数据.attrs.def_block,
+        "alias",
+        alias
+      );
+    },
     加载数据: async function () {
       let that = this;
-      await this.从思源块加载数据()
+      await this.从思源块加载数据();
       try {
         that.背景色 = (await that.$数据库.metadata.get("backgroundColor")).value;
       } catch (e) {
@@ -196,8 +223,10 @@ module.exports = {
           this.挂件自身元素.getAttribute("custom-data-assets") ||
           `assets/data-${this.挂件自身元素.getAttribute("data-node-id")}.cccards`;
       }
-      let url = this.思源伺服ip?`http://${this.思源伺服ip}/${filepath}`:`localhost:6806/${filepath}`;
-        console.log(url);
+      let url = this.思源伺服ip
+        ? `http://${this.思源伺服ip}/${filepath}`
+        : `localhost:6806/${filepath}`;
+      console.log(url);
       let 文件数据 = {};
       try {
         await axios.get(url).then((res) => {
@@ -206,12 +235,12 @@ module.exports = {
             try {
               this.图片缩放倍数 = parseFloat(文件数据.resize).toFixed(2);
             } catch (e) {
-                  console.log(e);
+              console.log(e);
             }
           }
         });
       } catch (e) {
-                console.log(e);
+        console.log(e);
 
         alert("文件不存在,将在附件中新建文件");
         this.$事件总线.$emit("上传当前画板文件数据到思源");

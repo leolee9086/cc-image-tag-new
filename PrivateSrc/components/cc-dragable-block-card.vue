@@ -181,7 +181,13 @@
           </el-row>
         </div>
         <div>
-          <span v-if="对象数据.attrs.def_block">引用自:</span>
+          <span v-if="对象数据.attrs.def_block && !$当前窗口状态.show_markdown_by_default"
+            >引用自:</span
+          >
+          <span v-if="对象数据.attrs.def_block && !$当前窗口状态.show_markdown_by_default"
+            >连接到:</span
+          >
+
           <cc-link-siyuan
             v-if="对象数据.attrs.def_block"
             :style="`color:${对象数据.attrs.color};`"
@@ -196,10 +202,13 @@
             v-if="正在编辑"
             :toolbarconfig="{ hide: false }"
           ></cc-vditor-vue>
-          <div v-if="!正在编辑 && !(思源HTML&&!$当前窗口状态.show_markdown_by_default)" v-html="预览HTML"></div>
+          <div
+            v-if="!正在编辑 && !(思源HTML && !$当前窗口状态.show_markdown_by_default)"
+            v-html="预览HTML"
+          ></div>
           <div
             class="protyle-wysiwyg protyle-wysiwyg--attr"
-            v-if="思源HTML&&!$当前窗口状态.show_markdown_by_default"
+            v-if="思源HTML && !$当前窗口状态.show_markdown_by_default"
             v-html="思源HTML"
           ></div>
         </div>
@@ -229,7 +238,7 @@ module.exports = {
       def_block: "",
       预设: "",
       绘制: "",
-      markdown:"",
+      markdown: "",
     };
   },
   beforeMount() {
@@ -338,8 +347,8 @@ module.exports = {
           this.def_block = val.attrs.def_block;
           this.生成html();
         }
-        if (this.markdown != val.markdown){
-          this.markdown =  val.markdown
+        if (this.markdown != val.markdown) {
+          this.markdown = val.markdown;
         }
         let 拷贝对象 = JSON.parse(JSON.stringify(val));
         let 拷贝旧对象 = JSON.parse(JSON.stringify(oldval || "{}"));
@@ -393,11 +402,11 @@ module.exports = {
         this.生成html();
       }
     },
-    markdown(val){
-        this.对象数据.markdown = val
-        this.对象数据= this.$更新数据时间戳(this.对象数据)
-        this.生成html();
-    }
+    markdown(val) {
+      this.对象数据.markdown = val;
+      this.对象数据 = this.$更新数据时间戳(this.对象数据);
+      this.生成html();
+    },
   },
   computed: {
     top: function () {
@@ -424,10 +433,19 @@ module.exports = {
     },
   },
   methods: {
+    覆盖markdown() {
+      let 思源markdown = lute.BlockDOM2Md(this.思源HTML);
+      思源markdown = this.去除ial(思源markdown);
+      this.markdown = 思源markdown;
+    },
+    去除ial(markdown) {
+      markdown = markdown.replace(/\n\{\:(.*?)\}\n/g, "");
+      return markdown;
+    },
     获取预设: async function (预设名) {
       let 预设表名 = this.对象数据.type + "presets";
       this.预设 = await this.$获取预设(预设表名, 预设名);
-      
+
       if (!this.预设) {
         return null;
       } else {
@@ -503,6 +521,9 @@ module.exports = {
             });
           }
           this.思源HTML = el.innerHTML;
+          if (this.$当前窗口状态.reload_markdown_by_default) {
+            this.覆盖markdown();
+          }
         } else this.思源HTML = "获取思源块内容失败";
       }
     },
@@ -579,7 +600,7 @@ module.exports = {
       $event ? (this.对象数据.name = $event) : null;
       this.对象数据 = this.$更新数据时间戳(this.对象数据);
       let 数据表名 = this.对象数据.type + "s";
-      this.$事件总线.$emit("保存数据",this.对象数据)
+      this.$事件总线.$emit("保存数据", this.对象数据);
     },
     转化为卡片: function () {
       let 新数据 = JSON.parse(JSON.stringify(this.对象数据));
@@ -628,9 +649,8 @@ module.exports = {
       if (对象数据.type == "link" && 对象数据.attrs.hidetag) {
         this.hide = true;
       }
-      if (对象数据.type == "link" &&typeof  对象数据.attrs.hidetag=="undefined"){
-        this.hide = !this.$当前窗口状态.show_tag_by_default
-        
+      if (对象数据.type == "link" && typeof 对象数据.attrs.hidetag == "undefined") {
+        this.hide = !this.$当前窗口状态.show_tag_by_default;
       }
       if (对象数据) {
         setTimeout(this.计算可见性, 500);
