@@ -64,6 +64,10 @@ module.exports = {
     this.卡片预设列表 = await this.$数据库.cardpresets.toArray();
     this.链接预设列表 = await this.$数据库.linkpresets.toArray();
   },
-  methods() {},
+  methods:{
+    删除预设(预设数据){
+      this.$事件总线.$emit("删除预设",预设数据)
+    }
+  },
 };
 </script>

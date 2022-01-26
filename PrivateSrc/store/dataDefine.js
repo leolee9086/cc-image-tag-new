@@ -430,9 +430,9 @@ Vue.prototype.$卡片属性默认值 = {
 
 Vue.prototype.$填充默认值 = function (数据) {
   if (数据 && 数据.attrs) {
-    for (属性名 in this.$卡片属性默认值) {
+    for (属性名 in this.$预设属性默认值列表) {
       if (数据["attrs"][属性名] === undefined) {
-        数据["attrs"][属性名] = this.$卡片属性默认值[属性名];
+        数据["attrs"][属性名] = 数据["type"]==card?this.$预设属性默认值列表[属性名]["cardDefault"]:this.$卡片属性默认值[属性名]["linkDefault"];
       }
     }
   }
