@@ -404,6 +404,20 @@ const 事务列表 = {
     this.$当前窗口状态.待发送数据 = 对象数据;
     this.$当前窗口状态.显示发送对话框 = true;
   },
+  改变预设名称:function(预设类型,预设id,旧预设名,新预设名){
+    this.$数据库[预设类型+"presets"].get(预设id).modify(
+      {name:新预设名}
+    ).then(
+      this.$数据库[预设类型+"s"].filter(
+        data=>{return data.subtype===旧预设名}
+      )
+      .modify({subtype:新预设名,updated:this.$生成毫秒时间戳()})
+      .each(
+        data =>this.$事件总线.$emit("保存数据",data)
+      )
+    
+    )
+  },
   改变数据预设: function (对象数据, 预设名) {
     对象数据.subtype = 预设名;
     let 预设值 = {};

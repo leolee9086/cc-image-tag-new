@@ -47,7 +47,7 @@ module.exports = {
           this.当前预设 = await this.$数据库[预设表名].filter((data) => {
             return data.name == val;
           });
-          this.事件总线.$emit("当前预设改变", this.当前预设, this.当前对象数据.type);
+          this.$事件总线.$emit("当前预设改变", this.当前预设, this.当前对象数据.type);
           console.log(this.当前预设);
         }
       },

@@ -7,9 +7,15 @@
     :wrapper-closable="false"
   >
     <el-row slot="title">
-      <div>{{ `节点信息:${$当前窗口状态.current_cardid || $当前窗口状态.current_linkid}` }}</div>
+      <div>
+        {{ `节点信息:${$当前窗口状态.current_cardid || $当前窗口状态.current_linkid}` }}
+      </div>
       <strong>预设类型</strong>
-      <cc-presets-selector :数据id="当前对象数据.id || ''" :数据表名="当前对象数据.type + 's' || ''" v-model="预设名"></cc-presets-selector>
+      <cc-presets-selector
+        :数据id="当前对象数据.id || ''"
+        :数据表名="当前对象数据.type + 's' || ''"
+        v-model="预设名"
+      ></cc-presets-selector>
     </el-row>
     <el-tabs v-model="当前面板">
       <el-tab-pane label="样式" name="样式">
@@ -28,7 +34,11 @@
                       <span class="el-icon-copy-document"></span>
                     </el-tooltip>
                   </span>
-                  <cc-color-pane v-model="属性对象.borderColor" :显示web命名颜色="true" :自定义颜色数组="自定义颜色数组"></cc-color-pane>
+                  <cc-color-pane
+                    v-model="属性对象.borderColor"
+                    :显示web命名颜色="true"
+                    :自定义颜色数组="自定义颜色数组"
+                  ></cc-color-pane>
                 </el-tab-pane>
                 <el-tab-pane label="背景色" name="背景色">
                   <span slot="label">
@@ -50,11 +60,18 @@
                 <el-tab-pane label="文字色" name="文字色">
                   <span slot="label">
                     文字色
-                    <el-tooltip v-if="预设.attrs.color != 'byref'" content="这是一个预设值,修改后会修改所有同类型元素">
+                    <el-tooltip
+                      v-if="预设.attrs.color != 'byref'"
+                      content="这是一个预设值,修改后会修改所有同类型元素"
+                    >
                       <span class="el-icon-copy-document"></span>
                     </el-tooltip>
                   </span>
-                  <cc-color-pane v-model="属性对象.color" :显示web命名颜色="true" :自定义颜色数组="自定义颜色数组"></cc-color-pane>
+                  <cc-color-pane
+                    v-model="属性对象.color"
+                    :显示web命名颜色="true"
+                    :自定义颜色数组="自定义颜色数组"
+                  ></cc-color-pane>
                 </el-tab-pane>
                 <el-tab-pane label="几何设置" name="几何设置">
                   <span slot="label">边框和锚点</span>
@@ -122,7 +139,10 @@
                   </span>
                   <el-row>
                     <el-col :span="15">
-                      <el-slider v-model="属性对象.path_width" @change="属性对象.path_width = $event"></el-slider>
+                      <el-slider
+                        v-model="属性对象.path_width"
+                        @change="属性对象.path_width = $event"
+                      ></el-slider>
                     </el-col>
                     <el-col :span="9">
                       <el-select v-model="属性对象.path_type" size="mini">
@@ -134,9 +154,13 @@
                       </el-select>
                     </el-col>
                   </el-row>
-
+                  <cc-setter-path-dash></cc-setter-path-dash>
                   <el-divider></el-divider>
-                  <cc-color-pane v-model="属性对象.path_color" :显示web命名颜色="true" :自定义颜色数组="自定义颜色数组"></cc-color-pane>
+                  <cc-color-pane
+                    v-model="属性对象.path_color"
+                    :显示web命名颜色="true"
+                    :自定义颜色数组="自定义颜色数组"
+                  ></cc-color-pane>
                 </el-tab-pane>
                 <el-tab-pane label="起点标记" name="起点标记">
                   <span slot="label">
@@ -148,13 +172,13 @@
                       <span class="el-icon-copy-document"></span>
                     </el-tooltip>
                   </span>
-                  <cc-anchor-setter
+                  <cc-setter-anchor
                     位置="from"
                     :对象数据="当前对象数据"
                     :思源伺服ip="思源伺服ip"
                     :预设="预设"
                     :byref="预设.attrs.mid_anchor_size == 'byref'"
-                  ></cc-anchor-setter>
+                  ></cc-setter-anchor>
                 </el-tab-pane>
                 <el-tab-pane label="中点标记" name="中点标记">
                   <span slot="label">
@@ -166,13 +190,13 @@
                       <span class="el-icon-copy-document"></span>
                     </el-tooltip>
                   </span>
-                  <cc-anchor-setter
+                  <cc-setter-anchor
                     位置="mid"
                     :对象数据="当前对象数据"
                     :思源伺服ip="思源伺服ip"
                     :预设="预设"
                     :byref="预设.attrs.mid_anchor_size == 'byref'"
-                  ></cc-anchor-setter>
+                  ></cc-setter-anchor>
                 </el-tab-pane>
                 <el-tab-pane label="终点标记样式" name="终点标记样式">
                   <span slot="label">
@@ -184,22 +208,20 @@
                       <span class="el-icon-copy-document"></span>
                     </el-tooltip>
                   </span>
-                  <cc-anchor-setter
+                  <cc-setter-anchor
                     位置="to"
                     :对象数据="当前对象数据"
                     :思源伺服ip="思源伺服ip"
                     :预设="预设"
                     :byref="预设.attrs.to_anchor_size == 'byref'"
-                  ></cc-anchor-setter>
+                  ></cc-setter-anchor>
                 </el-tab-pane>
               </el-tabs>
             </el-collapse-item>
           </el-collapse>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane label="预设" name="预设">
-        
-      </el-tab-pane>
+      <el-tab-pane label="预设" name="预设"> </el-tab-pane>
     </el-tabs>
     <div v-if="开发模式" v-html="JSON.stringify(当前对象数据)"></div>
   </el-drawer>
@@ -251,8 +273,7 @@ module.exports = {
     }
     //console.log(this.属性列表);
     this.获取预设();
-    this.添加监听器()
-
+    this.添加监听器();
   },
 
   watch: {
@@ -332,12 +353,15 @@ module.exports = {
         ($event) => (this.当前对象数据 = $event || this.当前对象数据)
       );
       this.$事件总线.$on("自定义颜色改变", ($event) => (this.自定义颜色数组 = $event));
-      this.$事件总线.$on("保存数据",($event)=>(this.判断id($event)))
+      this.$事件总线.$on("保存数据", ($event) => this.判断id($event));
     },
-    判断id($event){
-      if($event&&$event.attrs){
-        if($event==this.当前对象数据.id&&$event.updated>this.当前对象数据.updated){
-          !$event.attrs.trashed?this.当前对象数据=$event:null
+    判断id($event) {
+      if ($event && $event.attrs) {
+        if (
+          $event == this.当前对象数据.id &&
+          $event.updated > this.当前对象数据.updated
+        ) {
+          !$event.attrs.trashed ? (this.当前对象数据 = $event) : null;
         }
       }
     },

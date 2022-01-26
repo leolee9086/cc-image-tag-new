@@ -1,10 +1,16 @@
 <template>
-  <v-group @click="$事件总线.$emit('激活链接', 链接)" v-if="链接 && 代理起始标记 && 代理结束标记">
+  <v-group
+    @click="$事件总线.$emit('激活链接', 链接)"
+    v-if="链接 && 代理起始标记 && 代理结束标记"
+  >
     <v-path v-if="链接['attrs']" :config="链接设定"></v-path>
     <v-path v-if="链接['attrs'] && 显示引线 && 中点可见性" :config="引线设定"></v-path>
     <v-image v-if="链接['attrs'] && 结束节点图片元素" :config="结束节点设定"></v-image>
     <v-image v-if="链接['attrs'] && 起始节点图片元素" :config="起始节点设定"></v-image>
-    <v-image v-if="链接['attrs'] && 中间节点图片元素 && !链接.virtual && 中点可见性" :config="中间节点设定"></v-image>
+    <v-image
+      v-if="链接['attrs'] && 中间节点图片元素 && !链接.virtual && 中点可见性"
+      :config="中间节点设定"
+    ></v-image>
   </v-group>
 </template>
 <script>
@@ -24,13 +30,13 @@ module.exports = {
     this.$事件总线.$on("窗口缩放", (event) => (this.缩放倍数 = event));
     this.链接.attrs.from_id
       ? (this.代理起始标记 =
-        (await this.$数据库.cards.get(this.链接.attrs.from_id)) ||
-        (await this.$数据库.links.get(this.链接.attrs.from_id)))
+          (await this.$数据库.cards.get(this.链接.attrs.from_id)) ||
+          (await this.$数据库.links.get(this.链接.attrs.from_id)))
       : null;
     this.链接.attrs.to_id
       ? (this.代理结束标记 =
-        (await this.$数据库.cards.get(this.链接.attrs.to_id)) ||
-        (await this.$数据库.links.get(this.链接.attrs.to_id)))
+          (await this.$数据库.cards.get(this.链接.attrs.to_id)) ||
+          (await this.$数据库.links.get(this.链接.attrs.to_id)))
       : null;
     if (!this.代理起始标记 || !this.代理结束标记) {
       this.$事件总线.$emit("删除链接", this.link);
@@ -84,7 +90,6 @@ module.exports = {
     };
   },
   computed: {
-
     结束节点偏移: function () {
       let obj = {};
       if (this.代理结束标记 && this.代理结束标记.attrs) {
@@ -237,6 +242,7 @@ module.exports = {
         fill: "transparent",
         scaleX: this.缩放倍数,
         scaleY: this.缩放倍数,
+        dash: this.链接.attrs.path_dash || [],
       };
       return 引线;
     },
@@ -266,7 +272,7 @@ module.exports = {
     link: {
       handler: function (val, oldval) {
         console.log(this.路径类型);
-        this.计算中点可见性()
+        this.计算中点可见性();
 
         this.判断时间并计算链接(val, oldval);
       },
@@ -278,7 +284,7 @@ module.exports = {
         if (!val.attrs) {
           return null;
         }
-        this.计算中点可见性()
+        this.计算中点可见性();
         let 拷贝对象 = JSON.parse(JSON.stringify(val));
         let 拷贝旧对象 = JSON.parse(JSON.stringify(oldval || "{}"));
         拷贝对象.updated = "";
@@ -290,18 +296,16 @@ module.exports = {
       },
       deep: true,
     },
-    
   },
   methods: {
     计算中点可见性() {
       if (this.链接 && this.链接.attrs) {
         if (typeof this.链接.attrs.hidetag !== "undefined") {
-          console.log("bbb", this.$当前窗口状态.show_tag_by_default)
-          this.中点可见性 = this.链接.attrs.hidetag ? false : true
-        }
-        else {
-          console.log("bbb", this.$当前窗口状态.show_tag_by_default)
-          this.中点可见性 = this.$当前窗口状态.show_tag_by_default
+          console.log("bbb", this.$当前窗口状态.show_tag_by_default);
+          this.中点可见性 = this.链接.attrs.hidetag ? false : true;
+        } else {
+          console.log("bbb", this.$当前窗口状态.show_tag_by_default);
+          this.中点可见性 = this.$当前窗口状态.show_tag_by_default;
         }
       }
     },
@@ -457,7 +461,7 @@ module.exports = {
           // set image only when it is loaded
           this[参数名] = image;
         };
-      } catch (e) { }
+      } catch (e) {}
     },
     判断id: function ($event) {
       let that = this;
@@ -637,9 +641,11 @@ module.exports = {
       define = `
             M ${起始节点.x} ${起始节点.y}
             l ${-this.起始节点偏移.x * 2} ${-this.起始节点偏移.y * 2}
-            C ${起始节点.x - this.起始节点偏移.x * 20} ${起始节点.y - this.起始节点偏移.y * 20
-        } ${结束节点.x - this.结束节点偏移.x * 20} ${结束节点.y - this.结束节点偏移.y * 20
-        } ${结束节点.x - this.结束节点偏移.x * 2} ${结束节点.y - this.结束节点偏移.y * 2}
+            C ${起始节点.x - this.起始节点偏移.x * 20} ${
+        起始节点.y - this.起始节点偏移.y * 20
+      } ${结束节点.x - this.结束节点偏移.x * 20} ${
+        结束节点.y - this.结束节点偏移.y * 20
+      } ${结束节点.x - this.结束节点偏移.x * 2} ${结束节点.y - this.结束节点偏移.y * 2}
 
             L ${结束节点.x} ${结束节点.y}
             `;
