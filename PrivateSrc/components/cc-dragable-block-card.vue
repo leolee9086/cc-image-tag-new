@@ -434,12 +434,16 @@ module.exports = {
   },
   methods: {
     覆盖markdown() {
+      let html = this.思源html;
       let 思源markdown = lute.BlockDOM2Md(this.思源HTML);
       思源markdown = this.去除ial(思源markdown);
       this.markdown = 思源markdown;
+      this.生成html();
     },
     去除ial(markdown) {
       markdown = markdown.replace(/\n\{\:(.*?)\}\n/g, "");
+      markdown = markdown.replace(/\{\:(.*?)\}/g, "");
+
       return markdown;
     },
     获取预设: async function (预设名) {

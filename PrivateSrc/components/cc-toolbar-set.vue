@@ -114,7 +114,7 @@
       area-label="是否某认以思源markdown覆盖卡片markdown"
       size="mini"
       v-model="是否默认以思源块内容覆盖卡片markdown"
-      active-text="优先显示markdown"
+      active-text="以内容块覆盖卡片markdown"
     ></el-switch>
     <el-switch
       area-label="链接是否默认显示标记"
@@ -182,7 +182,7 @@ module.exports = {
     是否默认以思源块内容覆盖卡片markdown(val) {
       if (val) {
         alert(
-          "请注意,开启选项后,连接思源块时,卡片markdown内容将会思源块的markdown属性覆盖"
+          "请注意,开启选项后,连接思源块时,卡片markdown内容将会被思源块的markdown属性覆盖"
         );
         this.$当前窗口状态.reload_markdown_by_default = val ? true : false;
       }

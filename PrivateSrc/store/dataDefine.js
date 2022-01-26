@@ -546,7 +546,7 @@ Vue.prototype.$保存markdown卡片数据 = async function (卡片数据, 工作
 Vue.prototype.$生成卡片markdown = function (卡片数据) {
   let markdown = 卡片数据.markdown;
   let yaml = this.$生成卡片yaml(卡片数据);
-  return yaml + markdown;
+  return yaml +"\n"+ markdown;
 };
 Vue.prototype.$生成卡片yaml = function (对象数据) {
   let yaml = `---
