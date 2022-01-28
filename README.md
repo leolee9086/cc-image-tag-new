@@ -26,7 +26,7 @@
 
 你可以通过这个网址试用:
 
-leolee9086.github.io/cc-image-tag-new
+[leolee9086.github.io/cc-image-tag-new](https://leolee9086.github.io/cc-image-tag-new)
 
 但是注意这只是一个思源笔记的挂件,要正常使用全部功能的话,正确的打开方式应该是安装思源笔记之后以挂件的形式使用它,请到下面这个地址安装思源笔记:
 
