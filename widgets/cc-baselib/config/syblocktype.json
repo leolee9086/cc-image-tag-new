@@ -1,0 +1,22 @@
+[
+    {"attrname":"bookmark","label":"书签","type":"string"},
+    {"attrname":"alias","label":"别名","type":"string"},
+    {"attrname":"memo","label":"备注","type":"string"},
+    {"attrname":"name","label":"命名","type":"string"},
+    {"attrname":"box","label":"笔记本","type":"id"},
+    {"attrname":"content","label":"文本","type":"string"},
+    {"attrname":"created","label":"创建事件","type":"time"},
+    {"attrname":"hash","label":"哈希值","type":"hash"},
+    {"attrname":"hpath","label":"笔记路径","type":"path"},
+    {"attrname":"ial","label":"内联属性表","type":"string"},
+    {"attrname":"parent_id","label":"父ID","type":"string"},
+    {"attrname":"id","label":"id","type":"id"},
+    {"attrname":"length","label":"长度","type":"number"},
+    {"attrname":"markdown","label":"markdown","type":"string"},
+    {"attrname":"path","label":"文件路径","type":"id"},
+    {"attrname":"root_id","label":"笔记id","type":"id"},
+    {"attrname":"sort","label":"排序","type":"number"},
+    {"attrname":"subtype","label":"子类","type":"type"},
+    {"attrname":"type","label":"类型","type":"type"},
+    {"attrname":"updated","label":"更新时间","type":"time"}
+]
