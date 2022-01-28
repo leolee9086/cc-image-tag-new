@@ -272,6 +272,7 @@ const 事务列表 = {
      this.$事件总线.$emit("连接卡片", [等待连接卡片, 数据]);
      
     }
+    console.log("当前窗口状态",this.$当前窗口状态)
     await this.$数据库.states.put(this.$当前窗口状态);
   },
   连接卡片:async function (卡片数组, 链接类型) {

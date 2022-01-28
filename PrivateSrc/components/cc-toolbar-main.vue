@@ -122,6 +122,7 @@ module.exports = {
     };
   },
   async mounted() {
+    this.思源伺服ip = window.location.host;
     await this.加载数据();
     await this.$画板元数据库.workspace.get(00000).then((data) => console.log(data));
     this.$事件总线.$on("保存卡片", ($event) => this.获取当前元素数据($event));
@@ -190,7 +191,8 @@ module.exports = {
     },
     加载数据: async function () {
       let that = this;
-      await this.从思源块加载数据();
+      let baseid = this.$baseid;
+      await this.从思源块加载数据(baseid);
       try {
         that.背景色 = (await that.$数据库.metadata.get("backgroundColor")).value;
       } catch (e) {
@@ -240,7 +242,7 @@ module.exports = {
           }
         });
       } catch (e) {
-        console.log(e);
+        console.log("主工具栏数据加载错误", e);
 
         alert("文件不存在,将在附件中新建文件");
         this.$事件总线.$emit("上传当前画板文件数据到思源");

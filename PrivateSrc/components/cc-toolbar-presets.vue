@@ -44,9 +44,12 @@ module.exports = {
       async handler(val) {
         let 预设表名 = this.当前对象数据.type + "presets";
         if (预设表名) {
-          this.当前预设 = await this.$数据库[预设表名].filter((data) => {
-            return data.name == val;
-          });
+          let res = await this.$数据库[预设表名]
+            .filter((data) => {
+              return data.name == val;
+            })
+            .toArray();
+          this.当前预设 = res[0];
           this.$事件总线.$emit("当前预设改变", this.当前预设, this.当前对象数据.type);
           console.log(this.当前预设);
         }

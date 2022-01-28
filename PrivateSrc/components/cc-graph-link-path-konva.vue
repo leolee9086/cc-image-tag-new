@@ -226,7 +226,7 @@ module.exports = {
         fill: "transparent",
         scaleX: this.缩放倍数,
         scaleY: this.缩放倍数,
-        dash: this.链接.attrs.path_dash,
+        dash: this.链接.attrs.path_dash||undefined,
       };
     },
     引线设定: function () {
@@ -242,7 +242,7 @@ module.exports = {
         fill: "transparent",
         scaleX: this.缩放倍数,
         scaleY: this.缩放倍数,
-        dash: this.链接.attrs.path_dash || [],
+        dash: this.链接.attrs.path_dash ||undefined,
       };
       return 引线;
     },

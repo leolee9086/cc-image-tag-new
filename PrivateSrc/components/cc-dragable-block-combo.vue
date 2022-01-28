@@ -9,6 +9,8 @@
     :x="x - 10"
     :z="600"
     @dragging="dragging"
+        @draggstop="dragging"
+
     class-name-handle="resizer"
     class-name="cc-card-combo-container"
   >
@@ -100,7 +102,6 @@ module.exports = {
   },
   mounted() {
     this.$事件总线.$on("移动卡片", ($event) => this.判断坐标($event));
-
     this.$事件总线.$on("保存卡片", ($event) => this.判断id($event));
     this.$事件总线.$on("保存链接", ($event) => this.判断id($event));
     this.$事件总线.$on("保存数据", ($event) => this.判断id($event));
