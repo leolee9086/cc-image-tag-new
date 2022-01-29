@@ -57,6 +57,8 @@ module.exports = {
 
     window.addEventListener("mousemove", this.计算坐标);
     window.addEventListener("scroll", this.计算坐标);
+    this.$事件总线.$on("添加卡片", ($event) => this.卡片数组.push($event));
+    this.$事件总线.$on("添加链接", ($event) => this.链接数组.push($event));
 
     this.主界面 = window.parent.document;
     //console.log(this.主界面);
@@ -71,18 +73,7 @@ module.exports = {
 
     //  if (数据源id)
     // {await this.打开思源数据()};
-    this.卡片获取器 = liveQuery(() => this.$数据库.cards.toArray());
-    this.卡片订阅器 = this.卡片获取器.subscribe({
-      next: (result) => {
-        this.卡片数组 = result;
-      },
-    });
-    this.链接获取器 = liveQuery(() => this.$数据库.links.toArray());
-    this.链接订阅器 = this.链接获取器.subscribe({
-      next: (result) => {
-        this.链接数组 = result;
-      },
-    });
+    this.$数据总线.addEventListener("message", this.判断消息);
   },
   data() {
     return {
@@ -115,6 +106,10 @@ module.exports = {
     },
   },
   methods: {
+    判断消息(消息) {
+      消息.data.卡片数组 ? (this.卡片数组 = 消息.data.卡片数组) : null;
+      消息.data.链接数组 ? (this.链接数组 = 消息.data.链接数组) : null;
+    },
     以属性查找对象(集合, 属性名, 属性值) {
       let obj = null;
       集合.forEach((card) => {

@@ -1,6 +1,8 @@
 const 数据总线 = new Worker('./PrivateSrc/EventDefine/EventWorker.js');
 const 事件总线 = new Vue();
 数据总线.postMessage({'处理函数':"初始化数据库","数据":Vue.prototype.$baseid})
+数据总线.onmessage=function(massage){console.log(massage)}
+
 const 事务列表 = {
   数据库: 数据库,
   上传当前画板文件数据到思源: async function () {
@@ -80,10 +82,8 @@ const 事务列表 = {
       .then(() => this.$数据库.cards.put(新数据));
   },
 
-  添加卡片: async function (卡片数据, def) {
-    await this.$数据库.cards.put(卡片数据);
+  添加卡片:  function (卡片数据, def) {
     this.$事件总线.$emit("保存数据", 卡片数据, true);
-    //console.log(this.$当前窗口状态.current_cardpreset_name)
 
     if (this.$当前窗口状态.current_cardpreset_name) {
       //  console.log(this.$当前窗口状态.current_cardpreset_name)
@@ -101,7 +101,7 @@ const 事务列表 = {
     if (flag) {
       return null;
     }
-    //  传入数据 = this.$更新数据时间戳(传入数据)
+    传入数据 = this.$更新数据时间戳(传入数据)
     传入数据.type == "card"
       ? this.$事件总线.$emit("保存卡片", 传入数据)
       : this.$事件总线.$emit("保存链接", 传入数据);
@@ -308,6 +308,8 @@ const 事务列表 = {
       await this.$数据库.links.put(新链接).then(() => {
         this.$事件总线.$emit("结束连接");
       });
+      this.$事件总线.$emit("添加链接", 新链接);
+
       this.$事件总线.$emit("保存链接", 新链接);
 
       if (this.$当前窗口状态.current_linkpreset_name) {
@@ -316,6 +318,7 @@ const 事务列表 = {
           新链接,
           this.$当前窗口状态.current_linkpreset_name
         );
+        this.$事件总线.$emit("添加链接", 新链接);
 
         this.$事件总线.$emit("保存链接", 新链接);
       }
@@ -342,6 +345,8 @@ const 事务列表 = {
           (window.pageXOffset + $event.clientX) / this.$当前窗口状态.缩放倍数,
       });
       this.$数据库.cards.put(卡片数据).then(() => {
+        this.$事件总线.$emit("添加卡片", 卡片数据);
+
         this.$事件总线.$emit("保存卡片", 卡片数据);
         this.$事件总线.$emit("结束连接");
       });

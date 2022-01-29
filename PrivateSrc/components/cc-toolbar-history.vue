@@ -100,7 +100,7 @@ module.exports = {
         that.$数据库.metadata.put({ key: "maxhistorycount", value: 30 });
       }
       try {
-         that.保存并刷新历史();
+        that.保存并刷新历史();
       } catch (error) {
         console.log("加载出错", error);
         alert("加载挂件块数据失败,注意手动保存数据");
@@ -242,7 +242,8 @@ module.exports = {
           .offset(this.历史版本数量上限 - 1)
           .delete();
       }
-      await this.$保存历史();
+      //await this.$保存历史();
+      this.$数据总线.postMessage({ " 处理函数": "保存历史 " });
       this.文件历史列表 = await this.$数据库.history.toArray();
     },
     保存: function (blob, filename) {

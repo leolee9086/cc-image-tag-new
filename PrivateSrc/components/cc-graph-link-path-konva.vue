@@ -272,8 +272,14 @@ module.exports = {
       deep: true,
     },
     link: {
-      handler: function (val, oldval) {
-        console.log(this.路径类型);
+      handler: async function (val, oldval) {
+        if (!val) {
+          return null;
+        }
+        if (parseInt(val.updated) <= parseInt(oldval.updated)) {
+          return null;
+        }
+
         this.计算中点可见性();
 
         this.判断时间并计算链接(val, oldval);
@@ -310,9 +316,6 @@ module.exports = {
       }
     },
     判断时间并计算链接: function (val, oldval) {
-      if (parseInt(val.updated) <= parseInt(oldval.updated)) {
-        return null;
-      }
       if (!val.attrs) {
         return null;
       }
@@ -501,7 +504,7 @@ module.exports = {
       //  console.log(this.link);
     },
 
-    计算路径: async function () {
+    计算路径: function () {
       this.监听 = false;
       if (!this.代理起始标记 || !this.代理结束标记) {
         return null;
