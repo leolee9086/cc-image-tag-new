@@ -487,6 +487,9 @@ Vue.prototype.$清空画板 = async function () {
   await this.$数据库.cardpresets.clear();
   await this.$数据库.linkpresets.clear();
 };
+Vue.prototype.$获取画板列表 = async function(){
+  return await this.$画板元数据库.boards.toArray()
+},
 Vue.prototype.$保存历史 = async function () {
   let data = {};
   data.cards = await this.$数据库.cards.toArray();

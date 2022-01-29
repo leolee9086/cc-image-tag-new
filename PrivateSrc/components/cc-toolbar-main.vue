@@ -18,17 +18,7 @@
         <el-col :span="8">
           <el-popover trigger="click">
             <span>打开画板</span>
-            <el-select v-model="当前画板id" size="mini">
-              <el-option
-                v-for="(item, i) in 画板列表"
-                :label="item.name || item.id"
-                :value="item.id"
-              >
-                <el-tooltip trigger="hover" :content="item.id" placement="top-start">
-                  <span>{{ item.name }}</span>
-                </el-tooltip>
-              </el-option>
-            </el-select>
+            <cc-select-boards></cc-select-boards>
             <div slot="reference" class="el-icon-folder"></div>
           </el-popover>
           <span class="el-icon-download" @click="下载当前版本()"></span>
@@ -101,7 +91,6 @@
 module.exports = {
   name: "cc-toolbar-edit",
   props: ["卡片数据id", "链接数据id", "思源伺服ip"],
-  components: componentsList,
   data() {
     return {
       当前预设名: "",

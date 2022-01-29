@@ -44,7 +44,6 @@
 <script>
 module.exports = {
   name: "app",
-  components: componentsList,
   mounted: async function () {
     this.初始窗口大小 = { H: window.innerHeight, W: window.innerWidth };
     window.addEventListener("mousewheel", this.计算坐标, { passive: false });

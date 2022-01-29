@@ -86,11 +86,7 @@
 module.exports = {
   name: "cc-layer-graph",
   props: ["窗口大小", "当前鼠标坐标"],
-  components: {
-    "cc-color-pane": "url:/widgets/cc-baselib/components/cc-color-pane.vue",
-    "cc-graph-link-path": "url:../components/cc-graph-link-path.vue",
-    "cc-dragable-block-linklabel": "url:../components/cc-dragable-block-linklabel.vue",
-  },
+
   data() {
     return {
       显示虚拟连接: false,

@@ -59,10 +59,7 @@
 module.exports = {
   name: "cc-layers-cards",
   props: ["窗口大小", "当前鼠标坐标"],
-  components: {
-    "cc-dragable-block-card": "url:../components/cc-dragable-block-card.vue",
-    "cc-dragable-block-combo": "url:../components/cc-dragable-block-combo.vue",
-  },
+
   data() {
     return {
       当前激活标签id: "",

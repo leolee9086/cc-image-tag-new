@@ -24,85 +24,50 @@
   <script src="../cc-baselib/static/dexie.min.js"></script>
   <script src='./PrivateSrc/konva.js'></script>
   <script src='./PrivateSrc/vue-konva.min.js'></script>
-
-  
-
   <link id="baseStyle" rel="stylesheet" type="text/css" href="cc-base.css">
-
   <link id="themeStyle" rel="stylesheet" type="text/css" href="/appearance/themes/daylight/theme.css">
   <link rel="stylesheet" href="../cc-baselib/static/vditor/index.css" />
   <link rel="stylesheet" href="../cc-baselib/static/element-ui/theme-chalk/index.css" />
   <link id="themeDefaultStyle" />
   <script src="./PrivateSrc/store/dataDefine.js"></script>
   <script src="./PrivateSrc/GeomDefine/LinkDefine.js"></script>
-
-  <script src="./PrivateSrc/EventDefine/EventBus.js" ></script>
-  <script src="./PrivateSrc/store/historyDefine.js" ></script>
-  <script src="./PrivateSrc/store/MdFileDefine.js" ></script>
-
-
+  <script src="./PrivateSrc/EventDefine/EventBus.js"></script>
+  <script src="./PrivateSrc/store/historyDefine.js"></script>
+  <script src="./PrivateSrc/store/MdFileDefine.js"></script>
+  <script src="componentsDefine.js"></script>
 
 </head>
-
 <body>
   <div id="app">
     <app></app>
   </div>
 </body>
-
-<script >
-  const liveQuery= Dexie.liveQuery
+<script>
+  const liveQuery = Dexie.liveQuery
   Vue.use(httpVueLoader);
   Vue.use(VueDraggableResizable);
   Vue.use(VueKonva);
-
   Vue.component("vue-draggable-resizable", VueDraggableResizable);
-  let 应用组件列表  = [
-    "cc-layers-background",
-    "cc-layers-toolbar",
-    "cc-layers-cards",
-    "cc-layers-graph",
-    "cc-layers-tooltip",
-    "cc-layers-konva-graph",
-    "cc-presets-selector",
-    "cc-sydoc-searcher",
-    "cc-setter-anchor",
-    "cc-setter-board-background",
-    "cc-setter-path-dash",
-    "cc-setter-presets",
-    "cc-graphlink-infor",
-    "cc-toolbar-history",
-    "cc-toolbar-link",
-    "cc-toolbar-ref",
-    "cc-toolbar-set",
-    "cc-toolbar-trigger",
-    "cc-toolbar-draw",
-    "cc-toolbar-presets",
-    "cc-loader-file",
+  
 
-  ]
-  
-  应用组件列表.forEach(组件名=>
-    Vue.component(组件名,`url:../cc-image-tag-new/PrivateSrc/components/${组件名}.vue`)
-  )
-  
 
   localStorage.clear();
   lute = Lute.New();
-  
+
 
   var vm = new Vue({
     el: "#app",
-    components: {"app":"url:app.vue",
+    components: {
+      "app": "url:app.vue",
     },
   });
-   
+
 </script>
 <script src="/appearance/icons/material/icon.js?v=1.6.2" async id="iconScript"></script>
 <script src="/appearance/emojis/twitter-emoji.js?v=1.6.2" async="" id="emojiScript"></script>
 <style>
- 
- 
+
+
 </style>
 
 </html>

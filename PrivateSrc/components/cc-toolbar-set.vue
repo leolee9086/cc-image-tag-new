@@ -131,6 +131,7 @@ module.exports = {
   data() {
     return {
       当前画板命名: "",
+      当前画板id:"",
       JSON文件列表: [],
       思源伺服ip: "",
       apitoken: "",
@@ -166,6 +167,7 @@ module.exports = {
         that.当前画板命名 = "未命名";
         that.$数据库.metadata.put({ key: "name", value: "未命名" });
       }
+      
       that.画板列表 = await that.$画板元数据库.boards.toArray();
     },
     导入旧版JSON数据() {},
@@ -173,6 +175,11 @@ module.exports = {
     覆盖导入mardown数据() {},
   },
   watch: {
+    当前画板命名(val){
+      if(val){
+        this.$数据库.metadata.put({key:"name",value:val})
+      }
+    },
     是否默认显示链接标记(val) {
       this.$当前窗口状态.show_tag_by_default = val ? true : false;
     },

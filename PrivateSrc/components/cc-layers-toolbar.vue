@@ -65,7 +65,7 @@
         >
         </span>
       </div>
-       <div class="drawer-button">
+      <div class="drawer-button">
         <span
           @click="当前面板名 != '绘制' ? (当前面板名 = '绘制') : (当前面板名 = '')"
           circle
@@ -86,7 +86,7 @@
       :卡片数据id="当前卡片数据id"
       :链接数据id="当前链接数据id"
     ></cc-toolbar-infor>
-    
+
     <cc-toolbar-history :显示="当前面板名 == '历史'"> </cc-toolbar-history>
     <cc-toolbar-link :显示="当前面板名 == '图上连接'"> </cc-toolbar-link>
     <cc-toolbar-ref :显示="当前面板名 == '连接'"> </cc-toolbar-ref>
@@ -102,11 +102,6 @@
 module.exports = {
   name: "cc-layers-toolbar",
   props: ["思源伺服ip"],
-  components: {
-    "cc-toolbar-main": "url:../components/cc-toolbar-main.vue",
-    "cc-toolbar-infor": "url:../components/cc-toolbar-infor.vue",
-    "cc-toolbar-view": "url:../components/cc-toolbar-view.vue",
-  },
   data() {
     return {
       窗口状态数组: [],
