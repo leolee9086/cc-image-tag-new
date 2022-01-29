@@ -100,7 +100,7 @@ module.exports = {
         that.$数据库.metadata.put({ key: "maxhistorycount", value: 30 });
       }
       try {
-        await that.保存并刷新历史();
+         that.保存并刷新历史();
       } catch (error) {
         console.log("加载出错", error);
         alert("加载挂件块数据失败,注意手动保存数据");

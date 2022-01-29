@@ -1,6 +1,6 @@
 <template>
   <vue-draggable-resizable
-    v-if="显示 && 数据数组[1]"
+    v-show="显示 && 数据数组[1]"
     ref="container"
     :resizable="false"
     :y="y - 10"
@@ -9,8 +9,7 @@
     :x="x - 10"
     :z="600"
     @dragging="dragging"
-        @draggstop="dragging"
-
+    @draggstop="dragging"
     class-name-handle="resizer"
     class-name="cc-card-combo-container"
   >
@@ -41,14 +40,20 @@
       ></div>
     </div>
     <div
-      v-if="数据数组[1] || (数据数组[0] && 数据数组[0][attrs][children])"
+      v-if="数据数组[1] || (数据数组[0] && 数据数组[0]['attrs']['children'])"
       class="cc-card-toolbar combo"
       :style="`
       transform:scale(${窗口缩放倍数}) 
       `"
     >
       <span :aria-label="`选中了${数据数组.length}个元素`">{{ 数据数组.length }}</span>
-      <span @click="统一属性('left')" size="mini" circle class="el-icon-leftalign" aria-label="向左对齐元素"></span>
+      <span
+        @click="统一属性('left')"
+        size="mini"
+        circle
+        class="el-icon-leftalign"
+        aria-label="向左对齐元素"
+      ></span>
       <span
         @click="统一属性('right')"
         size="mini"
@@ -56,12 +61,48 @@
         class="el-icon-rightalign"
         aria-label="向右对齐元素"
       ></span>
-      <span @click="统一属性('up')" size="mini" circle class="el-icon-upalign" aria-label="向上对齐元素"></span>
-      <span @click="统一属性('down')" size="mini" circle class="el-icon-downalign" aria-label="向下对齐元素"></span>
-      <span @click="统一属性('width')" size="mini" circle class="el-icon-width" aria-label="统一宽度"></span>
-      <span @click="统一属性('height')" size="mini" circle class="el-icon-height" aria-label="统一高度"></span>
-      <span @click="统一属性('xspace')" size="mini" circle class="el-icon-xspace" aria-label="横向分布"></span>
-      <span @click="统一属性('yspace')" size="mini" circle class="el-icon-yspace" aria-label="竖向分布"></span>
+      <span
+        @click="统一属性('up')"
+        size="mini"
+        circle
+        class="el-icon-upalign"
+        aria-label="向上对齐元素"
+      ></span>
+      <span
+        @click="统一属性('down')"
+        size="mini"
+        circle
+        class="el-icon-downalign"
+        aria-label="向下对齐元素"
+      ></span>
+      <span
+        @click="统一属性('width')"
+        size="mini"
+        circle
+        class="el-icon-width"
+        aria-label="统一宽度"
+      ></span>
+      <span
+        @click="统一属性('height')"
+        size="mini"
+        circle
+        class="el-icon-height"
+        aria-label="统一高度"
+      ></span>
+      <span
+        @click="统一属性('xspace')"
+        size="mini"
+        circle
+        class="el-icon-xspace"
+        aria-label="横向分布"
+      ></span>
+      <span
+        @click="统一属性('yspace')"
+        size="mini"
+        circle
+        class="el-icon-yspace"
+        aria-label="竖向分布"
+      ></span>
       <span
         @click="设置集合()"
         size="mini"
@@ -167,8 +208,8 @@ module.exports = {
           this.父id || 数据数组[0]
             ? 数据数组[0]["parent_id"]
             : null || 数据数组[1]
-              ? 数据数组[1]["parent_id"]
-              : null;
+            ? 数据数组[1]["parent_id"]
+            : null;
         if (数据.id != 父id && 数据.parent_id != 父id) {
           数据.parent_id = 父id;
           this.$事件总线.$emit("保存数据", 数据);
@@ -208,9 +249,7 @@ module.exports = {
       for (i in 数据数组) {
         let 现状数据 = 数据数组[i];
 
-
         现状数据 = this.$更新数据时间戳(现状数据);
-
       }
       if (参数 == "left") {
         for (i in 数据数组) {
@@ -315,7 +354,6 @@ module.exports = {
               this[主坐标属性] / this.窗口缩放倍数 +
               (总卡片宽度 + 总空隙宽度 - 数据.attrs[长度属性]) / 2;
             数据 = this.$更新数据时间戳(数据);
-
           }
         }
       }
@@ -329,7 +367,6 @@ module.exports = {
             数据 = this.$更新数据时间戳(数据);
 
             await this.$数据库[数据类型].put(数据).then(() => {
-
               this.$事件总线.$emit("保存数据", 数据);
             });
           }

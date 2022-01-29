@@ -28,17 +28,12 @@
 <script>
 module.exports = {
   name: "cc-layers-konva-graph",
-  props: ["窗口大小", "当前鼠标坐标", "画布原点"],
+  props: ["窗口大小", "当前鼠标坐标", "画布原点","卡片数组","链接数组"],
 
   data() {
     return {
       显示虚拟连接: false,
-      卡片数组: [],
-      链接数组: [],
-      卡片获取器: {},
-      卡片订阅器: {},
-      链接获取器: {},
-      链接订阅器: {},
+    
       虚拟连接起点: {},
       虚拟连接路径: "",
       configKonva: {
@@ -54,18 +49,7 @@ module.exports = {
   },
 
   mounted() {
-    this.链接获取器 = liveQuery(() => this.$数据库.links.toArray());
-    this.链接订阅器 = this.链接获取器.subscribe({
-      next: (result) => {
-        this.链接数组 = result;
-      },
-    });
-    this.卡片获取器 = liveQuery(() => this.$数据库.cards.toArray());
-    this.卡片订阅器 = this.卡片获取器.subscribe({
-      next: (result) => {
-        this.卡片数组 = result;
-      },
-    });
+   
     this.$事件总线.$on("选中数据集合", (event) => (this.当前数据集合 = event));
     this.$事件总线.$on("清理选择", (event) => (this.当前数据集合 = []));
 

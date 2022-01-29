@@ -1,6 +1,6 @@
 <template>
   <vue-draggable-resizable
-    v-if="!hide"
+    v-show="!hide"
     ref="container"
     @click="鼠标点击($event)"
     :resizable="显示控制柄"
@@ -256,6 +256,7 @@ module.exports = {
     this.数据超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html/?id=${this.对象数据.id}&baseid=${this.$baseid}&type=${this.数据类型}`;
     this.hide = false;
     setTimeout(this.计算可见性, 500);
+    window.addEventListener("scroll", this.计算可见性);
     this.获取预设(this.value);
     this.$事件总线.$on("保存卡片", (event) => this.判断id(event));
     this.$事件总线.$on("保存链接", (event) => this.判断id(event));
@@ -266,6 +267,7 @@ module.exports = {
   watch: {
     value: {
       handler: function (val, oldval) {
+        this.计算可见性();
         if (JSON.stringify(val) == JSON.stringify(oldval)) {
           return null;
         }
@@ -463,6 +465,8 @@ module.exports = {
     返回原始点: function () {
       this.对象数据.attrs.offsetx = 0 - this.对象数据.attrs.width / 2;
       this.对象数据.attrs.offsety = 0 - this.对象数据.attrs.height / 2;
+      this.对象数据 = this.$更新数据时间戳(this.对象数据);
+
       this.保存数据();
     },
     发送卡片数据到思源: function () {
@@ -551,7 +555,7 @@ module.exports = {
     展开链接: function () {
       this.$emit("callbacklink", this.对象数据.attrs.def_block);
     },
-    计算坐标: async function (x, y) {
+    计算坐标: function (x, y) {
       let 窗口缩放倍数 = this.窗口缩放倍数;
       let attrs = this.对象数据.attrs;
       let top = attrs.top;
@@ -575,19 +579,25 @@ module.exports = {
     },
     dragging: function (x, y) {
       this.计算坐标(x, y);
+      this.对象数据 = this.$更新数据时间戳(this.对象数据);
+
       this.保存数据();
+
       this.$事件总线.$emit("移动卡片", this.对象数据);
     },
     dragstop(x, y) {
       this.计算坐标(x, y);
+      this.对象数据 = this.$更新数据时间戳(this.对象数据);
 
       this.保存数据(true);
+
       this.$事件总线.$emit("移动卡片", this.对象数据);
     },
     resizing: function (x, y, width, height) {
       this.计算坐标(x, y);
       this.对象数据.attrs.width = width / this.窗口缩放倍数 || 100;
       this.对象数据.attrs.height = height / this.窗口缩放倍数 || 100;
+      this.对象数据 = this.$更新数据时间戳(this.对象数据);
 
       this.保存数据();
       this.$事件总线.$emit("缩放卡片", this.对象数据);
@@ -598,6 +608,8 @@ module.exports = {
 
       this.对象数据.attrs.width = width / this.窗口缩放倍数 || 100;
       this.对象数据.attrs.height = height / this.窗口缩放倍数 || 100;
+      this.对象数据 = this.$更新数据时间戳(this.对象数据);
+
       this.保存数据(true);
     },
     保存数据: function (flag, $event) {
@@ -612,7 +624,7 @@ module.exports = {
       this.$事件总线.$emit("链接转化为卡片", 新数据);
       this.删除();
     },
-    计算可见性: async function () {
+    计算可见性: function () {
       this.hide = true;
       let 对象数据 = this.对象数据;
 
@@ -655,11 +667,6 @@ module.exports = {
       }
       if (对象数据.type == "link" && typeof 对象数据.attrs.hidetag == "undefined") {
         this.hide = !this.$当前窗口状态.show_tag_by_default;
-      }
-      if (对象数据) {
-        setTimeout(this.计算可见性, 500);
-      } else {
-        clearTimeout(this.计算可见性);
       }
     },
   },

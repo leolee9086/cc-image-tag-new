@@ -365,7 +365,7 @@ Vue.prototype.$预设属性默认值列表 = {
   to_anchor_rotate_offset:{
     name: "to_anchor_rotate_offset",
     label: "终点标记角度偏移",
-    cardDefault: 180,
+    cardDefault: 270,
     linkDefault: 180,
   },
   mid_anchor_rotate_offset:{
@@ -439,7 +439,7 @@ Vue.prototype.$填充默认值 = function (数据) {
     for (属性名 in this.$预设属性默认值列表) {
       if (数据["attrs"][属性名] === undefined) {
         try{
-        数据["attrs"][属性名] = 数据["type"]=="card"?this.$预设属性默认值列表[属性名]["cardDefault"]:this.$卡片属性默认值[属性名]["linkDefault"];}
+        数据["attrs"][属性名] = 数据["type"]=="card"?this.$预设属性默认值列表[属性名]["cardDefault"]:this.$预设属性默认值列表[属性名]["linkDefault"];}
         catch(e){console.log(e,属性名)}
       }
     }

@@ -1,5 +1,6 @@
+const 数据总线 = new Worker('./PrivateSrc/EventDefine/EventWorker.js');
 const 事件总线 = new Vue();
-
+数据总线.postMessage({'处理函数':"初始化数据库","数据":Vue.prototype.$baseid})
 const 事务列表 = {
   数据库: 数据库,
   上传当前画板文件数据到思源: async function () {
@@ -56,8 +57,8 @@ const 事务列表 = {
         }
       });
   },
-  设定工作空间:function(工作空间句柄){
-    this.$当前窗口状态.current_workspace_handle=工作空间句柄
+  设定工作空间: function (工作空间句柄) {
+    this.$当前窗口状态.current_workspace_handle = 工作空间句柄;
   },
   链接转化为卡片: async function (链接数据) {
     let 新数据 = JSON.parse(JSON.stringify(链接数据));
@@ -78,7 +79,6 @@ const 事务列表 = {
       .delete(链接数据.id)
       .then(() => this.$数据库.cards.put(新数据));
   },
-  
 
   添加卡片: async function (卡片数据, def) {
     await this.$数据库.cards.put(卡片数据);
@@ -101,85 +101,10 @@ const 事务列表 = {
     if (flag) {
       return null;
     }
+    //  传入数据 = this.$更新数据时间戳(传入数据)
     传入数据.type == "card"
       ? this.$事件总线.$emit("保存卡片", 传入数据)
       : this.$事件总线.$emit("保存链接", 传入数据);
-    
-  },
-  保存卡片: async function (传入数据) {
-    if (!传入数据) {
-      return null;
-    }
-    let 数据表名 = 传入数据.type + "s";
-    //console.log(数据表名)
-    if (传入数据.attrsproxy) {
-      let 原始数据 = await this.$数据库[数据表名].get(传入数据.id);
-      if (原始数据) {
-        原始数据.subtype = 传入数据.subtype || "属于";
-        for (属性名 in 传入数据.attrsproxy) {
-          原始数据.attrs[属性名] = 传入数据.attrsproxy[属性名];
-        }
-        原始数据 = this.$更新数据时间戳(原始数据);
-        传入数据 = 原始数据;
-      }
-      this.$事件总线.$emit("保存卡片", 传入数据);
-    } else if (传入数据.id) {
-      传入数据 = this.$更新数据时间戳(传入数据);
-      let 原始数据 = await this.$数据库[数据表名].get(传入数据.id);
-      if (原始数据) {
-        await this.$数据库[数据表名].put(传入数据);
-      }
-      if(this.$当前窗口状态.current_workspace_handle){
-        await this.$保存markdown卡片数据(传入数据,this.$当前窗口状态.current_workspace_handle)
-      }
-    }
-    
-  },
-  删除数据: function (传入数据) {
-   // console.log(传入数据)
-    if (传入数据.attrs) {
-      传入数据.type == "card"
-        ? this.$事件总线.$emit("删除卡片", 传入数据)
-        : this.$事件总线.$emit("删除链接", 传入数据);
-    }
-    let id = 传入数据.id;
-    let 数据表名=传入数据.type+"s"
-    if(!传入数据.attrs){传入数据.attrs={}}
-    传入数据.attrs.trashed = true;
-    if(!传入数据.type){return null}
-    this.$数据库[数据表名].put(传入数据).then(() => {
-      this.$数据库[数据表名].delete(id).then(() => {
-        this.$数据库.links
-          .filter((data) => {
-            if (data&&(data.attrs.from_id == id || data.attrs.to_id == id)) {
-              return true;
-            }
-          })
-          .toArray((array) =>{array[0]?
-            array.forEach((data) =>this.$事件总线.$emit("删除数据", data)):null}
-          );
-      });
-    });
-    if(传入数据.attrs.collection){
-      this.$数据库.cards.filter(
-        data=>{return data.parent_id==传入数据.id}
-        ).toArray(
-          array.forEach(
-            data=>{
-              data.parent_id = 传入数据.parent_id
-              this.$事件总线.$emit("保存数据",传入数据)
-            }
-          )
-        )
-    }
-  },
-  切换链接显示:function(传入数据){
-    console.log(传入数据)
-
-    if(!传入数据){return null}
-    if(!传入数据.attrs){return null}
-    传入数据.attrs.hidetag=!传入数据.attrs.hidetag?true:false
-    this.$事件总线.$emit("保存数据",传入数据)
   },
   保存链接: async function (传入数据) {
     if (!传入数据) {
@@ -197,20 +122,107 @@ const 事务列表 = {
           原始数据["attrs"][属性名] = 传入数据["attrsproxy"][属性名];
         }
 
-        原始数据 = this.$更新数据时间戳(原始数据);
+        原始数据.updated = 传入数据.updated || this.$生成毫秒时间戳();
         传入数据 = 原始数据;
       }
 
-      await this.$数据库.links.put(传入数据);
+      this.$数据总线.postMessage({处理函数:"保存数据",数据:传入数据})
     } else if (传入数据.id) {
       let 原始数据 = await this.$数据库[数据表名].get(传入数据.id);
-      传入数据 = this.$更新数据时间戳(传入数据);
 
       if (原始数据) {
-        await this.$数据库[数据表名].put(传入数据);
+        this.$数据总线.postMessage({处理函数:"保存数据",数据:传入数据})
       }
     }
   },
+  保存卡片: async function (传入数据) {
+    if (!传入数据) {
+      return null;
+    }
+    let 数据表名 = 传入数据.type + "s";
+    //console.log(数据表名)
+    if (传入数据.attrsproxy) {
+      let 原始数据 = await this.$数据库[数据表名].get(传入数据.id);
+      if (原始数据) {
+        原始数据.subtype = 传入数据.subtype || "属于";
+        for (属性名 in 传入数据.attrsproxy) {
+          原始数据.attrs[属性名] = 传入数据.attrsproxy[属性名];
+        }
+        原始数据.updated = 传入数据.updated || this.$生成毫秒时间戳();
+        传入数据 = 原始数据;
+      }
+      this.$数据总线.postMessage({处理函数:"保存数据",数据:传入数据})
+    } else if (传入数据.id) {
+      let 原始数据 = await this.$数据库[数据表名].get(传入数据.id);
+      if (原始数据) {
+        this.$数据总线.postMessage({处理函数:"保存数据",数据:传入数据})
+      }
+      if (this.$当前窗口状态.current_workspace_handle) {
+        await this.$保存markdown卡片数据(
+          传入数据,
+          this.$当前窗口状态.current_workspace_handle
+        );
+      }
+    }
+  },
+  删除数据: function (传入数据) {
+    // console.log(传入数据)
+    if (传入数据.attrs) {
+      传入数据.type == "card"
+        ? this.$事件总线.$emit("删除卡片", 传入数据)
+        : this.$事件总线.$emit("删除链接", 传入数据);
+    }
+    let id = 传入数据.id;
+    let 数据表名 = 传入数据.type + "s";
+    if (!传入数据.attrs) {
+      传入数据.attrs = {};
+    }
+    传入数据.attrs.trashed = true;
+    if (!传入数据.type) {
+      return null;
+    }
+    this.$数据库[数据表名].put(传入数据).then(() => {
+      this.$数据库[数据表名].delete(id).then(() => {
+        this.$数据库.links
+          .filter((data) => {
+            if (data && (data.attrs.from_id == id || data.attrs.to_id == id)) {
+              return true;
+            }
+          })
+          .toArray((array) => {
+            array[0]
+              ? array.forEach((data) => this.$事件总线.$emit("删除数据", data))
+              : null;
+          });
+      });
+    });
+    if (传入数据.attrs.collection) {
+      this.$数据库.cards
+        .filter((data) => {
+          return data.parent_id == 传入数据.id;
+        })
+        .toArray(
+          array.forEach((data) => {
+            data.parent_id = 传入数据.parent_id;
+            this.$事件总线.$emit("保存数据", 传入数据);
+          })
+        );
+    }
+  },
+  切换链接显示: function (传入数据) {
+    console.log(传入数据);
+
+    if (!传入数据) {
+      return null;
+    }
+    if (!传入数据.attrs) {
+      return null;
+    }
+    传入数据.attrs.hidetag = !传入数据.attrs.hidetag ? true : false;
+    this.$事件总线.$emit("保存数据", 传入数据);
+
+  },
+
   定位至卡片: async function (卡片数据) {
     let id = 卡片数据.id || 卡片数据;
     let 目标卡片数据 =
@@ -228,26 +240,26 @@ const 事务列表 = {
         window.innerHeight / 2
     );
   },
-  清理选集:function (){
+  清理选集: function () {
     //console.log("选集清空")
-    this.$当前窗口状态.current_cardid_array=[]
+    this.$当前窗口状态.current_cardid_array = [];
   },
   激活数据: function (数据) {
     let 数据类型 = 数据.type;
-    this.$当前窗口状态.current_cardpreset_name=数据.subtype
-    
+    this.$当前窗口状态.current_cardpreset_name = 数据.subtype;
+
     // console.log(数据类型)
     数据类型 == "card"
       ? this.$事件总线.$emit("激活卡片", 数据)
       : this.$事件总线.$emit("激活链接", 数据);
   },
   激活卡片: async function (数据) {
-    console.log(数据)
+    console.log(数据);
     this.$当前窗口状态.current_linkid = "";
     this.$当前窗口状态.current_cardid = 数据.id;
-    this.$当前窗口状态.current_link = ""
-    this.$当前窗口状态.current_card =数据
-    
+    this.$当前窗口状态.current_link = "";
+    this.$当前窗口状态.current_card = 数据;
+
     if (this.$当前窗口状态.等待连接卡片id) {
       let 等待连接卡片id = this.$当前窗口状态.等待连接卡片id;
       let 等待连接卡片 =
@@ -260,8 +272,8 @@ const 事务列表 = {
   激活链接: async function (数据) {
     this.$当前窗口状态.current_cardid = "";
     this.$当前窗口状态.current_linkid = 数据.id;
-    this.$当前窗口状态.current_card = ""
-    this.$当前窗口状态.current_link =数据
+    this.$当前窗口状态.current_card = "";
+    this.$当前窗口状态.current_link = 数据;
 
     if (this.$当前窗口状态.等待连接卡片id) {
       let 等待连接卡片id = this.$当前窗口状态.等待连接卡片id;
@@ -269,44 +281,44 @@ const 事务列表 = {
       let 等待连接卡片 =
         (await this.$数据库.cards.get(等待连接卡片id)) ||
         (await this.$数据库.links.get(等待连接卡片id));
-     this.$事件总线.$emit("连接卡片", [等待连接卡片, 数据]);
-     
+      this.$事件总线.$emit("连接卡片", [等待连接卡片, 数据]);
     }
-    console.log("当前窗口状态",this.$当前窗口状态)
+    console.log("当前窗口状态", this.$当前窗口状态);
     await this.$数据库.states.put(this.$当前窗口状态);
   },
-  连接卡片:async function (卡片数组, 链接类型) {
+  连接卡片: async function (卡片数组, 链接类型) {
     this.$当前窗口状态.等待连接卡片id = null;
-    
+
     let 起始卡片 = 卡片数组[0];
     let 结束卡片 = 卡片数组[1];
-    let 属性对象 ={}
+    let 属性对象 = {};
     if (起始卡片 && 结束卡片) {
       属性对象 = {
         from_id: 起始卡片.id,
         to_id: 结束卡片.id,
       };
 
-    if(属性对象.from_id==属性对象.to_id){return null}
+      if (属性对象.from_id == 属性对象.to_id) {
+        return null;
+      }
       let 新链接 = this.$根据属性生成链接(属性对象);
       if (链接类型) {
         新链接.subtype = 链接类型;
       }
-     await  this.$数据库.links
-        .put(新链接)
-        .then(() => this.$事件总线.$emit("保存链接", 新链接))
-        .then(() => {
-          if (this.$当前窗口状态.current_linkpreset_name) {
-            this.$事件总线.$emit(
-              "改变数据预设",
-              新链接,
-              this.$当前窗口状态.current_linkpreset_name
-            );
-          }
-          
-          this.$事件总线.$emit("保存链接", 新链接);
-          this.$事件总线.$emit("结束连接");
-        });
+      await this.$数据库.links.put(新链接).then(() => {
+        this.$事件总线.$emit("结束连接");
+      });
+      this.$事件总线.$emit("保存链接", 新链接);
+
+      if (this.$当前窗口状态.current_linkpreset_name) {
+        this.$事件总线.$emit(
+          "改变数据预设",
+          新链接,
+          this.$当前窗口状态.current_linkpreset_name
+        );
+
+        this.$事件总线.$emit("保存链接", 新链接);
+      }
     }
   },
   开始连接: function (data) {
@@ -320,7 +332,7 @@ const 事务列表 = {
   },
   点击画板空白处: function ($event) {
     if (!this.$当前窗口状态.等待连接卡片id) {
-      console.log($event.target)
+      console.log($event.target);
       this.$事件总线.$emit("清理选择");
     } else {
       let 卡片数据 = this.$根据属性生成卡片({
@@ -336,7 +348,7 @@ const 事务列表 = {
     }
   },
   清理选择: function () {
-    console.log("选择清空")
+    console.log("选择清空");
     this.$当前窗口状态.current_cardid = "";
     this.$当前窗口状态.current_linkid = "";
     this.$当前窗口状态.current_linkid_array = [];
@@ -353,24 +365,22 @@ const 事务列表 = {
     };
     this.$事件总线.$emit("开始选择", 鼠标点击坐标);
   },
-  鼠标点击卡片:function(数据,ctrl键被按下){
-    let id数组  = this.$当前窗口状态.current_cardid_array
+  鼠标点击卡片: function (数据, ctrl键被按下) {
+    let id数组 = this.$当前窗口状态.current_cardid_array;
     //console.log(id数组)
-    let flag = true
-    id数组.forEach(id=>id==数据.id?flag=false:null)
+    let flag = true;
+    id数组.forEach((id) => (id == 数据.id ? (flag = false) : null));
     if (id数组[0]) {
-      if(!ctrl键被按下){
-        console.log(id数组,数据.id)
-        flag?this.$事件总线.$emit("清理选集"):null;
-
-      }else{
-        console.log(id数组,数据.id)
+      if (!ctrl键被按下) {
+        console.log(id数组, 数据.id);
+        flag ? this.$事件总线.$emit("清理选集") : null;
+      } else {
+        console.log(id数组, 数据.id);
 
         this.$当前窗口状态.current_cardid_array.push(数据.id);
 
-      this.$事件总线.$emit("选集增加", 数据);
-    }
-
+        this.$事件总线.$emit("选集增加", 数据);
+      }
     } else {
       this.$当前窗口状态.current_cardid_array.push(数据.id);
       this.$事件总线.$emit("选集增加", 数据);
@@ -405,19 +415,18 @@ const 事务列表 = {
     this.$当前窗口状态.待发送数据 = 对象数据;
     this.$当前窗口状态.显示发送对话框 = true;
   },
-  改变预设名称:function(预设类型,预设id,旧预设名,新预设名){
-    this.$数据库[预设类型+"presets"].get(预设id).modify(
-      {name:新预设名}
-    ).then(
-      this.$数据库[预设类型+"s"].filter(
-        data=>{return data.subtype===旧预设名}
-      )
-      .modify({subtype:新预设名,updated:this.$生成毫秒时间戳()})
-      .each(
-        data =>this.$事件总线.$emit("保存数据",data)
-      )
-    
-    )
+  改变预设名称: function (预设类型, 预设id, 旧预设名, 新预设名) {
+    this.$数据库[预设类型 + "presets"]
+      .get(预设id)
+      .modify({ name: 新预设名 })
+      .then(
+        this.$数据库[预设类型 + "s"]
+          .filter((data) => {
+            return data.subtype === 旧预设名;
+          })
+          .modify({ subtype: 新预设名, updated: this.$生成毫秒时间戳() })
+          .each((data) => this.$事件总线.$emit("保存数据", data))
+      );
   },
   改变数据预设: function (对象数据, 预设名) {
     对象数据.subtype = 预设名;
@@ -488,7 +497,7 @@ const 事务列表 = {
     let 预设表名 = 预设项目.type + "presets";
     let 数据表名 = 预设项目.type + "s";
     let 预设名 = 预设项目.name;
-  //  console.log(预设表名);
+    //  console.log(预设表名);
     if (属性名 && 预设表名) {
       this.$数据库[预设表名].put(预设项目).then(() =>
         this.$数据库[数据表名]
@@ -530,12 +539,14 @@ const 事务列表 = {
       await this.$数据库[预设表名].put(新预设数据);
     }
   },
-  当前预设改变:function(预设数据,预设类型){
-    if(预设数据&&预设类型){
-      预设类型=="card"?this.$当前窗口状态.current_cardpreset=预设数据:this.$当前窗口状态.current_linkpreset=预设数据
+  当前预设改变: function (预设数据, 预设类型) {
+    if (预设数据 && 预设类型) {
+      预设类型 == "card"
+        ? (this.$当前窗口状态.current_cardpreset = 预设数据)
+        : (this.$当前窗口状态.current_linkpreset = 预设数据);
     }
   },
-  窗口状态初始化:function(){}
+  窗口状态初始化: function () {},
 };
 
 for (let item in 事务列表) {
@@ -546,5 +557,7 @@ for (let item in 事务列表) {
 Vue.prototype.$事务列表 = 事务列表;
 
 Vue.prototype.$事件总线 = 事件总线;
+Vue.prototype.$数据总线 = 数据总线;
+
 Vue.prototype.$思源伺服ip = window.location.host;
 Vue.prototype.$主界面 = window.parent.document;

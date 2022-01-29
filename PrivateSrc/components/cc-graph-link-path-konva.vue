@@ -27,6 +27,8 @@ module.exports = {
 
     this.$事件总线.$on("保存卡片", (event) => this.判断id(event));
     this.$事件总线.$on("保存链接", (event) => this.判断id(event));
+    this.$事件总线.$on("保存数据", (event) => this.判断id(event));
+
     this.$事件总线.$on("窗口缩放", (event) => (this.缩放倍数 = event));
     this.链接.attrs.from_id
       ? (this.代理起始标记 =
@@ -80,7 +82,7 @@ module.exports = {
       结束节点图片: "./PrivateSrc/icon/arrow1.png",
       终点标记大小: 30,
       终点标记自动旋转: true,
-      结束标记角度偏移: 90,
+      结束标记角度偏移: 180,
 
       中间节点图片元素: null,
       中间节点图片: "./PrivateSrc/icon/arrow1.png",
@@ -226,7 +228,7 @@ module.exports = {
         fill: "transparent",
         scaleX: this.缩放倍数,
         scaleY: this.缩放倍数,
-        dash: this.链接.attrs.path_dash||undefined,
+        dash: this.链接.attrs.path_dash || undefined,
       };
     },
     引线设定: function () {
@@ -242,7 +244,7 @@ module.exports = {
         fill: "transparent",
         scaleX: this.缩放倍数,
         scaleY: this.缩放倍数,
-        dash: this.链接.attrs.path_dash ||undefined,
+        dash: this.链接.attrs.path_dash || undefined,
       };
       return 引线;
     },
@@ -291,7 +293,7 @@ module.exports = {
         拷贝旧对象.updated = "";
         if (JSON.stringify(拷贝对象) !== JSON.stringify(拷贝旧对象)) {
           //  console.log("aaa", val);
-          !val.virtual ? this.$事件总线.$emit("保存链接", val) : null;
+          !val.virtual ? this.$事件总线.$emit("保存数据", val) : null;
         }
       },
       deep: true,
@@ -301,10 +303,8 @@ module.exports = {
     计算中点可见性() {
       if (this.链接 && this.链接.attrs) {
         if (typeof this.链接.attrs.hidetag !== "undefined") {
-          console.log("bbb", this.$当前窗口状态.show_tag_by_default);
           this.中点可见性 = this.链接.attrs.hidetag ? false : true;
         } else {
-          console.log("bbb", this.$当前窗口状态.show_tag_by_default);
           this.中点可见性 = this.$当前窗口状态.show_tag_by_default;
         }
       }
@@ -574,7 +574,6 @@ module.exports = {
           this.显示引线 = false;
         }
 
-        this.链接 = this.$更新数据时间戳(this.链接);
         !this.链接.virtual ? this.$事件总线.$emit("保存链接", this.链接) : null;
 
         this.监听 = true;

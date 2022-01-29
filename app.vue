@@ -21,6 +21,8 @@
       v-on:paste="黏贴内容($event)"
       :窗口大小="窗口大小"
       :当前鼠标坐标="当前鼠标坐标"
+      :卡片数组="卡片数组"
+      :链接数组="链接数组"
     ></cc-layers-cards>
 
     <cc-layers-graph
@@ -29,6 +31,8 @@
       :当前鼠标坐标="当前鼠标坐标"
       :窗口大小="窗口大小"
       :画布原点="画布原点"
+      :卡片数组="卡片数组"
+      :链接数组="链接数组"
     ></cc-layers-graph>
     <cc-layers-konva-graph
       v-if="!$当前窗口状态.使用svg"
@@ -36,6 +40,8 @@
       :当前鼠标坐标="当前鼠标坐标"
       :窗口大小="窗口大小"
       :画布原点="画布原点"
+      :卡片数组="卡片数组"
+      :链接数组="链接数组"
     >
     </cc-layers-konva-graph>
     <cc-layers-background class="layer" :窗口大小="窗口大小"> </cc-layers-background>
@@ -65,6 +71,18 @@ module.exports = {
 
     //  if (数据源id)
     // {await this.打开思源数据()};
+    this.卡片获取器 = liveQuery(() => this.$数据库.cards.toArray());
+    this.卡片订阅器 = this.卡片获取器.subscribe({
+      next: (result) => {
+        this.卡片数组 = result;
+      },
+    });
+    this.链接获取器 = liveQuery(() => this.$数据库.links.toArray());
+    this.链接订阅器 = this.链接获取器.subscribe({
+      next: (result) => {
+        this.链接数组 = result;
+      },
+    });
   },
   data() {
     return {
@@ -80,6 +98,12 @@ module.exports = {
       当前鼠标坐标: { x: "", y: "" },
       当前窗口状态: "",
       画布原点: "",
+      卡片获取器: {},
+      卡片订阅器: {},
+      链接获取器: {},
+      链接订阅器: {},
+      卡片数组: [],
+      链接数组: [],
     };
   },
   watch: {

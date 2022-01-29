@@ -21,7 +21,7 @@
             <cc-select-boards></cc-select-boards>
             <div slot="reference" class="el-icon-folder"></div>
           </el-popover>
-          <span class="el-icon-download" @click="下载当前版本()"></span>
+          <span class="el-icon-download" aria-label="导出当前画板数据"  @click="下载当前版本()"></span>
 
           <el-popover trigger="click" placement="top" :height="500">
             <el-input v-model="搜索关键词" @input="搜索()" size="mini"></el-input>
@@ -118,6 +118,8 @@ module.exports = {
     this.$事件总线.$on("保存链接", ($event) => this.获取当前元素数据($event));
     this.$事件总线.$on("激活卡片", ($event) => this.获取当前元素数据($event));
     this.$事件总线.$on("激活链接", ($event) => this.获取当前元素数据($event));
+        this.$事件总线.$on("激活数据", ($event) => this.获取当前元素数据($event));
+
   },
   watch: {
     使用svg渲染: function (val) {
@@ -157,6 +159,7 @@ module.exports = {
     },
   },
   methods: {
+    
     添加卡片名称到思源块别名: async function () {
       let 卡片名称 = this.当前对象名称;
       let 思源块内容 = await 以id获取思源块信息(
@@ -193,7 +196,7 @@ module.exports = {
       // console.log(that.画板列表);
     },
     获取当前元素数据: function ($event) {
-      if ($event) {
+      if ($event&&$event.attrs) {
         if ($event.id == this.卡片数据id || $event.id == this.链接数据id) {
           this.对象数据 = $event || this.对象数据;
           this.属性对象 = this.对象数据.attrs;
