@@ -24,9 +24,9 @@
 
 ## 使用
 
-你可以通过这个网址试用:
+~~你可以通过这个网址试用:
 
-[leolee9086.github.io/cc-image-tag-new](https://leolee9086.github.io/cc-image-tag-new)
+~~[leolee9086.github.io/cc-image-tag-new](https://leolee9086.github.io/cc-image-tag-new)~
 
 GitHub pages 不知道为什么弄起来有点问题,很多文件404了,改天另外找个地方托管一下.
 
