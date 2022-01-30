@@ -28,6 +28,8 @@
 
 [leolee9086.github.io/cc-image-tag-new](https://leolee9086.github.io/cc-image-tag-new)
 
+GitHub pages 不知道为什么弄起来有点问题,很多文件404了,改天另外找个地方托管一下.
+
 但是注意这只是一个思源笔记的挂件,要正常使用全部功能的话,正确的打开方式应该是安装思源笔记之后以挂件的形式使用它,请到下面这个地址安装思源笔记:
 
 [思源笔记 - 本地优先的个人知识管理系统，支持 Markdown 排版、块级引用和双向链接 (b3log.org)](https://b3log.org/siyuan/)
