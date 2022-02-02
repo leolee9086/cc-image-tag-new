@@ -57,8 +57,8 @@ module.exports = {
 
     window.addEventListener("mousemove", this.计算坐标);
     window.addEventListener("scroll", this.计算坐标);
-    this.$事件总线.$on("添加卡片", ($event) => this.卡片数组.push($event));
-    this.$事件总线.$on("添加链接", ($event) => this.链接数组.push($event));
+    this.$事件总线.$on("添加卡片", ($event) => this.判断id并添加($event));
+    this.$事件总线.$on("添加链接", ($event) => this.判断id并添加($event));
 
     this.主界面 = window.parent.document;
     //console.log(this.主界面);
@@ -106,6 +106,16 @@ module.exports = {
     },
   },
   methods: {
+    判断id并添加(数据) {
+      let 数据类型 = 数据.type;
+      let 数据列表 = [];
+      数据类型 == "card" ? (数据列表 = this.卡片数组) : (数据列表 = this.链接数组);
+      let flag = true;
+      for (let i = 0; i < 数据列表.length; i++) {
+        数据列表[i]["id"] == 数据.id ? (flag = false) : null;
+      }
+      flag ? 数据列表.push(数据) : null;
+    },
     判断消息(消息) {
       消息.data.卡片数组 ? (this.卡片数组 = 消息.data.卡片数组) : null;
       消息.data.链接数组 ? (this.链接数组 = 消息.data.链接数组) : null;

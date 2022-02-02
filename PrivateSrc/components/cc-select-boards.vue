@@ -23,17 +23,21 @@ module.exports = {
   },
   async mounted() {
     await this.获取数据();
+    this.获取画板列表();
   },
   methods: {
     获取数据: async function () {
       this.画板列表 = await this.$获取画板列表();
       this.当前画板id = this.$baseid;
       this.当前画板名称 = await this.$数据库.metadata.get("name").then((data) => {
-        return data.value;
+        return data ? data.value : "未命名";
       });
     },
     获取画板列表: function () {
-      this.$获取画板列表().then((data) => (this.画板列表 = data));
+      this.$获取画板列表().then((data) => {
+        console.log(data);
+        this.画板列表 = data;
+      });
     },
   },
   watch: {

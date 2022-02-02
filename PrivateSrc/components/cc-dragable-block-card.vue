@@ -385,7 +385,7 @@ module.exports = {
     },
     激活(val) {
       if (val) {
-        //   console.log(this.对象数据);
+        console.log("hhhh", this.对象数据);
         this.$事件总线.$emit("激活数据", this.对象数据);
 
         this.对象数据 = this.$更新数据时间戳(this.对象数据);
@@ -479,6 +479,11 @@ module.exports = {
     },
     判断id: function ($event) {
       let that = this;
+      // console.log("sss", $event);
+
+      if (!$event) {
+        return null;
+      }
       if ($event.attrsproxy) {
         return null;
       }
@@ -589,7 +594,7 @@ module.exports = {
       this.计算坐标(x, y);
       this.对象数据 = this.$更新数据时间戳(this.对象数据);
 
-      this.保存数据(true);
+      this.保存数据();
 
       this.$事件总线.$emit("移动卡片", this.对象数据);
     },
@@ -610,12 +615,11 @@ module.exports = {
       this.对象数据.attrs.height = height / this.窗口缩放倍数 || 100;
       this.对象数据 = this.$更新数据时间戳(this.对象数据);
 
-      this.保存数据(true);
+      this.保存数据();
     },
-    保存数据: function (flag, $event) {
+    保存数据: function ($event) {
       $event ? (this.对象数据.name = $event) : null;
       this.对象数据 = this.$更新数据时间戳(this.对象数据);
-      let 数据表名 = this.对象数据.type + "s";
       this.$事件总线.$emit("保存数据", this.对象数据);
     },
     转化为卡片: function () {

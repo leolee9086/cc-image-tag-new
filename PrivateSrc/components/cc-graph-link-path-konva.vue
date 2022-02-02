@@ -537,7 +537,7 @@ module.exports = {
       let 路径线段 = this.计算路径线段(代理起始标记, 代理结束标记);
       this.起点 = 路径线段.起点.x ? 路径线段.起点 : this.起点;
       this.终点 = 路径线段.终点.x ? 路径线段.终点 : this.终点;
-
+      console.log("设定", this.链接);
       if (路径线段) {
         switch (this.路径类型) {
           case "折线": {

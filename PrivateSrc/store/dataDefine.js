@@ -23,7 +23,7 @@ const 数据库 = new Dexie(Vue.prototype.$baseid);
   linkpresets:
     "id,parent_id,root_id,hash,box,path,&name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs",
 });
-
+数据库.open()
 const 画板元数据库 = new Dexie("cc_whiteboardfiles");
 画板元数据库.version(5).stores({
   workspace: "id,name,handle",
@@ -117,7 +117,8 @@ Vue.prototype.$生成毫秒时间戳 = function () {
   return str;
 };
 Vue.prototype.$更新数据时间戳 = function (数据) {
-  数据.updated = this.$生成毫秒时间戳();
+ // console.log(数据)
+  数据?数据.updated = this.$生成毫秒时间戳():null;
   return 数据;
 };
 Vue.prototype.$生成ial = function (属性数组, 卡片数据) {
@@ -447,7 +448,12 @@ Vue.prototype.$填充默认值 = function (数据) {
   return 数据;
 };
 Vue.prototype.$获取预设表 = async function (预设表名) {
-  return await this.$数据库[预设表名].toArray();
+  console.log(预设表名)
+  //try{
+    return await this.$数据库[预设表名].toArray();
+  /*}catch(e){
+    console.log(e)
+  }*/
 };
 
 Vue.prototype.$获取预设 = async function (预设表名, 预设名) {
@@ -536,7 +542,7 @@ Vue.prototype.$根据时间戳更新本地数据 = function (传入数据, 本�
     return 本地数据;
   } else if (!传入数据.attrs) {
     return 本地数据;
-  } else if (parseInt(传入数据.updated) <= parseInt(本地数据.updated)) {
+  } else if (parseInt(传入数据.updated) < parseInt(本地数据.updated)) {
     return 本地数据;
   } else {
     return 传入数据;

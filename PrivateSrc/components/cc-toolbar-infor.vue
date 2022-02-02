@@ -126,6 +126,9 @@
               </el-tabs>
             </el-collapse-item>
             <el-collapse-item title="链接样式" v-if="当前数据类型 == 'link'">
+
+                          <strong slot="title">链接样式</strong>
+
               <el-tabs>
                 <el-tab-pane label="连接线" name="连接线">
                   <span slot="label">
@@ -154,10 +157,7 @@
                       </el-select>
                     </el-col>
                   </el-row>
-                  <cc-setter-path-dash
-                  :链接="当前对象数据"
-                  >
-                  </cc-setter-path-dash>
+                  <cc-setter-path-dash :链接="当前对象数据"> </cc-setter-path-dash>
                   <el-divider></el-divider>
                   <cc-color-pane
                     v-model="属性对象.path_color"
@@ -308,7 +308,7 @@ module.exports = {
 
     当前对象数据: {
       handler: async function (val, oldval) {
-        //  console.log("当前数据", val);
+          console.log("当前数据", val);
         if (!val) {
           return null;
         }
@@ -467,7 +467,7 @@ module.exports = {
       let 预设表名 = this.当前对象数据.type + "presets";
       this.预设列表 = await this.$获取预设表(预设表名);
       if (this.预设名) {
-        this.预设 = (await this.$获取预设(预设表名, this.预设名)) || this.预设 || {};
+       // this.预设 = (await this.$获取预设(预设表名, this.预设名)) || this.预设 || {};
       }
     },
     新建预设: async function () {

@@ -87,6 +87,10 @@ module.exports = {
   },
   methods: {
     判断id: async function ($event) {
+      console.log($event);
+      if ($event.attrsproxy) {
+        return null;
+      }
       let that = this;
       if (!this.监听) {
         return null;

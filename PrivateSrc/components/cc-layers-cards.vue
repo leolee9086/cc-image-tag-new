@@ -58,14 +58,14 @@
 <script>
 module.exports = {
   name: "cc-layers-cards",
-  props: ["窗口大小", "当前鼠标坐标","卡片数组","链接数组"],
+  props: ["窗口大小", "当前鼠标坐标", "卡片数组", "链接数组"],
 
   data() {
     return {
       当前激活标签id: "",
       当前激活链接id: "",
       窗口缩放倍数: 1,
-      
+
       当前选集数据: [],
       当前选集主id: "",
       当前卡片集合数据: [],
@@ -73,7 +73,6 @@ module.exports = {
     };
   },
   mounted() {
-    
     this.$事件总线.$on("选集增加", ($event) => this.增加数据($event));
     this.$事件总线.$on("清理选择", this.清理选择);
     this.$事件总线.$on("清理选集", this.清理选集);

@@ -12,20 +12,20 @@
           icon="el-icon-minus"
           circle
         ></el-button>
-        <el-button
-          size="mini"
-          @click="虚线定义数组.push(10)"
-          icon="el-icon-plus"
-          circle
-        ></el-button>
       </el-row>
+      <el-button
+        size="mini"
+        @click="虚线定义数组.push(10)"
+        icon="el-icon-plus"
+        circle
+      ></el-button>
     </template>
   </div>
 </template>
 <script>
 module.exports = {
   name: "cc-setter-path-dash",
-  props:["链接"],
+  props: ["链接"],
   data() {
     return {
       当前对象数据: {},
@@ -34,37 +34,45 @@ module.exports = {
     };
   },
   mounted() {
-    this.链接?this.当前对象数据=this.链接:null
+    this.链接 ? (this.当前对象数据 = this.链接) : {};
     this.挂载事件();
   },
   methods: {
     挂载事件() {
       let 事件总线 = this.$事件总线;
       事件总线.$on("激活数据", ($event) =>
-        $event ? (this.当前对象数据 = $event) : null
+        $event.type == "link" ? (this.当前对象数据 = $event) : null
       );
-      事件总线.$on(
-        "保存数据",
-        ($event) =>
-          (this.当前对象数据 = this.$根据时间戳更新本地数据($event, this.当前对象数据))
-      );
+      事件总线.$on("保存数据", ($event) => {
+        this.当前对象数据 = this.$根据时间戳更新本地数据($event, this.当前对象数据);
+        this.当前对象数据 = this.$更新数据时间戳(this.当前对象数据);
+      });
     },
   },
   watch: {
     使用虚线(val) {
       if (val) {
-        this.虚线定义数组 = [10, 10];
+        this.虚线定义数组 = this.虚线定义数组[0]
+          ? this.当前对象数据.attrs.path_dash
+          : [10, 10];
       } else {
-        this.虚线定义数组 =null;
+        this.虚线定义数组 = [];
       }
     },
     当前对象数据: {
       handler: function (val) {
         if (val && val.attrs) {
+          if (val.attrs.path_dash) {
+            this.使用虚线 = true;
+          } else {
+            this.使用虚线 = false;
+            this.虚线定义数据 = [];
+          }
           if (val.attrs.path_dash !== this.虚线定义数组) {
             let array = val.attrs.path_dash;
             if (array && JSON.stringify(array) !== JSON.stringify(this.虚线定义数组)) {
               this.虚线定义数组 = array;
+              this.使用虚线 = true;
             }
           }
         }
@@ -78,17 +86,19 @@ module.exports = {
         }
         if (val && val[0]) {
           console.log(this.当前对象数据);
-            this.当前对象数据&&this.当前对象数据.attrs?this.当前对象数据.attrs.path_dash = val:null;
-          let 对象数据 = await this.$数据库.links.get(this.当前对象数据.id);
-          对象数据 ? (对象数据.attrs.path_dash = val) : null;
-          对象数据 ? this.$事件总线.$emit("保存数据", 对象数据) : null;
+          this.当前对象数据 && this.当前对象数据.attrs
+            ? (this.当前对象数据.attrs.path_dash = val)
+            : null;
+
+          this.当前对象数据 ? this.$事件总线.$emit("保存数据", this.当前对象数据) : null;
         } else {
-         
-            this.当前对象数据&&this.当前对象数据.attrs?this.当前对象数据.attrs.path_dash = null:null;
-            let 对象数据 = await this.$数据库.links.get(this.当前对象数据.id);
-            对象数据 ? (对象数据.attrs.path_dash = null) : null;
-            对象数据 ? this.$事件总线.$emit("保存数据", 对象数据) : null;
-          
+          this.当前对象数据 && this.当前对象数据.attrs
+            ? (this.当前对象数据.attrs.path_dash = null)
+            : null;
+          let 对象数据 = await this.$数据库.links.get(this.当前对象数据.id);
+          对象数据 ? (对象数据.attrs.path_dash = null) : null;
+          this.当前对象数据 ? this.$事件总线.$emit("保存数据", 对象数据) : null;
+
           this.使用虚线 = false;
         }
       },
