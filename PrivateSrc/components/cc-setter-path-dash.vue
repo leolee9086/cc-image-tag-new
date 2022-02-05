@@ -33,7 +33,7 @@ module.exports = {
       使用虚线: false,
     };
   },
-  mounted() {
+   mounted() {
     this.链接 ? (this.当前对象数据 = this.链接) : {};
     this.挂载事件();
   },

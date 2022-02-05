@@ -17,8 +17,6 @@
         v-model="预设名"
       ></cc-presets-selector>
     </el-row>
-    <el-tabs v-model="当前面板">
-      <el-tab-pane label="样式" name="样式">
         <el-row>
           <el-collapse>
             <el-collapse-item title="节点样式">
@@ -126,8 +124,7 @@
               </el-tabs>
             </el-collapse-item>
             <el-collapse-item title="链接样式" v-if="当前数据类型 == 'link'">
-
-                          <strong slot="title">链接样式</strong>
+              <strong slot="title">链接样式</strong>
 
               <el-tabs>
                 <el-tab-pane label="连接线" name="连接线">
@@ -223,9 +220,6 @@
             </el-collapse-item>
           </el-collapse>
         </el-row>
-      </el-tab-pane>
-      <el-tab-pane label="预设" name="预设"> </el-tab-pane>
-    </el-tabs>
     <div v-if="开发模式" v-html="JSON.stringify(当前对象数据)"></div>
   </el-drawer>
 </template>
@@ -294,7 +288,7 @@ module.exports = {
         //  this.$事件总线.$emit("改变数据预设", this.当前对象数据, val);
         await this.$数据库[预设表名]
           .filter((data) => {
-            if (data.name == val) {
+            if (data.name == this.当前对象数据.subtype) {
               return true;
             }
           })
@@ -307,14 +301,14 @@ module.exports = {
     },
 
     当前对象数据: {
-      handler: async function (val, oldval) {
-          console.log("当前数据", val);
+      handler:  function (val, oldval) {
         if (!val) {
           return null;
         }
-
-        this.预设名 = val.subtype;
-        await this.获取预设();
+        if (val && oldval && val.id == oldval.id&&val.subtype!==oldval.subtype) {
+          this.预设名 = val.subtype;
+           this.获取预设();
+        }
         this.当前数据类型 = val.type;
         this.属性对象 = val.attrs || this.属性对象;
       },
@@ -467,7 +461,7 @@ module.exports = {
       let 预设表名 = this.当前对象数据.type + "presets";
       this.预设列表 = await this.$获取预设表(预设表名);
       if (this.预设名) {
-       // this.预设 = (await this.$获取预设(预设表名, this.预设名)) || this.预设 || {};
+        // this.预设 = (await this.$获取预设(预设表名, this.预设名)) || this.预设 || {};
       }
     },
     新建预设: async function () {

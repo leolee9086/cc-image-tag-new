@@ -21,6 +21,7 @@ module.exports = {
     if (this.link.attrs) {
       this.链接 = JSON.parse(JSON.stringify(this.link));
     } else {
+      console.log("数据错误", this.link);
       this.$事件总线.$emit("删除数据", this.link);
     }
     this.监听 = true;
@@ -41,7 +42,7 @@ module.exports = {
           (await this.$数据库.links.get(this.链接.attrs.to_id)))
       : null;
     if (!this.代理起始标记 || !this.代理结束标记) {
-      this.$事件总线.$emit("删除链接", this.link);
+      return null;
     }
     this.加载节点图片(this.起始节点图片, "起始节点图片元素");
     this.加载节点图片(this.结束节点图片, "结束节点图片元素");
@@ -272,16 +273,14 @@ module.exports = {
       deep: true,
     },
     link: {
-      handler: async function (val, oldval) {
+      handler: function (val, oldval) {
         if (!val) {
           return null;
         }
-        if (parseInt(val.updated) <= parseInt(oldval.updated)) {
+        if (parseInt(val.updated) < parseInt(oldval.updated)) {
           return null;
         }
-
         this.计算中点可见性();
-
         this.判断时间并计算链接(val, oldval);
       },
       deep: true,
@@ -292,14 +291,13 @@ module.exports = {
         if (!val.attrs) {
           return null;
         }
-        this.计算中点可见性();
-        let 拷贝对象 = JSON.parse(JSON.stringify(val));
-        let 拷贝旧对象 = JSON.parse(JSON.stringify(oldval || "{}"));
-        拷贝对象.updated = "";
-        拷贝旧对象.updated = "";
-        if (JSON.stringify(拷贝对象) !== JSON.stringify(拷贝旧对象)) {
-          //  console.log("aaa", val);
-          !val.virtual ? this.$事件总线.$emit("保存数据", val) : null;
+        let 新数据 = JSON.parse(JSON.stringify(val));
+        let 旧数据 = JSON.parse(JSON.stringify(oldval));
+        新数据.updated = "";
+        旧数据.updated = "";
+        console.log(val, oldval);
+        if (JSON.stringify(新数据) !== JSON.stringify(旧数据)) {
+          !this.链接.virtual ? this.$事件总线.$emit("保存数据", this.链接) : null;
         }
       },
       deep: true,
@@ -452,7 +450,7 @@ module.exports = {
       }
       return 象限;
     },
-    加载节点图片: async function (图片源, 参数名) {
+    加载节点图片: function (图片源, 参数名) {
       if (图片源 == "none") {
         return null;
       }
@@ -475,26 +473,22 @@ module.exports = {
       if (!attrs) {
         return null;
       }
-      if (!that.监听) {
-        return null;
-      }
+
       if ($event.id == attrs.from_id) {
-        let 类型 = $event.type;
-        if (parseInt($event.updated) >= parseInt(this.代理起始标记.updated)) {
-          this.代理起始标记 = $event;
+        if (parseInt($event.updated) > parseInt(this.代理起始标记.updated)) {
+          this.代理起始标记 = JSON.parse(JSON.stringify($event));
           that.计算路径();
         }
       }
       if ($event.id == attrs.to_id) {
-        let 类型 = $event.type;
-        if (parseInt($event.updated) >= parseInt(this.代理结束标记.updated)) {
-          this.代理结束标记 = $event;
+        if (parseInt($event.updated) > parseInt(this.代理结束标记.updated)) {
+          this.代理结束标记 = JSON.parse(JSON.stringify($event));
           that.计算路径();
         }
       }
       if ($event.id == this.链接.id) {
-        if (parseInt($event.updated) >= parseInt(this.链接.updated)) {
-          this.链接 = $event;
+        if (parseInt($event.updated) > parseInt(this.链接.updated)) {
+          this.链接 = JSON.parse(JSON.stringify($event));
 
           this.计算路径();
         }
@@ -537,7 +531,6 @@ module.exports = {
       let 路径线段 = this.计算路径线段(代理起始标记, 代理结束标记);
       this.起点 = 路径线段.起点.x ? 路径线段.起点 : this.起点;
       this.终点 = 路径线段.终点.x ? 路径线段.终点 : this.终点;
-      console.log("设定", this.链接);
       if (路径线段) {
         switch (this.路径类型) {
           case "折线": {
@@ -577,9 +570,8 @@ module.exports = {
           this.显示引线 = false;
         }
 
-        !this.链接.virtual ? this.$事件总线.$emit("保存链接", this.链接) : null;
-
         this.监听 = true;
+        !this.链接.virtual ? this.计算中点可见性() : null;
       }
     },
     计算引线: function (链接) {

@@ -32,16 +32,6 @@ self.初始化数据库 = function (id) {
     boards:
       "id,parent_id,root_id,hash,box,path,name,alias,memo,content,markdown,length,type,subtype,ial,sort,created,updated,attrs",
   });
-  liveQuery(() => self.数据库.cards.toArray()).subscribe({
-    next: (result) => {
-      self.postMessage({ 卡片数组: result });
-    },
-  });
-  liveQuery(() => self.数据库.links.toArray()).subscribe({
-    next: (result) => {
-      self.postMessage({ 链接数组: result });
-    },
-  });
   self.postMessage("数据库初始化完成");
 };
 self.保存历史 = async function () {
@@ -78,6 +68,46 @@ self.保存数据 = function (数据) {
   let 数据表名 = 数据.type + "s";
   self.数据库[数据表名].put(数据);
 };
+self.删除数据 = function(传入数据){
+  if(传入数据.attrs){
+  传入数据.attrs.trashed = true;}
+    if (!传入数据.type) {
+      return null;
+    }
+    let 数据表名 = 传入数据.type + "s";
+    let id = 传入数据.id;
+    if (!传入数据.attrs) {
+      传入数据.attrs = {};
+      传入数据.attrs.trashed = true
+    }
+    self.数据库[数据表名].put(传入数据).then(() => {
+      self.数据库[数据表名].delete(id).then(() => {
+        self.数据库.links
+          .filter((data) => {
+            if (data && (data.attrs.from_id == id || data.attrs.to_id == id)) {
+              return true;
+            }
+          })
+          .toArray((array) => {
+            array[0]
+              ? array.forEach((data) => self.删除数据(data))
+              : null;
+          });
+      });
+    });
+    if (传入数据.attrs.collection) {
+       this.$数据库.cards
+        .filter((data) => {
+          return data.parent_id == 传入数据.id;
+        })
+        .toArray(
+          array.forEach((data) => {
+            data.parent_id = 传入数据.parent_id;
+            self.保存数据(传入数据);
+          })
+        );
+    }
+}
 /*定义消息处理过程*/
 self.消息处理器 = function (消息) {
   if (消息) {

@@ -449,11 +449,11 @@ Vue.prototype.$填充默认值 = function (数据) {
 };
 Vue.prototype.$获取预设表 = async function (预设表名) {
   console.log(预设表名)
-  //try{
+  try{
     return await this.$数据库[预设表名].toArray();
-  /*}catch(e){
+  }catch(e){
     console.log(e)
-  }*/
+  }
 };
 
 Vue.prototype.$获取预设 = async function (预设表名, 预设名) {

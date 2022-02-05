@@ -50,30 +50,31 @@
 <script>
 module.exports = {
   name: "app",
-  mounted: async function () {
+  mounted: function () {
     this.初始窗口大小 = { H: window.innerHeight, W: window.innerWidth };
-    window.addEventListener("mousewheel", this.计算坐标, { passive: false });
-    window.addEventListener("mousewheel", this.缩放, { passive: false });
-
-    window.addEventListener("mousemove", this.计算坐标);
-    window.addEventListener("scroll", this.计算坐标);
+    this.挂载全局事件();
     this.$事件总线.$on("添加卡片", ($event) => this.判断id并添加($event));
     this.$事件总线.$on("添加链接", ($event) => this.判断id并添加($event));
 
     this.主界面 = window.parent.document;
-    //console.log(this.主界面);
     this.思源伺服ip = window.location.host;
-    // console.log(this.思源伺服ip);
-    //  console.log(this.$数据库);
     let url参数 = this.$解析url(window.location.href);
-    // console.log(url参数);
     if (this.$挂件模式()) {
       this.挂件自身元素 = self.frameElement.parentElement.parentElement;
     }
+    liveQuery(() => this.$数据库.cards.toArray()).subscribe({
+      next: (result) => {
+        console.log(1);
+        this.卡片数组 = result;
+      },
+    });
+    liveQuery(() => this.$数据库.links.toArray()).subscribe({
+      next: (result) => {
+        console.log(2);
 
-    //  if (数据源id)
-    // {await this.打开思源数据()};
-    this.$数据总线.addEventListener("message", this.判断消息);
+        this.链接数组 = result;
+      },
+    });
   },
   data() {
     return {
@@ -106,6 +107,13 @@ module.exports = {
     },
   },
   methods: {
+    挂载全局事件() {
+      window.addEventListener("mousewheel", this.计算坐标, { passive: false });
+      window.addEventListener("mousewheel", this.缩放, { passive: false });
+      window.addEventListener("mousemove", this.计算坐标);
+      window.addEventListener("scroll", this.计算坐标);
+      window.addEventListener("keydown", this.$快捷键处理器);
+    },
     判断id并添加(数据) {
       let 数据类型 = 数据.type;
       let 数据列表 = [];
@@ -116,7 +124,8 @@ module.exports = {
       }
       flag ? 数据列表.push(数据) : null;
     },
-    判断消息(消息) {
+    判断消息: function (消息) {
+      console.log(消息);
       消息.data.卡片数组 ? (this.卡片数组 = 消息.data.卡片数组) : null;
       消息.data.链接数组 ? (this.链接数组 = 消息.data.链接数组) : null;
     },
