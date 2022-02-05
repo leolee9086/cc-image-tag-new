@@ -88,6 +88,7 @@ module.exports = {
       链接订阅器: {},
       卡片数组: [],
       链接数组: [],
+      数据时间戳: "",
     };
   },
   watch: {
@@ -116,10 +117,13 @@ module.exports = {
       }
       flag ? 数据列表.push(数据) : null;
     },
-    判断消息: async function (消息) {
-      console.log(消息);
+    判断消息: function (消息) {
+      if (消息.data.数据时间戳 <= this.数据时间戳) {
+        return null;
+      }
       消息.data.卡片数组 ? (this.卡片数组 = 消息.data.卡片数组) : null;
       消息.data.链接数组 ? (this.链接数组 = 消息.data.链接数组) : null;
+      消息.data.数据时间戳 ? (this.数据时间戳 = 消息.data.数据时间戳) : null;
     },
     以属性查找对象(集合, 属性名, 属性值) {
       let obj = null;

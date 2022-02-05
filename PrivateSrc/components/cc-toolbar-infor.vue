@@ -17,209 +17,207 @@
         v-model="预设名"
       ></cc-presets-selector>
     </el-row>
-        <el-row>
-          <el-collapse>
-            <el-collapse-item title="节点样式">
-              <strong slot="title">节点样式</strong>
-              <el-tabs>
-                <el-tab-pane label="边框色" name="边框色">
-                  <span slot="label">
-                    边框色
-                    <el-tooltip
-                      v-if="预设.attrs.borderColor != 'byref'"
-                      content="这是一个预设值,修改后会修改所有同类型元素"
-                    >
-                      <span class="el-icon-copy-document"></span>
-                    </el-tooltip>
-                  </span>
-                  <cc-color-pane
-                    v-model="属性对象.borderColor"
-                    :显示web命名颜色="true"
-                    :自定义颜色数组="自定义颜色数组"
-                  ></cc-color-pane>
-                </el-tab-pane>
-                <el-tab-pane label="背景色" name="背景色">
-                  <span slot="label">
-                    背景色
-                    <el-tooltip
-                      v-if="预设.attrs.backgroundColor != 'byref'"
-                      content="这是一个预设值,修改后会修改所有同类型元素"
-                    >
-                      <span class="el-icon-copy-document"></span>
-                    </el-tooltip>
-                  </span>
-                  <cc-color-pane
-                    v-model="属性对象.backgroundColor"
-                    :显示web命名颜色="true"
-                    :自定义颜色数组="自定义颜色数组"
-                  ></cc-color-pane>
-                </el-tab-pane>
+    <el-row>
+      <el-collapse>
+        <el-collapse-item title="节点样式">
+          <strong slot="title">节点样式</strong>
+          <el-tabs>
+            <el-tab-pane label="边框色" name="边框色">
+              <span slot="label">
+                边框色
+                <el-tooltip
+                  v-if="预设.attrs.borderColor != 'byref'"
+                  content="这是一个预设值,修改后会修改所有同类型元素"
+                >
+                  <span class="el-icon-copy-document"></span>
+                </el-tooltip>
+              </span>
+              <cc-color-pane
+                v-model="属性对象.borderColor"
+                :显示web命名颜色="true"
+                :自定义颜色数组="自定义颜色数组"
+              ></cc-color-pane>
+            </el-tab-pane>
+            <el-tab-pane label="背景色" name="背景色">
+              <span slot="label">
+                背景色
+                <el-tooltip
+                  v-if="预设.attrs.backgroundColor != 'byref'"
+                  content="这是一个预设值,修改后会修改所有同类型元素"
+                >
+                  <span class="el-icon-copy-document"></span>
+                </el-tooltip>
+              </span>
+              <cc-color-pane
+                v-model="属性对象.backgroundColor"
+                :显示web命名颜色="true"
+                :自定义颜色数组="自定义颜色数组"
+              ></cc-color-pane>
+            </el-tab-pane>
 
-                <el-tab-pane label="文字色" name="文字色">
-                  <span slot="label">
-                    文字色
-                    <el-tooltip
-                      v-if="预设.attrs.color != 'byref'"
-                      content="这是一个预设值,修改后会修改所有同类型元素"
-                    >
-                      <span class="el-icon-copy-document"></span>
-                    </el-tooltip>
-                  </span>
-                  <cc-color-pane
-                    v-model="属性对象.color"
-                    :显示web命名颜色="true"
-                    :自定义颜色数组="自定义颜色数组"
-                  ></cc-color-pane>
-                </el-tab-pane>
-                <el-tab-pane label="几何设置" name="几何设置">
-                  <span slot="label">边框和锚点</span>
-                  <el-row>
-                    <el-tooltip
-                      v-if="预设.attrs.fixed_anchor != 'byref'"
-                      content="这是一个预设值,修改后会修改所有同类型元素"
-                    >
-                      <span class="el-icon-copy-document"></span>
-                    </el-tooltip>
-                    <el-switch
-                      :value="
-                        属性对象.fixed_anchor !== undefined
-                          ? 属性对象.fixed_anchor
-                          : false
-                      "
-                      @change="属性对象.fixed_anchor = $event"
-                    ></el-switch>
-                    <span>始终连接到中点</span>
-                  </el-row>
-                  <el-row>
-                    <el-tooltip
-                      v-if="预设.attrs.borderWidth != 'byref'"
-                      content="这是一个预设值,修改后会修改所有同类型元素"
-                    >
-                      <span class="el-icon-copy-document"></span>
-                    </el-tooltip>
-                    <el-input-number
-                      size="mini"
-                      :value="属性对象.borderWidth"
-                      @change="属性对象.borderWidth = $event"
-                      :min="1"
-                      :max="50"
-                    ></el-input-number>
-                  </el-row>
-                  <el-row>
-                    <el-tooltip
-                      v-if="预设.attrs.borderStyle != 'byref'"
-                      content="这是一个预设值,修改后会修改所有同类型元素"
-                    >
-                      <span class="el-icon-copy-document"></span>
-                    </el-tooltip>
-                    <el-select v-model="属性对象.borderStyle">
-                      <el-option
-                        v-for="(item, i) in 边框线型对照表"
-                        :label="item.label"
-                        :value="item.value"
-                      ></el-option>
-                    </el-select>
-                  </el-row>
-                </el-tab-pane>
-              </el-tabs>
-            </el-collapse-item>
-            <el-collapse-item title="链接样式" v-if="当前数据类型 == 'link'">
-              <strong slot="title">链接样式</strong>
+            <el-tab-pane label="文字色" name="文字色">
+              <span slot="label">
+                文字色
+                <el-tooltip
+                  v-if="预设.attrs.color != 'byref'"
+                  content="这是一个预设值,修改后会修改所有同类型元素"
+                >
+                  <span class="el-icon-copy-document"></span>
+                </el-tooltip>
+              </span>
+              <cc-color-pane
+                v-model="属性对象.color"
+                :显示web命名颜色="true"
+                :自定义颜色数组="自定义颜色数组"
+              ></cc-color-pane>
+            </el-tab-pane>
+            <el-tab-pane label="几何设置" name="几何设置">
+              <span slot="label">边框和锚点</span>
+              <el-row>
+                <el-tooltip
+                  v-if="预设.attrs.fixed_anchor != 'byref'"
+                  content="这是一个预设值,修改后会修改所有同类型元素"
+                >
+                  <span class="el-icon-copy-document"></span>
+                </el-tooltip>
+                <el-switch
+                  :value="
+                    属性对象.fixed_anchor !== undefined ? 属性对象.fixed_anchor : false
+                  "
+                  @change="属性对象.fixed_anchor = $event"
+                ></el-switch>
+                <span>始终连接到中点</span>
+              </el-row>
+              <el-row>
+                <el-tooltip
+                  v-if="预设.attrs.borderWidth != 'byref'"
+                  content="这是一个预设值,修改后会修改所有同类型元素"
+                >
+                  <span class="el-icon-copy-document"></span>
+                </el-tooltip>
+                <el-input-number
+                  size="mini"
+                  :value="属性对象.borderWidth"
+                  @change="属性对象.borderWidth = $event"
+                  :min="1"
+                  :max="50"
+                ></el-input-number>
+              </el-row>
+              <el-row>
+                <el-tooltip
+                  v-if="预设.attrs.borderStyle != 'byref'"
+                  content="这是一个预设值,修改后会修改所有同类型元素"
+                >
+                  <span class="el-icon-copy-document"></span>
+                </el-tooltip>
+                <el-select v-model="属性对象.borderStyle">
+                  <el-option
+                    v-for="(item, i) in 边框线型对照表"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
+              </el-row>
+            </el-tab-pane>
+          </el-tabs>
+        </el-collapse-item>
+        <el-collapse-item title="链接样式" v-if="当前数据类型 == 'link'">
+          <strong slot="title">链接样式</strong>
 
-              <el-tabs>
-                <el-tab-pane label="连接线" name="连接线">
-                  <span slot="label">
-                    几何设置
-                    <el-tooltip
-                      v-if="预设.attrs.path_width != 'byref'"
-                      content="这是一个预设值,修改后会修改所有同类型元素"
-                    >
-                      <span class="el-icon-copy-document"></span>
-                    </el-tooltip>
-                  </span>
-                  <el-row>
-                    <el-col :span="15">
-                      <el-slider
-                        v-model="属性对象.path_width"
-                        @change="属性对象.path_width = $event"
-                      ></el-slider>
-                    </el-col>
-                    <el-col :span="9">
-                      <el-select v-model="属性对象.path_type" size="mini">
-                        <el-option
-                          v-for="(item, i) in [`直线`, `折线`, '简单曲线']"
-                          :label="item"
-                          :value="item"
-                        ></el-option>
-                      </el-select>
-                    </el-col>
-                  </el-row>
-                  <cc-setter-path-dash :链接="当前对象数据"> </cc-setter-path-dash>
-                  <el-divider></el-divider>
-                  <cc-color-pane
-                    v-model="属性对象.path_color"
-                    :显示web命名颜色="true"
-                    :自定义颜色数组="自定义颜色数组"
-                  ></cc-color-pane>
-                </el-tab-pane>
-                <el-tab-pane label="起点标记" name="起点标记">
-                  <span slot="label">
-                    起点标记
-                    <el-tooltip
-                      v-if="预设.attrs.from_anchor_size != 'byref'"
-                      content="这是一个预设值,修改后会修改所有同类型元素"
-                    >
-                      <span class="el-icon-copy-document"></span>
-                    </el-tooltip>
-                  </span>
-                  <cc-setter-anchor
-                    位置="from"
-                    :对象数据="当前对象数据"
-                    :思源伺服ip="思源伺服ip"
-                    :预设="预设"
-                    :byref="预设.attrs.mid_anchor_size == 'byref'"
-                  ></cc-setter-anchor>
-                </el-tab-pane>
-                <el-tab-pane label="中点标记" name="中点标记">
-                  <span slot="label">
-                    中点标记
-                    <el-tooltip
-                      v-if="预设.attrs.mid_anchor_size != 'byref'"
-                      content="这是一个预设值,修改后会修改所有同类型元素"
-                    >
-                      <span class="el-icon-copy-document"></span>
-                    </el-tooltip>
-                  </span>
-                  <cc-setter-anchor
-                    位置="mid"
-                    :对象数据="当前对象数据"
-                    :思源伺服ip="思源伺服ip"
-                    :预设="预设"
-                    :byref="预设.attrs.mid_anchor_size == 'byref'"
-                  ></cc-setter-anchor>
-                </el-tab-pane>
-                <el-tab-pane label="终点标记样式" name="终点标记样式">
-                  <span slot="label">
-                    终点标记
-                    <el-tooltip
-                      v-if="预设.attrs.to_anchor_size != 'byref'"
-                      content="这是一个预设值,修改后会修改所有同类型元素"
-                    >
-                      <span class="el-icon-copy-document"></span>
-                    </el-tooltip>
-                  </span>
-                  <cc-setter-anchor
-                    位置="to"
-                    :对象数据="当前对象数据"
-                    :思源伺服ip="思源伺服ip"
-                    :预设="预设"
-                    :byref="预设.attrs.to_anchor_size == 'byref'"
-                  ></cc-setter-anchor>
-                </el-tab-pane>
-              </el-tabs>
-            </el-collapse-item>
-          </el-collapse>
-        </el-row>
+          <el-tabs>
+            <el-tab-pane label="连接线" name="连接线">
+              <span slot="label">
+                几何设置
+                <el-tooltip
+                  v-if="预设.attrs.path_width != 'byref'"
+                  content="这是一个预设值,修改后会修改所有同类型元素"
+                >
+                  <span class="el-icon-copy-document"></span>
+                </el-tooltip>
+              </span>
+              <el-row>
+                <el-col :span="15">
+                  <el-slider
+                    v-model="属性对象.path_width"
+                    @change="属性对象.path_width = $event"
+                  ></el-slider>
+                </el-col>
+                <el-col :span="9">
+                  <el-select v-model="属性对象.path_type" size="mini">
+                    <el-option
+                      v-for="(item, i) in [`直线`, `折线`, '简单曲线']"
+                      :label="item"
+                      :value="item"
+                    ></el-option>
+                  </el-select>
+                </el-col>
+              </el-row>
+              <!--   <cc-setter-path-dash :链接="当前对象数据"> </cc-setter-path-dash>-->
+              <el-divider></el-divider>
+              <cc-color-pane
+                v-model="属性对象.path_color"
+                :显示web命名颜色="true"
+                :自定义颜色数组="自定义颜色数组"
+              ></cc-color-pane>
+            </el-tab-pane>
+            <el-tab-pane label="起点标记" name="起点标记">
+              <span slot="label">
+                起点标记
+                <el-tooltip
+                  v-if="预设.attrs.from_anchor_size != 'byref'"
+                  content="这是一个预设值,修改后会修改所有同类型元素"
+                >
+                  <span class="el-icon-copy-document"></span>
+                </el-tooltip>
+              </span>
+              <cc-setter-anchor
+                位置="from"
+                :对象数据="当前对象数据"
+                :思源伺服ip="思源伺服ip"
+                :预设="预设"
+                :byref="预设.attrs.mid_anchor_size == 'byref'"
+              ></cc-setter-anchor>
+            </el-tab-pane>
+            <el-tab-pane label="中点标记" name="中点标记">
+              <span slot="label">
+                中点标记
+                <el-tooltip
+                  v-if="预设.attrs.mid_anchor_size != 'byref'"
+                  content="这是一个预设值,修改后会修改所有同类型元素"
+                >
+                  <span class="el-icon-copy-document"></span>
+                </el-tooltip>
+              </span>
+              <cc-setter-anchor
+                位置="mid"
+                :对象数据="当前对象数据"
+                :思源伺服ip="思源伺服ip"
+                :预设="预设"
+                :byref="预设.attrs.mid_anchor_size == 'byref'"
+              ></cc-setter-anchor>
+            </el-tab-pane>
+            <el-tab-pane label="终点标记样式" name="终点标记样式">
+              <span slot="label">
+                终点标记
+                <el-tooltip
+                  v-if="预设.attrs.to_anchor_size != 'byref'"
+                  content="这是一个预设值,修改后会修改所有同类型元素"
+                >
+                  <span class="el-icon-copy-document"></span>
+                </el-tooltip>
+              </span>
+              <cc-setter-anchor
+                位置="to"
+                :对象数据="当前对象数据"
+                :思源伺服ip="思源伺服ip"
+                :预设="预设"
+                :byref="预设.attrs.to_anchor_size == 'byref'"
+              ></cc-setter-anchor>
+            </el-tab-pane>
+          </el-tabs>
+        </el-collapse-item>
+      </el-collapse>
+    </el-row>
     <div v-if="开发模式" v-html="JSON.stringify(当前对象数据)"></div>
   </el-drawer>
 </template>
@@ -301,13 +299,13 @@ module.exports = {
     },
 
     当前对象数据: {
-      handler:  function (val, oldval) {
+      handler: function (val, oldval) {
         if (!val) {
           return null;
         }
-        if (val && oldval && val.id == oldval.id&&val.subtype!==oldval.subtype) {
+        if (val && oldval && val.id == oldval.id && val.subtype !== oldval.subtype) {
           this.预设名 = val.subtype;
-           this.获取预设();
+          this.获取预设();
         }
         this.当前数据类型 = val.type;
         this.属性对象 = val.attrs || this.属性对象;
@@ -526,10 +524,13 @@ module.exports = {
         //console.log(属性名, 上传数据["attrsproxy"][属性名]);
       }
       if (this.当前对象数据.type == "card") {
-        this.$事件总线.$emit("保存卡片", 上传数据);
+        console.log(上传数据);
+        //this.$事件总线.$emit("保存卡片", 上传数据);
       }
       if (this.当前对象数据.type == "link") {
-        this.$事件总线.$emit("保存链接", 上传数据);
+        console.log(上传数据);
+
+        // this.$事件总线.$emit("保存链接", 上传数据);
       }
       for (序号 in 属性列表) {
         let 属性名 = 属性列表[序号];

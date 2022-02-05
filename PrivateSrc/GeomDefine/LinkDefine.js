@@ -31,6 +31,5 @@ const 几何定义 = {
     圆形内接正方形(圆形){
         let 圆心 = 圆形.center
         let 半径 = 圆形.radius
-        
     },
 }

@@ -303,8 +303,8 @@ module.exports = {
             ? null
             : () => {
                 if (
-                  Math.floor(新数据.attrs.top + 新数据.attrs.offsetx) !==
-                  Math.floor(旧数据.attrs.top + 旧数据.attrs.offsetx)
+                  新数据.attrs.top + 新数据.attrs.offsetx !==
+                  旧数据.attrs.top + 旧数据.attrs.offsetx
                 ) {
                   !this.链接.virtual ? this.$事件总线.$emit("保存数据", this.链接) : null;
                 }
@@ -509,7 +509,7 @@ module.exports = {
       //  console.log(this.link);
     },
 
-    计算路径: function () {
+    计算路径: async function () {
       this.监听 = false;
       if (!this.代理起始标记 || !this.代理结束标记) {
         return null;
@@ -547,18 +547,17 @@ module.exports = {
           case "折线": {
             this.路径 = this.生成折线路径(路径线段);
             this.链接.attrs.path = this.路径.d;
-            this.链接.attrs.top = Math.floor(this.路径.mid.y);
-            this.链接.attrs.left = Math.floor(this.路径.mid.x);
+            this.链接.attrs.top = this.路径.mid.y;
+            this.链接.attrs.left = this.路径.mid.x;
             this.中点 = this.路径.mid;
-
             break;
           }
 
           case "简单曲线": {
             this.路径 = this.两点生成三次贝塞尔曲线(路径线段);
             this.链接.attrs.path = this.路径.d;
-            this.链接.attrs.top = Math.floor(this.路径.mid.y);
-            this.链接.attrs.left = Math.floor(this.路径.mid.x);
+            this.链接.attrs.top = this.路径.mid.y;
+            this.链接.attrs.left = this.路径.mid.x;
             this.中点 = this.路径.mid;
 
             break;
@@ -566,8 +565,8 @@ module.exports = {
           default: {
             this.路径 = this.生成直线路径(路径线段);
             this.链接.attrs.path = this.路径.d;
-            this.链接.attrs.top = Math.floor(this.路径.mid.y);
-            this.链接.attrs.left = Math.floor(this.路径.mid.x);
+            this.链接.attrs.top = this.路径.mid.y;
+            this.链接.attrs.left = this.路径.mid.x;
             this.中点 = this.路径.mid;
           }
         }

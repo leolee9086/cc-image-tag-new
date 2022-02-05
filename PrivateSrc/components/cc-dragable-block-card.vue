@@ -170,8 +170,8 @@
                 class="cc-card-name"
                 :ref="'cardname' + 对象数据.id"
                 autofix="ture"
-                @input="保存数据(true, $event)"
-                @change="保存数据(true, $event)"
+                @input="保存数据($event)"
+                @change="保存数据($event)"
                 v-model="对象数据.name"
               ></el-input>
             </el-col>
@@ -258,10 +258,10 @@ module.exports = {
     setTimeout(this.计算可见性, 500);
     window.addEventListener("scroll", this.计算可见性);
     this.获取预设(this.value);
-    this.$事件总线.$on("保存卡片", (event) => this.判断id(event));
-    this.$事件总线.$on("保存链接", (event) => this.判断id(event));
-    this.$事件总线.$on("保存数据", (event) => this.判断id(event));
-    this.$事件总线.$on("删除数据", (event) => this.判断id(event));
+    /* this.$事件总线.addEventListener("保存卡片", (event) => this.判断id(event));
+    this.$事件总线.addEventListener("保存链接", (event) => this.判断id(event));
+    this.$事件总线.addEventListener("保存数据", (event) => this.判断id(event));
+    this.$事件总线.addEventListener("删除数据", (event) => this.判断id(event));*/
   },
 
   watch: {
@@ -413,16 +413,12 @@ module.exports = {
   computed: {
     top: function () {
       let a =
-        (this.对象数据.attrs.top + this.对象数据.attrs.offsety) * this.窗口缩放倍数 ||
-        this.对象数据.attrs.top * this.窗口缩放倍数 ||
-        0;
+        (this.对象数据.attrs.top + this.对象数据.attrs.offsety) * this.窗口缩放倍数 || 0;
       return a;
     },
     left: function () {
       let a =
-        (this.对象数据.attrs.left + this.对象数据.attrs.offsetx) * this.窗口缩放倍数 ||
-        this.对象数据.attrs.left * this.窗口缩放倍数 ||
-        0;
+        (this.对象数据.attrs.left + this.对象数据.attrs.offsetx) * this.窗口缩放倍数 || 0;
       return a;
     },
     width: function () {
@@ -479,7 +475,7 @@ module.exports = {
     },
     判断id: function ($event) {
       let that = this;
-      // console.log("sss", $event);
+      console.log("sss", $event, this.对象数据);
 
       if (!$event) {
         return null;
@@ -489,14 +485,13 @@ module.exports = {
       }
       if (
         $event.id == this.对象数据.id &&
-        parseInt($event.updated) >= parseInt(this.对象数据.updated)
+        parseInt($event.updated) > parseInt(this.对象数据.updated)
       ) {
         let 旧数据 = JSON.parse(JSON.stringify(this.对象数据 || {}));
         let 新数据 = JSON.parse(JSON.stringify($event || {}));
         旧数据.updated = "";
         新数据.updated = "";
         if (旧数据 !== 新数据 && !新数据.attrs.trashed && !旧数据.trashed) {
-          console.log($event);
           this.对象数据 = $event;
         }
       }
@@ -578,10 +573,12 @@ module.exports = {
         offsety = y / 窗口缩放倍数 - top;
         offsetx = x / 窗口缩放倍数 - left;
       }
-      this.对象数据.attrs.top = Math.floor(top);
-      this.对象数据.attrs.left = Math.floor(left);
-      this.对象数据.attrs.offsetx = Math.floor(offsetx);
-      this.对象数据.attrs.offsety = Math.floor(offsety);
+      this.对象数据.attrs.top = top;
+      this.对象数据.attrs.left = left;
+      this.对象数据.attrs.offsetx = offsetx;
+      this.对象数据.attrs.offsety = offsety;
+
+      this.对象数据 = this.$更新数据时间戳(this.对象数据);
     },
     dragging: function (x, y) {
       this.计算坐标(x, y);
@@ -619,11 +616,10 @@ module.exports = {
       this.保存数据();
     },
     保存数据: function ($event) {
+      console.log(this.对象数据);
       $event ? (this.对象数据.name = $event) : null;
       this.对象数据 = this.$更新数据时间戳(this.对象数据);
-      this.数据类型 == "link"
-        ? console.log(this.对象数据.attrs.offsetx, this.对象数据.attrs.offsety)
-        : null;
+
       this.$事件总线.$emit("保存数据", this.对象数据);
     },
     转化为卡片: function () {
