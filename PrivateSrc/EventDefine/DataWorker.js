@@ -10,7 +10,7 @@ const window = {
   
   const liveQuery = Dexie.liveQuery;
   
-  self.初始化数据库 = function (id) {
+  self.初始化数据库 =async function (id) {
     self.数据库 = new Dexie(id);
     self.数据库.version(3).stores({
       cards:
@@ -35,19 +35,26 @@ const window = {
     liveQuery(() => self.数据库.cards.toArray()).subscribe({
       next: (result) => {
         self.卡片数组 =result;
-        self.postMessage({卡片数组:self.卡片数组,链接数组:self.链接数组})
 
       },
     });
     liveQuery(() => self.数据库.links.toArray()).subscribe({
       next: (result) => {
         self.链接数组 =result;
-        self.postMessage({卡片数组:self.卡片数组,链接数组:self.链接数组})
-
       },
     });
+    setTimeout(async()=>self.发送数据(),50)
     self.postMessage("数据库初始化完成");
   };
+  self.发送数据=async function(){
+  
+    let 卡片数组 = await self.数据库.cards.toArray()
+    let 链接数组 = await self.数据库.links.toArray()
+    self.postMessage({卡片数组:卡片数组,链接数组:链接数组});
+
+    setTimeout(async()=> self.发送数据(),50)
+  }
+
   self.卡片数组 = []
   self.链接数组 = []
   self.消息处理器 = function (消息) {

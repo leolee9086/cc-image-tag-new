@@ -6,7 +6,6 @@ const 事件总线 = new Vue();
 //数据总线.onmessage=function(massage){console.log(massage)}
 数据获取器.postMessage({'处理函数':"初始化数据库","数据":Vue.prototype.$baseid})
 
-//数据获取器.onmessage=function(massage){console.log(massage)}
 
 const 事务列表 = {
   数据库: 数据库,
@@ -281,6 +280,7 @@ const 事务列表 = {
       if (链接类型) {
         新链接.subtype = 链接类型;
       }
+      console.log(新链接)
       this.$数据总线.postMessage({"处理函数":"保存数据","数据":新链接})
         this.$事件总线.$emit("结束连接");
         this.$事件总线.$emit("添加链接", 新链接);

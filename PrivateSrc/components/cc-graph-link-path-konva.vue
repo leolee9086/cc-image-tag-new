@@ -292,12 +292,23 @@ module.exports = {
           return null;
         }
         let 新数据 = JSON.parse(JSON.stringify(val));
-        let 旧数据 = JSON.parse(JSON.stringify(oldval));
+        let 旧数据 = JSON.parse(JSON.stringify(this.link));
         新数据.updated = "";
         旧数据.updated = "";
-        console.log(val, oldval);
+        //console.log(JSON.stringify(新数据), JSON.stringify(旧数据));
+
         if (JSON.stringify(新数据) !== JSON.stringify(旧数据)) {
-          !this.链接.virtual ? this.$事件总线.$emit("保存数据", this.链接) : null;
+          console.log(3);
+          新数据 && 旧数据 && 新数据.attrs && 旧数据.attrs
+            ? null
+            : () => {
+                if (
+                  Math.floor(新数据.attrs.top + 新数据.attrs.offsetx) !==
+                  Math.floor(旧数据.attrs.top + 旧数据.attrs.offsetx)
+                ) {
+                  !this.链接.virtual ? this.$事件总线.$emit("保存数据", this.链接) : null;
+                }
+              };
         }
       },
       deep: true,
@@ -325,11 +336,12 @@ module.exports = {
       if (JSON.stringify(旧链接) === JSON.stringify(新链接)) {
         return null;
       }
+
       this.链接 = val;
       this.链接 = this.$填充默认值(this.链接);
       this.计算路径();
 
-      this.链接.type = "link";
+      /* this.链接.type = "link";
       this.链接.subtype = val.subtype || "属于";
 
       this.路径类型 = val.attrs.path_type || "直线";
@@ -350,7 +362,7 @@ module.exports = {
 
       this.起始标记角度偏移 = val.attrs.from_anchor_rotate_offset || 0;
       this.结束标记角度偏移 = val.attrs.to_anchor_rotate_offset || 180;
-      this.中间标记角度偏移 = val.attrs.mid_anchor_rotate_offset || 0;
+      this.中间标记角度偏移 = val.attrs.mid_anchor_rotate_offset || 0;*/
     },
     计算节点标志偏移: function (
       起点坐标,
@@ -487,9 +499,8 @@ module.exports = {
         }
       }
       if ($event.id == this.链接.id) {
-        if (parseInt($event.updated) > parseInt(this.链接.updated)) {
+        if (parseInt($event.updated) >= parseInt(this.链接.updated)) {
           this.链接 = JSON.parse(JSON.stringify($event));
-
           this.计算路径();
         }
       }
@@ -536,8 +547,8 @@ module.exports = {
           case "折线": {
             this.路径 = this.生成折线路径(路径线段);
             this.链接.attrs.path = this.路径.d;
-            this.链接.attrs.top = this.路径.mid.y;
-            this.链接.attrs.left = this.路径.mid.x;
+            this.链接.attrs.top = Math.floor(this.路径.mid.y);
+            this.链接.attrs.left = Math.floor(this.路径.mid.x);
             this.中点 = this.路径.mid;
 
             break;
@@ -546,8 +557,8 @@ module.exports = {
           case "简单曲线": {
             this.路径 = this.两点生成三次贝塞尔曲线(路径线段);
             this.链接.attrs.path = this.路径.d;
-            this.链接.attrs.top = this.路径.mid.y;
-            this.链接.attrs.left = this.路径.mid.x;
+            this.链接.attrs.top = Math.floor(this.路径.mid.y);
+            this.链接.attrs.left = Math.floor(this.路径.mid.x);
             this.中点 = this.路径.mid;
 
             break;
@@ -555,14 +566,14 @@ module.exports = {
           default: {
             this.路径 = this.生成直线路径(路径线段);
             this.链接.attrs.path = this.路径.d;
-            this.链接.attrs.top = this.路径.mid.y;
-            this.链接.attrs.left = this.路径.mid.x;
+            this.链接.attrs.top = Math.floor(this.路径.mid.y);
+            this.链接.attrs.left = Math.floor(this.路径.mid.x);
             this.中点 = this.路径.mid;
           }
         }
 
         this.计算引线(this.链接);
-
+        this.链接 = this.$更新数据时间戳(this.链接);
         if (Math.abs(this.链接.attrs.offsetx) > 50 || this.链接.attrs.offsety > 50) {
           // console.log("计算引线");
           this.显示引线 = true;

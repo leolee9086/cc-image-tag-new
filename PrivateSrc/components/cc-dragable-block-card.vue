@@ -496,6 +496,7 @@ module.exports = {
         旧数据.updated = "";
         新数据.updated = "";
         if (旧数据 !== 新数据 && !新数据.attrs.trashed && !旧数据.trashed) {
+          console.log($event);
           this.对象数据 = $event;
         }
       }
@@ -577,10 +578,10 @@ module.exports = {
         offsety = y / 窗口缩放倍数 - top;
         offsetx = x / 窗口缩放倍数 - left;
       }
-      this.对象数据.attrs.top = top;
-      this.对象数据.attrs.left = left;
-      this.对象数据.attrs.offsetx = offsetx;
-      this.对象数据.attrs.offsety = offsety;
+      this.对象数据.attrs.top = Math.floor(top);
+      this.对象数据.attrs.left = Math.floor(left);
+      this.对象数据.attrs.offsetx = Math.floor(offsetx);
+      this.对象数据.attrs.offsety = Math.floor(offsety);
     },
     dragging: function (x, y) {
       this.计算坐标(x, y);
@@ -620,6 +621,9 @@ module.exports = {
     保存数据: function ($event) {
       $event ? (this.对象数据.name = $event) : null;
       this.对象数据 = this.$更新数据时间戳(this.对象数据);
+      this.数据类型 == "link"
+        ? console.log(this.对象数据.attrs.offsetx, this.对象数据.attrs.offsety)
+        : null;
       this.$事件总线.$emit("保存数据", this.对象数据);
     },
     转化为卡片: function () {

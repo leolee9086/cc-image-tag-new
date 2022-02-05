@@ -64,9 +64,9 @@ self.获取数据 = function (数据请求对象) {
     });
   });
 };
-self.保存数据 = function (数据) {
+self.保存数据 =async function (数据) {
   let 数据表名 = 数据.type + "s";
-  self.数据库[数据表名].put(数据);
+  await self.数据库[数据表名].put(数据);
 };
 self.删除数据 = function(传入数据){
   if(传入数据.attrs){

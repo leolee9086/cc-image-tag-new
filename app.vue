@@ -62,19 +62,11 @@ module.exports = {
     if (this.$挂件模式()) {
       this.挂件自身元素 = self.frameElement.parentElement.parentElement;
     }
-    liveQuery(() => this.$数据库.cards.toArray()).subscribe({
-      next: (result) => {
-        console.log(1);
-        this.卡片数组 = result;
-      },
-    });
-    liveQuery(() => this.$数据库.links.toArray()).subscribe({
-      next: (result) => {
-        console.log(2);
-
-        this.链接数组 = result;
-      },
-    });
+    console.log(this.$数据获取器);
+    let that = this;
+    this.$数据获取器.onmessage = function (massage) {
+      that.判断消息(massage);
+    };
   },
   data() {
     return {
@@ -124,7 +116,7 @@ module.exports = {
       }
       flag ? 数据列表.push(数据) : null;
     },
-    判断消息: function (消息) {
+    判断消息: async function (消息) {
       console.log(消息);
       消息.data.卡片数组 ? (this.卡片数组 = 消息.data.卡片数组) : null;
       消息.data.链接数组 ? (this.链接数组 = 消息.data.链接数组) : null;
