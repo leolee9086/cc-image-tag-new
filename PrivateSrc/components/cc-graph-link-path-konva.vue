@@ -49,6 +49,7 @@ module.exports = {
     this.加载节点图片(this.中间节点图片, "中间节点图片元素");
 
     this.计算路径();
+    几何计算器.addEventListener("message", this.几何计算消息处理);
   },
   beforeDestroy() {
     this.监听 = false;
@@ -220,7 +221,7 @@ module.exports = {
       return {
         offsetX: this.真实画布原点.x / this.缩放倍数 || 0,
         offsetY: this.真实画布原点.y / this.缩放倍数 || 0,
-        data: this.路径.d,
+        data: this.链接["attrs"]["path"],
         stroke:
           this.链接["attrs"]["path_color"] ||
           this.链接["attrs"]["borderColor"] ||
@@ -315,6 +316,13 @@ module.exports = {
     },
   },
   methods: {
+    几何计算消息处理(massage) {
+      if (!massage.data || massage.data.数据id !== this.链接.id) {
+        return null;
+      }
+      let 数据名 = massage.data.数据名;
+      this[数据名] = massage.data.数据值;
+    },
     计算中点可见性() {
       if (this.链接 && this.链接.attrs) {
         if (typeof this.链接.attrs.hidetag !== "undefined") {
@@ -469,9 +477,7 @@ module.exports = {
       try {
         let image = new window.Image();
         image.src = 图片源;
-
         image.onload = () => {
-          // set image only when it is loaded
           this[参数名] = image;
         };
       } catch (e) {}
@@ -543,7 +549,7 @@ module.exports = {
       this.起点 = 路径线段.起点.x ? 路径线段.起点 : this.起点;
       this.终点 = 路径线段.终点.x ? 路径线段.终点 : this.终点;
       if (路径线段) {
-        switch (this.路径类型) {
+        /*switch (this.路径类型) {
           case "折线": {
             this.路径 = this.生成折线路径(路径线段);
             this.链接.attrs.path = this.路径.d;
@@ -569,9 +575,14 @@ module.exports = {
             this.链接.attrs.left = this.路径.mid.x;
             this.中点 = this.路径.mid;
           }
-        }
+        }*/
+        几何计算器.postMessage({
+          处理函数: "生成链接路径",
+          数据: [this.代理起始标记, this.代理结束标记, this.链接],
+        });
 
-        this.计算引线(this.链接);
+        几何计算器.postMessage({ 处理函数: "计算引线", 数据: this.链接 });
+        // this.计算引线(this.链接);
         this.链接 = this.$更新数据时间戳(this.链接);
         if (Math.abs(this.链接.attrs.offsetx) > 50 || this.链接.attrs.offsety > 50) {
           // console.log("计算引线");

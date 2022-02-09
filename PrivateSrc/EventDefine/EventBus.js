@@ -1,10 +1,12 @@
 const 数据总线 = new Worker('./PrivateSrc/EventDefine/EventWorker.js');
 const 数据获取器 = new Worker('./PrivateSrc/EventDefine/DataWorker.js');
+const 几何计算器 = new Worker('./PrivateSrc/GeomDefine/GeomWorker.js');
 
 const 事件总线 = new Vue();
 数据总线.postMessage({'处理函数':"初始化数据库","数据":Vue.prototype.$baseid})
 //数据总线.onmessage=function(massage){console.log(massage)}
 数据获取器.postMessage({'处理函数':"初始化数据库","数据":Vue.prototype.$baseid})
+几何计算器.onmessage=function(massage){console.log(massage)}
 
 
 const 事务列表 = {
