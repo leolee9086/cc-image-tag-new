@@ -1,3 +1,5 @@
+importScripts("/widgets/cc-baselib/static/moment-with-locales.js");
+
 const 几何定义 = {
   矢量加(矢量1, 矢量2) {
     return { x: 矢量1.x + 矢量2.x, y: 矢量1.y + 矢量2.y };
@@ -111,7 +113,10 @@ self.矩形与矢量交点 = function (矩形, 矢量) {
   }
   return 交点;
 };
-
+function 生成毫秒时间戳() {
+  let str = moment().format("YYYYMMDDHHmmssSSSS");
+  return str;
+}
 self.生成引线路径 = function (路径线段) {
   let 起始节点 = 路径线段.起点;
   let 结束节点 = 路径线段.终点;
@@ -170,7 +175,9 @@ self.生成链接路径 = function (数据数组) {
       链接.attrs.mid = 路径.mid;
     }
   }
+  发送日志(链接)
   if (链接 && 链接.attrs.top && 链接.attrs.left) {
+    链接.updated=生成毫秒时间戳()
     self.postMessage({
       数据id: 链接.id,
       数据名: "链接",
@@ -254,7 +261,11 @@ self.生成直线路径 = function (起始标记, 结束标记, 链接属性) {
         M ${起始节点.x} ${起始节点.y}
         l ${路径矢量.x} ${路径矢量.y}
         `;
+        发送日志(define);
+
   midpoint = 几何定义.矢量加(起始节点, 几何定义.矢量除标量(路径矢量, 2));
+  发送日志(midpoint);
+
   return { d: define, mid: midpoint };
 };
 

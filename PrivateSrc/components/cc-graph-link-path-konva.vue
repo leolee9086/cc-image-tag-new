@@ -49,7 +49,9 @@ module.exports = {
     this.加载节点图片(this.中间节点图片, "中间节点图片元素");
 
     this.计算路径();
-    几何计算器.addEventListener("message", this.几何计算消息处理);
+    this.$几何计算器.addEventListener("message", (massage) =>
+      this.几何计算消息处理(massage)
+    );
   },
   beforeDestroy() {
     this.监听 = false;
@@ -297,30 +299,20 @@ module.exports = {
         if (!val.attrs) {
           return null;
         }
+        console.log("数据变化");
         let 新数据 = JSON.parse(JSON.stringify(val));
         let 旧数据 = JSON.parse(JSON.stringify(oldval || this.link));
+        if (parseInt(新数据.updated) <= parseInt(旧数据.updated)) {
+          return null;
+        }
         新数据.updated = "";
         旧数据.updated = "";
         //console.log(JSON.stringify(新数据), JSON.stringify(旧数据));
 
         if (JSON.stringify(新数据) !== JSON.stringify(旧数据)) {
-          console.log(新数据.attrs);
-
-          新数据 && 旧数据 && 新数据.attrs && 旧数据.attrs
-            ? null
-            : () => {
-                if (
-                  新数据.attrs.top + 新数据.attrs.offsety !==
-                  旧数据.attrs.top + 旧数据.attrs.offsety
-                ) {
-                  !this.链接.virtual
-                    ? () => {
-                        console.log("保存链接"),
-                          this.$事件总线.$emit("保存数据", this.链接);
-                      }
-                    : null;
-                }
-              };
+          if (JSON.stringify(新数据.attrs) !== JSON.stringify(旧数据.attrs)) {
+            console.log("保存链接"), this.$事件总线.$emit("保存数据", this.链接);
+          }
         }
       },
       deep: true,
@@ -328,11 +320,16 @@ module.exports = {
   },
   methods: {
     几何计算消息处理(massage) {
-      if (!massage.data || massage.data.数据id !== this.链接.id) {
+      let that = this;
+      console.log(massage.data);
+      if (!massage.data || massage.data.数据id !== that.链接.id) {
         return null;
       }
-      let 数据名 = massage.data.数据名;
-      this[数据名] = massage.data.数据值;
+      let 数据名 = massage.data["数据名"];
+      console.log(数据名);
+      that[数据名] = massage.data["数据值"];
+
+      that[数据名] = JSON.parse(JSON.stringify(that[数据名]));
     },
     计算中点可见性() {
       if (this.链接 && this.链接.attrs) {
@@ -516,7 +513,7 @@ module.exports = {
         }
       }
       if ($event.id == this.链接.id) {
-        if (parseInt($event.updated) >= parseInt(this.链接.updated)) {
+        if (parseInt($event.updated) > parseInt(this.链接.updated)) {
           this.链接 = JSON.parse(JSON.stringify($event));
           this.计算路径();
         }
