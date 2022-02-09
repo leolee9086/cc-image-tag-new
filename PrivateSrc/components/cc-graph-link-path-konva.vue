@@ -68,7 +68,7 @@ module.exports = {
       路径线段: {},
       起点: {},
       终点: {},
-      中点: {},
+      //中点: {},
       路径类型: "",
       中点可见性: true,
       缩放倍数: this.$当前窗口状态.缩放倍数 || 1,
@@ -250,6 +250,11 @@ module.exports = {
       };
       return 引线;
     },
+    中点: function () {
+      if (this.链接 && this.链接.attrs && this.链接.attrs.mid) {
+        return this.链接.attrs.mid;
+      } else return { x: 0, y: 0 };
+    },
   },
   watch: {
     起始节点图片: {
@@ -293,21 +298,27 @@ module.exports = {
           return null;
         }
         let 新数据 = JSON.parse(JSON.stringify(val));
-        let 旧数据 = JSON.parse(JSON.stringify(this.link));
+        let 旧数据 = JSON.parse(JSON.stringify(oldval || this.link));
         新数据.updated = "";
         旧数据.updated = "";
         //console.log(JSON.stringify(新数据), JSON.stringify(旧数据));
 
         if (JSON.stringify(新数据) !== JSON.stringify(旧数据)) {
-          console.log(3);
+          console.log(新数据.attrs);
+
           新数据 && 旧数据 && 新数据.attrs && 旧数据.attrs
             ? null
             : () => {
                 if (
-                  新数据.attrs.top + 新数据.attrs.offsetx !==
-                  旧数据.attrs.top + 旧数据.attrs.offsetx
+                  新数据.attrs.top + 新数据.attrs.offsety !==
+                  旧数据.attrs.top + 旧数据.attrs.offsety
                 ) {
-                  !this.链接.virtual ? this.$事件总线.$emit("保存数据", this.链接) : null;
+                  !this.链接.virtual
+                    ? () => {
+                        console.log("保存链接"),
+                          this.$事件总线.$emit("保存数据", this.链接);
+                      }
+                    : null;
                 }
               };
         }
@@ -581,9 +592,7 @@ module.exports = {
           数据: [this.代理起始标记, this.代理结束标记, this.链接],
         });
 
-        几何计算器.postMessage({ 处理函数: "计算引线", 数据: this.链接 });
         // this.计算引线(this.链接);
-        this.链接 = this.$更新数据时间戳(this.链接);
         if (Math.abs(this.链接.attrs.offsetx) > 50 || this.链接.attrs.offsety > 50) {
           // console.log("计算引线");
           this.显示引线 = true;

@@ -33,7 +33,9 @@ const 几何定义 = {
     let 半径 = 圆形.radius;
   },
 };
-
+const 发送日志 = function (数据) {
+  self.postMessage({ 日志: 数据 });
+};
 self.计算中心 = function (代理标记) {
   let 中心 = {};
   if (代理标记.offsetx + "" != "undefined" && 代理标记.offsetx + "" != "NAN") {
@@ -125,14 +127,14 @@ self.生成引线路径 = function (路径线段) {
 };
 
 self.生成链接路径 = function (数据数组) {
-  let 起始标记=数据数组[0]
-  let 结束标记=数据数组[1]
-  let 链接 =  数据数组[2]
+  let 起始标记 = 数据数组[0];
+  let 结束标记 = 数据数组[1];
+  let 链接 = 数据数组[2];
   let 起始标记属性 = 起始标记["attrs"];
   let 结束标记属性 = 结束标记["attrs"];
-  let 链接属性 = 链接["attrs"]
-  let 路径 = ""
-  let 中点 = ""
+  let 链接属性 = 链接["attrs"];
+  let 路径 = "";
+  let 中点 = "";
   if (起始标记属性.folded) {
     起始标记属性.width = 100;
     起始标记属性.height = 30;
@@ -143,7 +145,7 @@ self.生成链接路径 = function (数据数组) {
   }
   switch (链接.attrs.path_type) {
     case "折线": {
-      路径 = self.生成折线路径(起始标记属性,结束标记属性,链接属性);
+      路径 = self.生成折线路径(起始标记属性, 结束标记属性, 链接属性);
       链接.attrs.path = 路径.d;
       链接.attrs.top = 路径.mid.y;
       链接.attrs.left = 路径.mid.x;
@@ -152,8 +154,8 @@ self.生成链接路径 = function (数据数组) {
     }
 
     case "简单曲线": {
-      路径 = self.两点生成三次贝塞尔曲线(起始标记属性,结束标记属性,链接属性);
-      链接.attrs.path =路径.d;
+      路径 = self.两点生成三次贝塞尔曲线(起始标记属性, 结束标记属性, 链接属性);
+      链接.attrs.path = 路径.d;
       链接.attrs.top = 路径.mid.y;
       链接.attrs.left = 路径.mid.x;
       中点 = 路径.mid;
@@ -161,37 +163,38 @@ self.生成链接路径 = function (数据数组) {
       break;
     }
     default: {
-      路径 = self.生成直线路径(起始标记属性,结束标记属性,链接属性);
+      路径 = self.生成直线路径(起始标记属性, 结束标记属性, 链接属性);
       链接.attrs.path = 路径.d;
       链接.attrs.top = 路径.mid.y;
       链接.attrs.left = 路径.mid.x;
       链接.attrs.mid = 路径.mid;
     }
   }
-  
-  self.postMessage({
-    数据id:链接.id,
-    数据名:"链接",
-    数据值:链接
-
-  })
+  if (链接 && 链接.attrs.top && 链接.attrs.left) {
+    self.postMessage({
+      数据id: 链接.id,
+      数据名: "链接",
+      数据值: 链接,
+    });
+    self.计算引线(链接)
+  }
 };
-self.计算路径线段= function (起始标记属性, 结束标记属性) {
-    let 起始中心 = self.计算中心(起始标记属性);
-    let 结束中心 = self.计算中心(结束标记属性);
-    let 方向矢量 = 几何定义.矢量减(结束中心, 起始中心);
-    if (方向矢量.x === 0) {
-      方向矢量.x = 0.00000000001;
-    }
-    if (方向矢量.y === 0) {
-      方向矢量.y = 0.00000000001;
-    }
-    let 反转方向矢量 = 几何定义.矢量乘标量(方向矢量, -1);
-    方向矢量 = 几何定义.矢量乘标量(方向矢量, 1);
-    let 起始节点 = self.矩形与矢量交点(起始标记属性, 方向矢量);
-    let 结束节点 = self.矩形与矢量交点(结束标记属性, 反转方向矢量);
-    let 路径线段 = { 起点: 起始节点, 终点: 结束节点 };
-    return 路径线段;
+self.计算路径线段 = function (起始标记属性, 结束标记属性) {
+  let 起始中心 = self.计算中心(起始标记属性);
+  let 结束中心 = self.计算中心(结束标记属性);
+  let 方向矢量 = 几何定义.矢量减(结束中心, 起始中心);
+  if (方向矢量.x === 0) {
+    方向矢量.x = 0.00000000001;
+  }
+  if (方向矢量.y === 0) {
+    方向矢量.y = 0.00000000001;
+  }
+  let 反转方向矢量 = 几何定义.矢量乘标量(方向矢量, -1);
+  方向矢量 = 几何定义.矢量乘标量(方向矢量, 1);
+  let 起始节点 = self.矩形与矢量交点(起始标记属性, 方向矢量);
+  let 结束节点 = self.矩形与矢量交点(结束标记属性, 反转方向矢量);
+  let 路径线段 = { 起点: 起始节点, 终点: 结束节点 };
+  return 路径线段;
 };
 
 self.消息处理器 = function (消息) {
@@ -221,12 +224,27 @@ self.消息处理器 = function (消息) {
   }
 };
 
-self.生成直线路径=function (起始标记,结束标记,链接属性) {
-  let 路径线段 = self.计算路径线段(起始标记,结束标记)
-  let 起点坐标 = 路径线段.起点
-  let 终点坐标 = 路径线段.终点
-  let 起始节点偏移 = self.计算节点标志偏移(起点坐标,终点坐标,链接属性,"from",10)
-  let 结束节点偏移 = self.计算节点标志偏移(终点坐标,起点坐标,链接属性,"to",10)
+self.生成直线路径 = function (起始标记, 结束标记, 链接属性) {
+  let 路径线段 = self.计算路径线段(起始标记, 结束标记);
+  发送日志(路径线段);
+  let 起点坐标 = 路径线段.起点;
+  let 终点坐标 = 路径线段.终点;
+  let 起始节点偏移 = self.计算节点标志偏移(
+    起点坐标,
+    终点坐标,
+    链接属性,
+    "from",
+    10
+  );
+  let 结束节点偏移 = self.计算节点标志偏移(
+    终点坐标,
+    起点坐标,
+    链接属性,
+    "to",
+    10
+  );
+  发送日志(起始节点偏移);
+  发送日志(结束节点偏移);
   let 起始节点 = 几何定义.矢量减(路径线段.起点, 起始节点偏移);
   let 结束节点 = 几何定义.矢量减(路径线段.终点, 结束节点偏移);
   let 路径矢量 = 几何定义.矢量减(结束节点, 起始节点);
@@ -238,18 +256,26 @@ self.生成直线路径=function (起始标记,结束标记,链接属性) {
         `;
   midpoint = 几何定义.矢量加(起始节点, 几何定义.矢量除标量(路径矢量, 2));
   return { d: define, mid: midpoint };
-}
+};
 
-self.计算节点标志偏移= function (
+self.计算节点标志偏移 = function (
   起点坐标,
   终点坐标,
   链接属性,
   方向,
-  计算容差,
+  计算容差
 ) {
-  let 矩形 = 链接属性
-  方向==="from"?标记大小 = 链接属性.from_anchor_size:标记大小=链接属性.to_anchor_size;
-  方向==="from"?是否自动旋转 =链接属性.from_anchor_rotate:是否自动旋转=链接属性.to_anchor_rotate;
+  发送日志(起点坐标);
+  发送日志(终点坐标);
+  发送日志(方向);
+  发送日志(链接属性);
+  let 矩形 = 链接属性;
+  方向 === "from"
+    ? (标记大小 = 链接属性.from_anchor_size)
+    : (标记大小 = 链接属性.to_anchor_size);
+  方向 === "from"
+    ? (是否自动旋转 = 链接属性.from_anchor_rotate)
+    : (是否自动旋转 = 链接属性.to_anchor_rotate);
   let obj = {};
   let 角度 = 0;
   if (起点坐标.y <= 矩形.top + 计算容差) {
@@ -274,6 +300,7 @@ self.计算节点标志偏移= function (
     obj.y = 0 - 标记大小 / 2;
     角度 = 180;
   }
+  发送日志(obj);
   obj.rotation = 角度;
   if (是否自动旋转) {
     let 方向矢量 = { x: 终点坐标.x - 起点坐标.x, y: 终点坐标.y - 起点坐标.y };
@@ -282,8 +309,8 @@ self.计算节点标志偏移= function (
     obj.rotation = 角度 - 90;
   }
   return obj;
-}
-self.计算角度= function (角度向量) {
+};
+self.计算角度 = function (角度向量) {
   let 象限 = self.象限判断(角度向量);
   let 角度 = (360 * Math.atan(角度向量.y / 角度向量.x)) / (2 * Math.PI);
   switch (象限) {
@@ -317,8 +344,8 @@ self.计算角度= function (角度向量) {
   }
 
   return 角度;
-}
-self.象限判断=function(位移向量) {
+};
+self.象限判断 = function (位移向量) {
   let x = 位移向量["x"];
   let y = 位移向量["y"];
   let 象限 = "第一象限";
@@ -335,8 +362,8 @@ self.象限判断=function(位移向量) {
     象限 = "第三象限";
   }
   return 象限;
-}
+};
 onerror = function (e) {
-  self.postMessage(e);
+  self.postMessage({ 错误: e });
 };
 self.onmessage = self.消息处理器;
