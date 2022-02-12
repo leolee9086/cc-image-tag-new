@@ -21,8 +21,11 @@
             <cc-select-boards></cc-select-boards>
             <div slot="reference" class="el-icon-folder"></div>
           </el-popover>
-          <span class="el-icon-download" aria-label="导出当前画板数据"  @click="下载当前版本()"></span>
-
+          <span
+            class="el-icon-download"
+            aria-label="导出当前画板数据"
+            @click="下载当前版本()"
+          ></span>
           <el-popover trigger="click" placement="top" :height="500">
             <el-input v-model="搜索关键词" @input="搜索()" size="mini"></el-input>
             <div v-for="(item, i) in 搜索结果列表">
@@ -89,7 +92,7 @@
 </template>
 <script>
 module.exports = {
-  name: "cc-toolbar-edit",
+  name: "cc-toolbar-infor",
   props: ["卡片数据id", "链接数据id", "思源伺服ip"],
   data() {
     return {
@@ -111,21 +114,17 @@ module.exports = {
     };
   },
   async mounted() {
-    this.思源伺服ip = window.location.host;
-    await this.加载数据();
     await this.$画板元数据库.workspace.get(00000).then((data) => console.log(data));
     this.$事件总线.$on("保存卡片", ($event) => this.获取当前元素数据($event));
     this.$事件总线.$on("保存链接", ($event) => this.获取当前元素数据($event));
     this.$事件总线.$on("激活卡片", ($event) => this.获取当前元素数据($event));
     this.$事件总线.$on("激活链接", ($event) => this.获取当前元素数据($event));
-        this.$事件总线.$on("激活数据", ($event) => this.获取当前元素数据($event));
-
+    this.$事件总线.$on("激活数据", ($event) => this.获取当前元素数据($event));
   },
   watch: {
     使用svg渲染: function (val) {
       this.$当前窗口状态.使用svg = val;
     },
-
     当前画板命名: {
       handler: async function (val, oldval) {
         this.$事件总线.$emit("修改画板元数据", { key: "name", value: val });
@@ -159,7 +158,6 @@ module.exports = {
     },
   },
   methods: {
-    
     添加卡片名称到思源块别名: async function () {
       let 卡片名称 = this.当前对象名称;
       let 思源块内容 = await 以id获取思源块信息(
@@ -181,22 +179,9 @@ module.exports = {
         alias
       );
     },
-    加载数据: async function () {
-      let that = this;
-      let baseid = this.$baseid;
-      await this.从思源块加载数据(baseid);
-      try {
-        that.背景色 = (await that.$数据库.metadata.get("backgroundColor")).value;
-      } catch (e) {
-        that.背景色 = "var(--b3-theme-background)";
-        that.$数据库.metadata.put({ key: "customcolors", value: [] });
-      }
 
-      that.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${that.对象数据.id}&baseid=${that.$baseid}`;
-      // console.log(that.画板列表);
-    },
     获取当前元素数据: function ($event) {
-      if ($event&&$event.attrs) {
+      if ($event && $event.attrs) {
         if ($event.id == this.卡片数据id || $event.id == this.链接数据id) {
           this.对象数据 = $event || this.对象数据;
           this.属性对象 = this.对象数据.attrs;
@@ -206,73 +191,7 @@ module.exports = {
         }
       }
     },
-    从思源块加载数据: async function (id) {
-      let that = this;
-      let filepath = `assets/data-${id}.cccards`;
-      if (this.$挂件模式()) {
-        this.挂件自身元素 = window.frameElement.parentElement.parentElement;
 
-        filepath =
-          this.挂件自身元素.getAttribute("data-assets") ||
-          this.挂件自身元素.getAttribute("custom-data-assets") ||
-          `assets/data-${this.挂件自身元素.getAttribute("data-node-id")}.cccards`;
-      }
-      let url = this.思源伺服ip
-        ? `http://${this.思源伺服ip}/${filepath}`
-        : `localhost:6806/${filepath}`;
-      console.log(url);
-      let 文件数据 = {};
-      try {
-        await axios.get(url).then((res) => {
-          文件数据 = res.data;
-          if (文件数据["cardarray"]) {
-            try {
-              this.图片缩放倍数 = parseFloat(文件数据.resize).toFixed(2);
-            } catch (e) {
-              console.log(e);
-            }
-          }
-        });
-      } catch (e) {
-        console.log("主工具栏数据加载错误", e);
-
-        alert("文件不存在,将在附件中新建文件");
-        this.$事件总线.$emit("上传当前画板文件数据到思源");
-      }
-      if (文件数据) {
-        let 卡片数组 = 文件数据["cards"];
-        let 链接数组 = 文件数据["links"];
-        let metadata = 文件数据["metadata"];
-        let 卡片预设 = 文件数据["cardpresets"];
-        let 链接预设 = 文件数据["linkpresets"];
-        if (卡片数组) {
-          for (i in 卡片数组) {
-            await this.$数据库.cards.put(卡片数组[i]);
-          }
-        }
-        if (链接数组) {
-          for (i in 链接数组) {
-            await this.$数据库.links.put(链接数组[i]);
-          }
-        }
-        if (metadata) {
-          for (i in metadata) {
-            await this.$数据库.metadata.put(metadata[i]);
-          }
-        }
-        if (卡片预设) {
-          for (i in 卡片预设) {
-            await this.$数据库.cardpresets.put(卡片预设[i]);
-          }
-        }
-        if (链接预设) {
-          for (i in 链接预设) {
-            await this.$数据库.linkpresets.put(链接预设[i]);
-          }
-        }
-      }
-      //     console.log("加载完成");
-    },
     聚焦到卡片: function (对象数据) {
       if (this.$当前窗口状态.缩放倍数 < 1) {
         this.$事件总线.$emit("窗口缩放", 1);
@@ -340,7 +259,6 @@ module.exports = {
         let 链接列表 = await this.$数据库.cards.toArray();
         this.搜索结果列表 = 卡片列表.concat(链接列表);
       }
-      //    console.log("搜索结果", this.搜索结果列表);
     },
   },
   computed: {},

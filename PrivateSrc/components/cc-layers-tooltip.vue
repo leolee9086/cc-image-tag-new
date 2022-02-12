@@ -1,13 +1,18 @@
 <template>
-  <div
-    role="tooltip"
-    v-if="当前提示内容"
-    class="tooltip"
-    :style="`position:fixed;left:${当前鼠标坐标.x + 10}px;top: ${
-      当前鼠标坐标.y + 10
-    }px;z-index:20000`"
-  >
-    {{ 当前提示内容 }}
+  <div>
+    <div
+      role="tooltip"
+      v-if="当前提示内容"
+      class="tooltip float"
+      :style="`position:fixed;left:${当前鼠标坐标.x + 10}px;top: ${
+        当前鼠标坐标.y + 10
+      }px;z-index:20000`"
+    >
+      {{ 当前提示内容 }}
+    </div>
+    <div class="statstip tooltip" style="position: fixed; top: calc(100vh - 3em)">
+      {{ $当前窗口状态.当前窗口状态提示 }}
+    </div>
   </div>
 </template>
 <script>

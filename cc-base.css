@@ -19,7 +19,14 @@
   background-color: none;
   border: none;
 }
+.tooltip {
+  background-color: rgba(58, 56, 56, 0.664);
+  font-size: xx-small;
+}
+.tooltip .float{
+  max-width: 100px;
 
+}
 .cc-card-body.folded {
   position: absolute;
   height: 15px;

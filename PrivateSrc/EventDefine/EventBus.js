@@ -1,17 +1,17 @@
-const 数据总线 = new Worker('./PrivateSrc/EventDefine/EventWorker.js');
-const 数据获取器 = new Worker('./PrivateSrc/EventDefine/DataWorker.js');
-const 几何计算器 = new Worker('./PrivateSrc/GeomDefine/GeomWorker.js');
+const 数据总线 = new Worker("./PrivateSrc/EventDefine/EventWorker.js");
+const 数据获取器 = new Worker("./PrivateSrc/EventDefine/DataWorker.js");
 const 事件总线 = new Vue();
+let 共享数据总线 = new BroadcastChannel("共享数据总线");
 
-数据总线.postMessage({'处理函数':"初始化数据库","数据":Vue.prototype.$baseid})
-//数据总线.onmessage=function(massage){console.log(massage)}
-数据获取器.postMessage({'处理函数':"初始化数据库","数据":Vue.prototype.$baseid})
-const 消息打印 = function(massage){
-  massage.data&&massage.data.日志?console.log(massage.data.日志):null
-  massage.data&&massage.data.错误?console.log(massage.data.错误):null
+const 消息打印 = function (massage) {
+  massage.data && massage.data.日志 ? console.log(massage.data.日志) : null;
+  massage.data && massage.data.错误 ? console.log(massage.data.错误) : null;
+};
+共享数据总线.onmessage=function(massage){
+    if(massage.data.对象数据){
+      事件总线.$emit("接收数据",massage.data.对象数据)
+    }
 }
-几何计算器.onmessage=function(massage){消息打印(massage)}
-
 
 const 事务列表 = {
   数据库: 数据库,
@@ -85,7 +85,7 @@ const 事务列表 = {
     let 结束卡片 =
       (await this.$数据库.cards.get(链接数据.attrs.to_id)) ||
       (await this.$数据库.links.get(链接数据.attrs.to_id));
-      await this.$数据库.links
+    await this.$数据库.links
       .delete(链接数据.id)
       .then(() => this.$数据库.cards.put(新数据));
 
@@ -93,7 +93,7 @@ const 事务列表 = {
     this.$事件总线.$emit("连接卡片", [新数据, 结束卡片]);
   },
 
-  添加卡片:  function (卡片数据, def) {
+  添加卡片: function (卡片数据, def) {
     this.$事件总线.$emit("保存数据", 卡片数据, true);
 
     if (this.$当前窗口状态.current_cardpreset_name) {
@@ -112,92 +112,57 @@ const 事务列表 = {
     if (flag) {
       return null;
     }
-    if(!传入数据){
+    if (!传入数据) {
+      return null;
+    }
+    if (!传入数据.id) {
+      return null;
+    }
+    if (!传入数据.type){
       return null
     }
-    if(!传入数据.id){
-      return null
-    }
-    传入数据= this.$更新数据时间戳(传入数据)
+    // 传入数据 = this.$更新数据时间戳(传入数据);
     传入数据.type == "card"
       ? this.$事件总线.$emit("保存卡片", 传入数据)
       : this.$事件总线.$emit("保存链接", 传入数据);
-  },
-  保存链接:  function (传入数据) {
-    if (!传入数据) {
-      return null;
-    }
-
-    let 数据表名 = 传入数据.type + "s";
-    console.log(传入数据)
-    if (传入数据.attrsproxy) {
-       this.$数据库.links.get(传入数据.id).then(
-      原始数据=>{
-      if (原始数据) {
-        原始数据.subtype = 传入数据.subtype || "属于";
-
-        for (属性名 in 传入数据.attrsproxy) {
-          原始数据["attrs"][属性名] = 传入数据["attrsproxy"][属性名];
-        }
-
-        原始数据.updated = 传入数据.updated || this.$生成毫秒时间戳();
-        传入数据 = 原始数据;
-      }
-
-      this.$数据总线.postMessage({处理函数:"保存数据",数据:传入数据})
-      return null}
-      )
-    } 
-    else if (传入数据.id) {
-    
-        this.$数据总线.postMessage({处理函数:"保存数据",数据:传入数据})
-      
-    }
-  },
-  保存卡片:  function (传入数据) {
-    if (!传入数据) {
-      return null;
-    }
     let 数据表名 = 传入数据.type + "s";
     //console.log(数据表名)
     if (传入数据.attrsproxy) {
-      this.$数据库.cards.get(传入数据.id).then(
-        原始数据=>{
+      this.$数据库[数据表名].get(传入数据.id).then((原始数据) => {
         if (原始数据) {
           原始数据.subtype = 传入数据.subtype || "属于";
-  
           for (属性名 in 传入数据.attrsproxy) {
             原始数据["attrs"][属性名] = 传入数据["attrsproxy"][属性名];
           }
-  
+
           原始数据.updated = 传入数据.updated || this.$生成毫秒时间戳();
           传入数据 = 原始数据;
         }
-  
-        this.$数据总线.postMessage({处理函数:"保存数据",数据:传入数据})
-        return null}
-        )
+        this.$数据库[数据表名].put(传入数据)
+        共享数据总线.postMessage({"动作时间":this.$生成毫秒时间戳(),"对象数据":传入数据})
+        return null;
+      });
     } else if (传入数据.id) {
-     
-        this.$数据总线.postMessage({处理函数:"保存数据",数据:传入数据})
-      
+      this.$数据库[数据表名].put(传入数据)
+      共享数据总线.postMessage({"动作时间":this.$生成毫秒时间戳(),"对象数据":传入数据})
       if (this.$当前窗口状态.current_workspace_handle) {
-         this.$保存markdown卡片数据(
+        this.$保存markdown卡片数据(
           传入数据,
           this.$当前窗口状态.current_workspace_handle
         );
       }
     }
   },
+  
   删除数据: function (传入数据) {
     // console.log(传入数据)
-    let that =this
+    let that = this;
     if (传入数据.attrs) {
       传入数据.type == "card"
         ? this.$事件总线.$emit("删除卡片", 传入数据)
         : this.$事件总线.$emit("删除链接", 传入数据);
     }
-    this.$数据总线.postMessage({"处理函数":"删除数据",数据:传入数据})
+    this.$数据总线.postMessage({ 处理函数: "删除数据", 数据: 传入数据 });
   },
   切换链接显示: function (传入数据) {
     console.log(传入数据);
@@ -210,7 +175,6 @@ const 事务列表 = {
     }
     传入数据.attrs.hidetag = !传入数据.attrs.hidetag ? true : false;
     this.$事件总线.$emit("保存数据", 传入数据);
-
   },
 
   定位至卡片: async function (卡片数据) {
@@ -243,7 +207,7 @@ const 事务列表 = {
       ? this.$事件总线.$emit("激活卡片", 数据)
       : this.$事件总线.$emit("激活链接", 数据);
   },
-  激活卡片:  function (数据) {
+  激活卡片: function (数据) {
     console.log(数据);
     this.$当前窗口状态.current_linkid = "";
     this.$当前窗口状态.current_cardid = 数据.id;
@@ -252,10 +216,10 @@ const 事务列表 = {
 
     if (this.$当前窗口状态.等待连接卡片) {
       let 等待连接卡片 = this.$当前窗口状态.等待连接卡片;
-    
+
       this.$事件总线.$emit("连接卡片", [等待连接卡片, 数据]);
     }
-    },
+  },
   激活链接: async function (数据) {
     this.$当前窗口状态.current_cardid = "";
     this.$当前窗口状态.current_linkid = 数据.id;
@@ -265,11 +229,10 @@ const 事务列表 = {
     if (this.$当前窗口状态.等待连接卡片) {
       let 等待连接卡片 = this.$当前窗口状态.等待连接卡片;
 
- 
       this.$事件总线.$emit("连接卡片", [等待连接卡片, 数据]);
     }
   },
-  连接卡片:  function (卡片数组, 链接类型) {
+  连接卡片: function (卡片数组, 链接类型) {
     this.$当前窗口状态.等待连接卡片 = null;
     let 起始卡片 = 卡片数组[0];
     let 结束卡片 = 卡片数组[1];
@@ -286,8 +249,9 @@ const 事务列表 = {
       if (链接类型) {
         新链接.subtype = 链接类型;
       }
-      console.log(新链接)
-      this.$数据总线.postMessage({"处理函数":"保存数据","数据":新链接})
+      console.log(新链接);
+      //this.$数据总线.postMessage({"处理函数":"保存数据","数据":新链接})
+      this.$数据库.links.put(新链接).then(() => {
         this.$事件总线.$emit("结束连接");
         this.$事件总线.$emit("添加链接", 新链接);
         this.$事件总线.$emit("保存链接", 新链接);
@@ -300,14 +264,14 @@ const 事务列表 = {
           this.$事件总线.$emit("添加链接", 新链接);
           this.$事件总线.$emit("保存链接", 新链接);
         }
+      });
     }
   },
-  结束连接:function(){
-    this.$当前窗口状态.等待连接卡片= null;
-
+  结束连接: function () {
+    this.$当前窗口状态.等待连接卡片 = null;
   },
   开始连接: function (data) {
-    this.$当前窗口状态.等待连接卡片= data;
+    this.$当前窗口状态.等待连接卡片 = data;
   },
   显示提示: function (提示内容) {
     this.$当前窗口状态.当前提示内容 = 提示内容;
@@ -317,7 +281,7 @@ const 事务列表 = {
   },
   点击画板空白处: function ($event) {
     if (!this.$当前窗口状态.等待连接卡片) {
-    //  console.log($event.target);
+      //  console.log($event.target);
       this.$事件总线.$emit("清理选择");
     } else {
       let 卡片数据 = this.$根据属性生成卡片({
@@ -334,7 +298,7 @@ const 事务列表 = {
     }
   },
   清理选择: function () {
- //   console.log("选择清空");
+    //   console.log("选择清空");
     this.$当前窗口状态.current_cardid = "";
     this.$当前窗口状态.current_linkid = "";
     this.$当前窗口状态.current_linkid_array = [];
@@ -358,10 +322,10 @@ const 事务列表 = {
     id数组.forEach((id) => (id == 数据.id ? (flag = false) : null));
     if (id数组[0]) {
       if (!ctrl键被按下) {
-      //  console.log(id数组, 数据.id);
+        //  console.log(id数组, 数据.id);
         flag ? this.$事件总线.$emit("清理选集") : null;
       } else {
-       // console.log(id数组, 数据.id);
+        // console.log(id数组, 数据.id);
 
         this.$当前窗口状态.current_cardid_array.push(数据.id);
 
@@ -379,8 +343,9 @@ const 事务列表 = {
     let 卡片数据 = this.$根据属性生成卡片({
       top: (window.pageYOffset + $event.clientY) / this.$当前窗口状态.缩放倍数,
       left: (window.pageXOffset + $event.clientX) / this.$当前窗口状态.缩放倍数,
+      
     });
-    this.$事件总线.$emit("添加卡片",卡片数据)
+    this.$事件总线.$emit("添加卡片", 卡片数据);
     this.$数据库.cards
       .put(卡片数据)
       .then(this.$事件总线.$emit("保存卡片", 卡片数据));
@@ -542,11 +507,8 @@ for (let item in 事务列表) {
   }
 }
 Vue.prototype.$事务列表 = 事务列表;
-
 Vue.prototype.$事件总线 = 事件总线;
 Vue.prototype.$数据总线 = 数据总线;
 Vue.prototype.$数据获取器 = 数据获取器;
-Vue.prototype.$几何计算器 = 几何计算器;
-
 Vue.prototype.$思源伺服ip = window.location.host;
 Vue.prototype.$主界面 = window.parent.document;

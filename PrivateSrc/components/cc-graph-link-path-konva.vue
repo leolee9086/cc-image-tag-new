@@ -4,13 +4,14 @@
     v-if="链接 && 代理起始标记 && 代理结束标记"
   >
     <v-path v-if="链接['attrs']" :config="链接设定"></v-path>
-    <v-path v-if="链接['attrs'] && 显示引线 && 中点可见性" :config="引线设定"></v-path>
-    <v-image v-if="链接['attrs'] && 结束节点图片元素" :config="结束节点设定"></v-image>
-    <v-image v-if="链接['attrs'] && 起始节点图片元素" :config="起始节点设定"></v-image>
+    <v-path v-if="链接['attrs'] && 显示引线" :config="引线设定"></v-path>
+    <v-image v-if="链接['attrs'] && 结束节点图片元素" :config="结束节点设定"> </v-image>
+    <v-image v-if="链接['attrs'] && 起始节点图片元素" :config="起始节点设定"> </v-image>
     <v-image
-      v-if="链接['attrs'] && 中间节点图片元素 && !链接.virtual && 中点可见性"
+      v-if="链接['attrs'] && 中间节点图片元素 && !链接.virtual"
       :config="中间节点设定"
-    ></v-image>
+    >
+    </v-image>
   </v-group>
 </template>
 <script>
@@ -21,15 +22,12 @@ module.exports = {
     if (this.link.attrs) {
       this.链接 = JSON.parse(JSON.stringify(this.link));
     } else {
-      console.log("数据错误", this.link);
       this.$事件总线.$emit("删除数据", this.link);
     }
     this.监听 = true;
 
     this.$事件总线.$on("保存卡片", (event) => this.判断id(event));
     this.$事件总线.$on("保存链接", (event) => this.判断id(event));
-    this.$事件总线.$on("保存数据", (event) => this.判断id(event));
-
     this.$事件总线.$on("窗口缩放", (event) => (this.缩放倍数 = event));
     this.链接.attrs.from_id
       ? (this.代理起始标记 =
@@ -42,16 +40,13 @@ module.exports = {
           (await this.$数据库.links.get(this.链接.attrs.to_id)))
       : null;
     if (!this.代理起始标记 || !this.代理结束标记) {
-      return null;
+      this.$事件总线.$emit("删除链接", this.link);
     }
     this.加载节点图片(this.起始节点图片, "起始节点图片元素");
     this.加载节点图片(this.结束节点图片, "结束节点图片元素");
     this.加载节点图片(this.中间节点图片, "中间节点图片元素");
 
     this.计算路径();
-    this.$几何计算器.addEventListener("message", (massage) =>
-      this.几何计算消息处理(massage)
-    );
   },
   beforeDestroy() {
     this.监听 = false;
@@ -70,9 +65,8 @@ module.exports = {
       路径线段: {},
       起点: {},
       终点: {},
-      //中点: {},
+      中点: {},
       路径类型: "",
-      中点可见性: true,
       缩放倍数: this.$当前窗口状态.缩放倍数 || 1,
       真实画布原点: "",
 
@@ -86,7 +80,7 @@ module.exports = {
       结束节点图片: "./PrivateSrc/icon/arrow1.png",
       终点标记大小: 30,
       终点标记自动旋转: true,
-      结束标记角度偏移: 180,
+      结束标记角度偏移: 90,
 
       中间节点图片元素: null,
       中间节点图片: "./PrivateSrc/icon/arrow1.png",
@@ -223,7 +217,7 @@ module.exports = {
       return {
         offsetX: this.真实画布原点.x / this.缩放倍数 || 0,
         offsetY: this.真实画布原点.y / this.缩放倍数 || 0,
-        data: this.链接["attrs"]["path"],
+        data: this.路径.d,
         stroke:
           this.链接["attrs"]["path_color"] ||
           this.链接["attrs"]["borderColor"] ||
@@ -232,7 +226,7 @@ module.exports = {
         fill: "transparent",
         scaleX: this.缩放倍数,
         scaleY: this.缩放倍数,
-        dash: this.链接.attrs.path_dash || undefined,
+        dash: this.链接.attrs.path_dash,
       };
     },
     引线设定: function () {
@@ -248,14 +242,8 @@ module.exports = {
         fill: "transparent",
         scaleX: this.缩放倍数,
         scaleY: this.缩放倍数,
-        dash: this.链接.attrs.path_dash || undefined,
       };
       return 引线;
-    },
-    中点: function () {
-      if (this.链接 && this.链接.attrs && this.链接.attrs.mid) {
-        return this.链接.attrs.mid;
-      } else return { x: 0, y: 0 };
     },
   },
   watch: {
@@ -282,13 +270,7 @@ module.exports = {
     },
     link: {
       handler: function (val, oldval) {
-        if (!val) {
-          return null;
-        }
-        if (parseInt(val.updated) < parseInt(oldval.updated)) {
-          return null;
-        }
-        this.计算中点可见性();
+        // console.log(this.路径类型);
         this.判断时间并计算链接(val, oldval);
       },
       deep: true,
@@ -299,48 +281,23 @@ module.exports = {
         if (!val.attrs) {
           return null;
         }
-        console.log("数据变化");
-        let 新数据 = JSON.parse(JSON.stringify(val));
-        let 旧数据 = JSON.parse(JSON.stringify(oldval || this.link));
-        if (parseInt(新数据.updated) <= parseInt(旧数据.updated)) {
-          return null;
-        }
-        新数据.updated = "";
-        旧数据.updated = "";
-        //console.log(JSON.stringify(新数据), JSON.stringify(旧数据));
-
-        if (JSON.stringify(新数据) !== JSON.stringify(旧数据)) {
-          if (JSON.stringify(新数据.attrs) !== JSON.stringify(旧数据.attrs)) {
-            console.log("保存链接"), this.$事件总线.$emit("保存数据", this.链接);
-          }
+        let 拷贝对象 = JSON.parse(JSON.stringify(val));
+        let 拷贝旧对象 = JSON.parse(JSON.stringify(oldval || "{}"));
+        拷贝对象.updated = "";
+        拷贝旧对象.updated = "";
+        if (JSON.stringify(拷贝对象) !== JSON.stringify(拷贝旧对象)) {
+          //  console.log("aaa", val);
+          !val.virtual ? this.$事件总线.$emit("保存链接", val) : null;
         }
       },
       deep: true,
     },
   },
   methods: {
-    几何计算消息处理(massage) {
-      let that = this;
-      console.log(massage.data);
-      if (!massage.data || massage.data.数据id !== that.链接.id) {
+    判断时间并计算链接: function (val, oldval) {
+      if (parseInt(val.updated) <= parseInt(oldval.updated)) {
         return null;
       }
-      let 数据名 = massage.data["数据名"];
-      console.log(数据名);
-      that[数据名] = massage.data["数据值"];
-
-      that[数据名] = JSON.parse(JSON.stringify(that[数据名]));
-    },
-    计算中点可见性() {
-      if (this.链接 && this.链接.attrs) {
-        if (typeof this.链接.attrs.hidetag !== "undefined") {
-          this.中点可见性 = this.链接.attrs.hidetag ? false : true;
-        } else {
-          this.中点可见性 = this.$当前窗口状态.show_tag_by_default;
-        }
-      }
-    },
-    判断时间并计算链接: function (val, oldval) {
       if (!val.attrs) {
         return null;
       }
@@ -352,12 +309,11 @@ module.exports = {
       if (JSON.stringify(旧链接) === JSON.stringify(新链接)) {
         return null;
       }
-
       this.链接 = val;
       this.链接 = this.$填充默认值(this.链接);
       this.计算路径();
 
-      /* this.链接.type = "link";
+      this.链接.type = "link";
       this.链接.subtype = val.subtype || "属于";
 
       this.路径类型 = val.attrs.path_type || "直线";
@@ -378,7 +334,7 @@ module.exports = {
 
       this.起始标记角度偏移 = val.attrs.from_anchor_rotate_offset || 0;
       this.结束标记角度偏移 = val.attrs.to_anchor_rotate_offset || 180;
-      this.中间标记角度偏移 = val.attrs.mid_anchor_rotate_offset || 0;*/
+      this.中间标记角度偏移 = val.attrs.mid_anchor_rotate_offset || 0;
     },
     计算节点标志偏移: function (
       起点坐标,
@@ -478,17 +434,13 @@ module.exports = {
       }
       return 象限;
     },
-    加载节点图片: function (图片源, 参数名) {
-      if (图片源 == "none") {
-        return null;
-      }
-      try {
-        let image = new window.Image();
-        image.src = 图片源;
-        image.onload = () => {
-          this[参数名] = image;
-        };
-      } catch (e) {}
+    加载节点图片: async function (图片源, 参数名) {
+      let image = new window.Image();
+      image.src = 图片源;
+      image.onload = () => {
+        // set image only when it is loaded
+        this[参数名] = image;
+      };
     },
     判断id: function ($event) {
       let that = this;
@@ -499,22 +451,27 @@ module.exports = {
       if (!attrs) {
         return null;
       }
-
+      if (!that.监听) {
+        return null;
+      }
       if ($event.id == attrs.from_id) {
-        if (parseInt($event.updated) > parseInt(this.代理起始标记.updated)) {
-          this.代理起始标记 = JSON.parse(JSON.stringify($event));
+        let 类型 = $event.type;
+        if (parseInt($event.updated) >= parseInt(this.代理起始标记.updated)) {
+          this.代理起始标记 = $event;
           that.计算路径();
         }
       }
       if ($event.id == attrs.to_id) {
-        if (parseInt($event.updated) > parseInt(this.代理结束标记.updated)) {
-          this.代理结束标记 = JSON.parse(JSON.stringify($event));
+        let 类型 = $event.type;
+        if (parseInt($event.updated) >= parseInt(this.代理结束标记.updated)) {
+          this.代理结束标记 = $event;
           that.计算路径();
         }
       }
       if ($event.id == this.链接.id) {
-        if (parseInt($event.updated) > parseInt(this.链接.updated)) {
-          this.链接 = JSON.parse(JSON.stringify($event));
+        if (parseInt($event.updated) >= parseInt(this.链接.updated)) {
+          this.链接 = $event;
+
           this.计算路径();
         }
       }
@@ -556,14 +513,16 @@ module.exports = {
       let 路径线段 = this.计算路径线段(代理起始标记, 代理结束标记);
       this.起点 = 路径线段.起点.x ? 路径线段.起点 : this.起点;
       this.终点 = 路径线段.终点.x ? 路径线段.终点 : this.终点;
+
       if (路径线段) {
-        /*switch (this.路径类型) {
+        switch (this.路径类型) {
           case "折线": {
             this.路径 = this.生成折线路径(路径线段);
             this.链接.attrs.path = this.路径.d;
             this.链接.attrs.top = this.路径.mid.y;
             this.链接.attrs.left = this.路径.mid.x;
             this.中点 = this.路径.mid;
+
             break;
           }
 
@@ -583,13 +542,10 @@ module.exports = {
             this.链接.attrs.left = this.路径.mid.x;
             this.中点 = this.路径.mid;
           }
-        }*/
-        几何计算器.postMessage({
-          处理函数: "生成链接路径",
-          数据: [this.代理起始标记, this.代理结束标记, this.链接],
-        });
+        }
 
-        // this.计算引线(this.链接);
+        this.计算引线(this.链接);
+
         if (Math.abs(this.链接.attrs.offsetx) > 50 || this.链接.attrs.offsety > 50) {
           // console.log("计算引线");
           this.显示引线 = true;
@@ -597,8 +553,10 @@ module.exports = {
           this.显示引线 = false;
         }
 
+        this.链接 = this.$更新数据时间戳(this.链接);
+        !this.链接.virtual ? this.$事件总线.$emit("保存链接", this.链接) : null;
+
         this.监听 = true;
-        !this.链接.virtual ? this.计算中点可见性() : null;
       }
     },
     计算引线: function (链接) {

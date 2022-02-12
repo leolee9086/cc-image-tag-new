@@ -10,6 +10,7 @@
         :窗口大小="窗口大小"
         :思源伺服ip="思源伺服ip"
       ></cc-layers-toolbar>
+
       <cc-layers-tooltip
         class="layer"
         :窗口大小="窗口大小"
@@ -25,7 +26,7 @@
       :链接数组="链接数组"
     ></cc-layers-cards>
 
-    <cc-layers-graph
+    <!--   <cc-layers-graph
       v-if="$当前窗口状态.使用svg"
       class="layer"
       :当前鼠标坐标="当前鼠标坐标"
@@ -33,7 +34,7 @@
       :画布原点="画布原点"
       :卡片数组="卡片数组"
       :链接数组="链接数组"
-    ></cc-layers-graph>
+    ></cc-layers-graph>-->
     <cc-layers-konva-graph
       v-if="!$当前窗口状态.使用svg"
       class="layer"
@@ -50,23 +51,18 @@
 <script>
 module.exports = {
   name: "app",
-  mounted: function () {
+  mounted: async function () {
+    this.思源伺服ip = window.location.host;
+    await this.加载数据();
     this.初始窗口大小 = { H: window.innerHeight, W: window.innerWidth };
     this.挂载全局事件();
     this.$事件总线.$on("添加卡片", ($event) => this.判断id并添加($event));
     this.$事件总线.$on("添加链接", ($event) => this.判断id并添加($event));
-
     this.主界面 = window.parent.document;
-    this.思源伺服ip = window.location.host;
-    let url参数 = this.$解析url(window.location.href);
     if (this.$挂件模式()) {
       this.挂件自身元素 = self.frameElement.parentElement.parentElement;
     }
-    console.log(this.$数据获取器);
-    let that = this;
-    this.$数据获取器.onmessage = function (massage) {
-      that.判断消息(massage);
-    };
+    this.开始获取数据();
   },
   data() {
     return {
@@ -82,10 +78,6 @@ module.exports = {
       当前鼠标坐标: { x: "", y: "" },
       当前窗口状态: "",
       画布原点: "",
-      卡片获取器: {},
-      卡片订阅器: {},
-      链接获取器: {},
-      链接订阅器: {},
       卡片数组: [],
       链接数组: [],
       数据时间戳: "",
@@ -100,6 +92,100 @@ module.exports = {
     },
   },
   methods: {
+    开始获取数据: async function () {
+      liveQuery(() => this.$数据库.cards.toArray()).subscribe({
+        next: async (result) => {
+          this.$当前窗口状态.当前窗口状态提示 = "同步数据中";
+          this.卡片数组 = result;
+          this.$当前窗口状态.当前窗口状态提示 = "同步数据完成";
+        },
+      });
+      liveQuery(() => this.$数据库.links.toArray()).subscribe({
+        next: async (result) => {
+          this.$当前窗口状态.当前窗口状态提示 = "同步数据中";
+          this.链接数组 = result;
+          this.$当前窗口状态.当前窗口状态提示 = "同步数据完成";
+        },
+      });
+    },
+    加载数据: async function () {
+      let that = this;
+      let baseid = this.$baseid;
+      await this.从思源块加载数据(baseid);
+      try {
+        that.背景色 = (await that.$数据库.metadata.get("backgroundColor")).value;
+      } catch (e) {
+        that.背景色 = "var(--b3-theme-background)";
+        that.$数据库.metadata.put({ key: "customcolors", value: [] });
+      }
+    },
+    从思源块加载数据: async function (id) {
+      let that = this;
+      let filepath = `assets/data-${id}.cccards`;
+      if (this.$挂件模式()) {
+        this.挂件自身元素 = window.frameElement.parentElement.parentElement;
+
+        filepath =
+          this.挂件自身元素.getAttribute("data-assets") ||
+          this.挂件自身元素.getAttribute("custom-data-assets") ||
+          `assets/data-${this.挂件自身元素.getAttribute("data-node-id")}.cccards`;
+      }
+      let url = this.思源伺服ip
+        ? `http://${this.思源伺服ip}/${filepath}`
+        : `localhost:6806/${filepath}`;
+      console.log(url);
+      let 文件数据 = {};
+      try {
+        await axios.get(url).then((res) => {
+          文件数据 = res.data;
+          if (文件数据["cardarray"]) {
+            try {
+              this.图片缩放倍数 = parseFloat(文件数据.resize).toFixed(2);
+            } catch (e) {
+              console.log(e);
+            }
+          }
+        });
+      } catch (e) {
+        console.log("主工具栏数据加载错误", e);
+
+        alert("文件不存在,将在附件中新建文件");
+        this.$事件总线.$emit("上传当前画板文件数据到思源");
+      }
+      if (文件数据) {
+        let 卡片数组 = 文件数据["cards"];
+        let 链接数组 = 文件数据["links"];
+        let metadata = 文件数据["metadata"];
+        let 卡片预设 = 文件数据["cardpresets"];
+        let 链接预设 = 文件数据["linkpresets"];
+        if (卡片数组) {
+          for (i in 卡片数组) {
+            await this.$数据库.cards.put(卡片数组[i]);
+          }
+        }
+        if (链接数组) {
+          for (i in 链接数组) {
+            await this.$数据库.links.put(链接数组[i]);
+          }
+        }
+        if (metadata) {
+          for (i in metadata) {
+            await this.$数据库.metadata.put(metadata[i]);
+          }
+        }
+        if (卡片预设) {
+          for (i in 卡片预设) {
+            await this.$数据库.cardpresets.put(卡片预设[i]);
+          }
+        }
+        if (链接预设) {
+          for (i in 链接预设) {
+            await this.$数据库.linkpresets.put(链接预设[i]);
+          }
+        }
+      }
+      //     console.log("加载完成");
+    },
     挂载全局事件() {
       window.addEventListener("mousewheel", this.计算坐标, { passive: false });
       window.addEventListener("mousewheel", this.缩放, { passive: false });
@@ -108,6 +194,8 @@ module.exports = {
       window.addEventListener("keydown", this.$快捷键处理器);
     },
     判断id并添加(数据) {
+      this.$事件总线.$emit("保存数据", 数据);
+
       let 数据类型 = 数据.type;
       let 数据列表 = [];
       数据类型 == "card" ? (数据列表 = this.卡片数组) : (数据列表 = this.链接数组);
@@ -117,7 +205,7 @@ module.exports = {
       }
       flag ? 数据列表.push(数据) : null;
     },
-    判断消息: function (消息) {
+    判断消息: async function (消息) {
       if (消息.data.数据时间戳 <= this.数据时间戳) {
         return null;
       }
@@ -163,16 +251,13 @@ module.exports = {
           height: window.pageYOffset + $event.clientY + window.innerHeight,
         };
       }
-
       this.画布原点 = { x: window.pageXOffset, y: window.pageYOffset };
     },
     保存数据: async function () {
       this.$事件总线.$emit("上传数据到思源", this.数据源id);
     },
-
     打开新窗口() {
       let 链接 = `http://${this.思源伺服ip}/widgets/cc-image-tag/?baseid=${this.$baseid}`;
-
       this.$窗口内打开超链接(链接);
     },
   },

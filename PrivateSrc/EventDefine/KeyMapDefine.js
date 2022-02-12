@@ -24,8 +24,6 @@ Vue.prototype.$快捷键处理器 = function($event){
     键位字符串= 键位数组.join('+')
     console.log(键位字符串)
     Vue.prototype.$键位数组=[]
-
     let 处理函数 = that.$快捷键触发器[键位字符串]
     处理函数?处理函数($event):null
-
 }
