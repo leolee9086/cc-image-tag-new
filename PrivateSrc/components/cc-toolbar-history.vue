@@ -242,9 +242,19 @@ module.exports = {
           .offset(this.历史版本数量上限 - 1)
           .delete();
       }
-      //await this.$保存历史();
-      this.$数据总线.postMessage({ " 处理函数": "保存历史 " });
+      await this.保存历史();
       this.文件历史列表 = await this.$数据库.history.toArray();
+    },
+    保存历史: async function () {
+      let data = {};
+      data.cards = await this.$数据库.cards.toArray();
+      data.links = await this.$数据库.links.toArray();
+      data.metadata = await this.$数据库.metadata.toArray();
+      data.states = await this.$数据库.states.toArray();
+      data.linkpresets = await this.$数据库.linkpresets.toArray();
+      data.cardpresets = await this.$数据库.cardpresets.toArray();
+      data.timestamp = this.$生成毫秒时间戳();
+      await this.$数据库.history.put(data);
     },
     保存: function (blob, filename) {
       let type = blob.type;

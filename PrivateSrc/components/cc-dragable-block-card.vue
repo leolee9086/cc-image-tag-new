@@ -203,6 +203,7 @@
             :toolbarconfig="{ hide: false }"
           ></cc-vditor-vue>
           <div
+            @click="正在编辑 = true"
             v-if="!正在编辑 && !(思源HTML && !$当前窗口状态.show_markdown_by_default)"
             v-html="预览HTML"
           ></div>
@@ -542,6 +543,9 @@ module.exports = {
     },
     开始连接() {
       //console.log("开始连接");
+      if (this.正在编辑) {
+        return null;
+      }
       this.$事件总线.$emit("开始连接", this.对象数据);
     },
     删除() {
@@ -622,12 +626,7 @@ module.exports = {
       $event ? (this.对象数据.name = $event) : null;
       this.对象数据 = this.$更新数据时间戳(this.对象数据);
       this.$事件总线.$emit("保存数据", this.对象数据);
-      this.对象数据.type == "link"
-        ? this.$数据总线.postMessage({
-            处理函数: "生成链接路径",
-            数据: [0, 0, this.对象数据],
-          })
-        : null;
+      this.激活 ? this.$事件总线.$emit("当前对象改变", this.对象数据) : null;
     },
     转化为卡片: function () {
       let 新数据 = JSON.parse(JSON.stringify(this.对象数据));

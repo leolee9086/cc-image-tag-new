@@ -1,13 +1,12 @@
-const 数据总线 = new Worker("./PrivateSrc/EventDefine/EventWorker.js");
 const 数据获取器 = new Worker("./PrivateSrc/EventDefine/DataWorker.js");
 const 事件总线 = new Vue();
-let 共享数据总线 = new BroadcastChannel("共享数据总线");
+let 数据共享总线 = new BroadcastChannel("数据共享总线");
 
 const 消息打印 = function (massage) {
   massage.data && massage.data.日志 ? console.log(massage.data.日志) : null;
   massage.data && massage.data.错误 ? console.log(massage.data.错误) : null;
 };
-共享数据总线.onmessage=function(massage){
+数据共享总线.onmessage=function(massage){
     if(massage.data.对象数据){
       事件总线.$emit("接收数据",massage.data.对象数据)
     }
@@ -78,7 +77,7 @@ const 事务列表 = {
     新数据.type = "card";
     新数据.subtype = "一般概念";
 
-    this.$事件总线.$emit("保存卡片", 新数据);
+    this.$事件总线.$emit("保存数据", 新数据);
     let 起始卡片 =
       (await this.$数据库.cards.get(链接数据.attrs.from_id)) ||
       (await this.$数据库.links.get(链接数据.attrs.from_id));
@@ -139,12 +138,12 @@ const 事务列表 = {
           传入数据 = 原始数据;
         }
         this.$数据库[数据表名].put(传入数据)
-        共享数据总线.postMessage({"动作时间":this.$生成毫秒时间戳(),"对象数据":传入数据})
+        数据共享总线.postMessage({"动作时间":this.$生成毫秒时间戳(),"对象数据":传入数据})
         return null;
       });
     } else if (传入数据.id) {
       this.$数据库[数据表名].put(传入数据)
-      共享数据总线.postMessage({"动作时间":this.$生成毫秒时间戳(),"对象数据":传入数据})
+      数据共享总线.postMessage({"动作时间":this.$生成毫秒时间戳(),"对象数据":传入数据})
       if (this.$当前窗口状态.current_workspace_handle) {
         this.$保存markdown卡片数据(
           传入数据,
@@ -162,7 +161,24 @@ const 事务列表 = {
         ? this.$事件总线.$emit("删除卡片", 传入数据)
         : this.$事件总线.$emit("删除链接", 传入数据);
     }
-    this.$数据总线.postMessage({ 处理函数: "删除数据", 数据: 传入数据 });
+    let 数据表名 = 传入数据.type+'s'
+    数据共享总线.postMessage({删除数据:传入数据})
+    this.$数据库[数据表名].filter(
+      data=>{
+        if(data.id==传入数据.id){
+          return true
+        }
+      }
+    ).delete().then(
+      this.$数据库.links.filter(
+        data=>{
+          if(data.attrs.from_id==传入数据.id||data.attrs.to_id==传入数据.id){
+            return true
+          }
+        }
+      ).delete()
+    )
+    
   },
   切换链接显示: function (传入数据) {
     console.log(传入数据);
@@ -292,8 +308,10 @@ const 事务列表 = {
       });
       this.$数据库.cards.put(卡片数据).then(() => {
         this.$事件总线.$emit("添加卡片", 卡片数据);
-        this.$事件总线.$emit("保存卡片", 卡片数据);
-        this.$事件总线.$emit("结束连接");
+        this.$事件总线.$emit("保存数据", 卡片数据);
+        this.$事件总线.$emit('结束连接')
+
+        this.$事件总线.$emit("连接卡片",[等待连接卡片,卡片数据]);
       });
     }
   },
@@ -348,7 +366,7 @@ const 事务列表 = {
     this.$事件总线.$emit("添加卡片", 卡片数据);
     this.$数据库.cards
       .put(卡片数据)
-      .then(this.$事件总线.$emit("保存卡片", 卡片数据));
+      .then(this.$事件总线.$emit("保存数据", 卡片数据));
   },
   修改画板元数据: function (属性对象, 画板id) {
     this.$数据库.metadata.put(属性对象);
@@ -413,7 +431,7 @@ const 事务列表 = {
         传出数据.attrsproxy = attrsproxy;
         // console.log(传出数据)
         // console.log(attrsproxy)
-        this.$事件总线.$emit("保存卡片", 传出数据);
+        this.$事件总线.$emit("保存数据", 传出数据);
       });
   },
   删除预设: async function (预设项目, 预设表名, callback) {
@@ -508,7 +526,6 @@ for (let item in 事务列表) {
 }
 Vue.prototype.$事务列表 = 事务列表;
 Vue.prototype.$事件总线 = 事件总线;
-Vue.prototype.$数据总线 = 数据总线;
 Vue.prototype.$数据获取器 = 数据获取器;
 Vue.prototype.$思源伺服ip = window.location.host;
 Vue.prototype.$主界面 = window.parent.document;

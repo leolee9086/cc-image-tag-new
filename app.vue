@@ -51,9 +51,9 @@
 <script>
 module.exports = {
   name: "app",
-  mounted: async function () {
+  mounted: function () {
     this.思源伺服ip = window.location.host;
-    await this.加载数据();
+    this.加载数据();
     this.初始窗口大小 = { H: window.innerHeight, W: window.innerWidth };
     this.挂载全局事件();
     this.$事件总线.$on("添加卡片", ($event) => this.判断id并添加($event));
@@ -124,7 +124,6 @@ module.exports = {
       let filepath = `assets/data-${id}.cccards`;
       if (this.$挂件模式()) {
         this.挂件自身元素 = window.frameElement.parentElement.parentElement;
-
         filepath =
           this.挂件自身元素.getAttribute("data-assets") ||
           this.挂件自身元素.getAttribute("custom-data-assets") ||
@@ -159,27 +158,27 @@ module.exports = {
         let 卡片预设 = 文件数据["cardpresets"];
         let 链接预设 = 文件数据["linkpresets"];
         if (卡片数组) {
-          for (i in 卡片数组) {
+          for (let i = 0, len = 卡片数组.length; i < len; i++) {
             await this.$数据库.cards.put(卡片数组[i]);
           }
         }
         if (链接数组) {
-          for (i in 链接数组) {
+          for (let i = 0, len = 链接数组.length; i < len; i++) {
             await this.$数据库.links.put(链接数组[i]);
           }
         }
         if (metadata) {
-          for (i in metadata) {
+          for (let i = 0, len = metadata.length; i < len; i++) {
             await this.$数据库.metadata.put(metadata[i]);
           }
         }
         if (卡片预设) {
-          for (i in 卡片预设) {
+          for (let i = 0, len = 卡片预设.length; i < len; i++) {
             await this.$数据库.cardpresets.put(卡片预设[i]);
           }
         }
         if (链接预设) {
-          for (i in 链接预设) {
+          for (let i = 0, len = 链接预设.length; i < len; i++) {
             await this.$数据库.linkpresets.put(链接预设[i]);
           }
         }
