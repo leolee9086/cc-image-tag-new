@@ -9,6 +9,8 @@
         class="layer"
         :窗口大小="窗口大小"
         :思源伺服ip="思源伺服ip"
+        :卡片数组="卡片数组"
+        :链接数组="链接数组"
       ></cc-layers-toolbar>
 
       <cc-layers-tooltip
@@ -95,16 +97,14 @@ module.exports = {
     开始获取数据: async function () {
       liveQuery(() => this.$数据库.cards.toArray()).subscribe({
         next: async (result) => {
-          this.$当前窗口状态.当前窗口状态提示 = "同步数据中";
           this.卡片数组 = result;
-          this.$当前窗口状态.当前窗口状态提示 = "同步数据完成";
+          this.$当前窗口状态.当前窗口状态提示 = "同步数据于:" + this.$生成毫秒时间戳();
         },
       });
       liveQuery(() => this.$数据库.links.toArray()).subscribe({
         next: async (result) => {
-          this.$当前窗口状态.当前窗口状态提示 = "同步数据中";
           this.链接数组 = result;
-          this.$当前窗口状态.当前窗口状态提示 = "同步数据完成";
+          this.$当前窗口状态.当前窗口状态提示 = "同步数据于:" + this.$生成毫秒时间戳();
         },
       });
     },

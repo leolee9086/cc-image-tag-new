@@ -85,25 +85,19 @@
     <el-divider></el-divider>
     <cc-setter-board-background></cc-setter-board-background>
     <el-divider></el-divider>
-    <el-row>
-      <el-col :span="12">
-        <el-switch
-          size="mini"
-          @change="$当前窗口状态.showname = $event"
-          v-model="折叠时显示名称"
-          active-text="折叠卡片时显示名称"
-        ></el-switch>
-      </el-col>
-      <el-tooltip content="折叠时是否显示名称">
-        <el-switch
-          area-label="折叠时是否显示名称"
-          @change="$当前窗口状态.showsubtype = $event"
-          size="mini"
-          v-model="折叠时显示类别"
-          active-text="折叠卡片时显示类别"
-        ></el-switch>
-      </el-tooltip>
-    </el-row>
+    <el-switch
+      size="mini"
+      @change="$当前窗口状态.showname = $event"
+      v-model="折叠时显示名称"
+      active-text="折叠卡片时显示名称"
+    ></el-switch>
+    <el-switch
+      area-label="折叠时显示名称"
+      @change="$当前窗口状态.showsubtype = $event"
+      size="mini"
+      v-model="折叠时显示类别"
+      active-text="折叠时显示类别"
+    ></el-switch>
     <el-switch
       area-label="折叠时是否显示名称"
       size="mini"
@@ -131,7 +125,7 @@ module.exports = {
   data() {
     return {
       当前画板命名: "",
-      当前画板id:"",
+      当前画板id: "",
       JSON文件列表: [],
       思源伺服ip: "",
       apitoken: "",
@@ -158,6 +152,15 @@ module.exports = {
       this.工作空间名 = $event.name;
       this.$事件总线.$emit("设定工作空间", $event, false);
       console.log($event);
+      this.批量保存卡片文件();
+    },
+    async 批量保存卡片文件() {
+      let 卡片数组 = await this.$数据库.cards.toArray();
+      let 链接数组 = await this.$数据库.links.toArray();
+      let 完全数组 = 卡片数组.concat(链接数组);
+      for (let i = 0, len = 完全数组.length; i < len; i++) {
+        this.$事件总线.$emit("保存数据", 完全数组[i]);
+      }
     },
     加载数据: async function () {
       let that = this;
@@ -167,7 +170,7 @@ module.exports = {
         that.当前画板命名 = "未命名";
         that.$数据库.metadata.put({ key: "name", value: "未命名" });
       }
-      
+
       that.画板列表 = await that.$画板元数据库.boards.toArray();
     },
     导入旧版JSON数据() {},
@@ -175,9 +178,9 @@ module.exports = {
     覆盖导入mardown数据() {},
   },
   watch: {
-    当前画板命名(val){
-      if(val){
-        this.$数据库.metadata.put({key:"name",value:val})
+    当前画板命名(val) {
+      if (val) {
+        this.$数据库.metadata.put({ key: "name", value: val });
       }
     },
     是否默认显示链接标记(val) {

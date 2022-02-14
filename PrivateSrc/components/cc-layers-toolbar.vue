@@ -93,7 +93,7 @@
     <cc-toolbar-set :显示="当前面板名 == '画板设置'"> </cc-toolbar-set>
     <cc-toolbar-draw :显示="当前面板名 == '绘制'"> </cc-toolbar-draw>
     <cc-toolbar-presets :显示="当前面板名 == '预设'"> </cc-toolbar-presets>
-
+    <cc-toolbar-boards :显示="当前面板名 == '画板列表'"> </cc-toolbar-boards>
     <cc-toolbar-view></cc-toolbar-view>
     <cc-sydoc-searcher :思源伺服ip="思源伺服ip" :apitoken="''"></cc-sydoc-searcher>
   </div>
@@ -101,7 +101,7 @@
 <script>
 module.exports = {
   name: "cc-layers-toolbar",
-  props: ["思源伺服ip"],
+  props: ["思源伺服ip", "卡片数组", "链接数组"],
   data() {
     return {
       窗口状态数组: [],
@@ -132,6 +132,17 @@ module.exports = {
   },
 
   watch: {
+    当前面板名: {
+      handler: function (val, oldval) {
+        if (val == "绘制") {
+          this.$当前窗口状态.is_drawing = true;
+          console.log(this.$当前窗口状态.is_drawing);
+        } else {
+          this.$当前窗口状态.is_drawing = false;
+          console.log(this.$当前窗口状态.is_drawing);
+        }
+      },
+    },
     窗口状态数组: {
       handler: function (val, oldval) {
         let that = this;

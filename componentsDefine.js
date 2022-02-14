@@ -25,9 +25,11 @@ let 应用组件列表 = [
     "cc-toolbar-view",
     "cc-toolbar-trigger",
     "cc-toolbar-draw",
+    "cc-toolbar-boards",
     "cc-toolbar-presets",
     "cc-loader-file",
     "cc-select-boards",
+    "cc-shower-board",
   ]
   应用组件列表.forEach(组件名 => {
    Vue.component(组件名, `url:/widgets/cc-image-tag-new/PrivateSrc/components/${组件名}.vue`)}

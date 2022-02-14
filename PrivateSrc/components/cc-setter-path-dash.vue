@@ -33,8 +33,8 @@ module.exports = {
       使用虚线: false,
     };
   },
-   mounted() {
-    this.链接 ? (this.当前对象数据 = this.链接) : {};
+  mounted() {
+    this.当前对象数据 = this.$当前窗口状态.current_link || {};
     this.挂载事件();
   },
   methods: {
@@ -44,8 +44,9 @@ module.exports = {
         $event.type == "link" ? (this.当前对象数据 = $event) : null
       );
       事件总线.$on("保存数据", ($event) => {
-        this.当前对象数据 = this.$根据时间戳更新本地数据($event, this.当前对象数据);
-        this.当前对象数据 = this.$更新数据时间戳(this.当前对象数据);
+        $event
+          ? (this.当前对象数据 = this.$根据时间戳更新本地数据($event, this.当前对象数据))
+          : null;
       });
     },
   },
@@ -80,25 +81,23 @@ module.exports = {
       deep: true,
     },
     虚线定义数组: {
-      handler: async function (val) {
+      handler: function (val) {
         if (!this.当前对象数据) {
           return null;
         }
+        this.当前对象数据.attrsproxy = {};
         if (val && val[0]) {
           console.log(this.当前对象数据);
           this.当前对象数据 && this.当前对象数据.attrs
-            ? (this.当前对象数据.attrs.path_dash = val)
+            ? (this.当前对象数据.attrsproxy.path_dash = val)
             : null;
 
           this.当前对象数据 ? this.$事件总线.$emit("保存数据", this.当前对象数据) : null;
         } else {
           this.当前对象数据 && this.当前对象数据.attrs
-            ? (this.当前对象数据.attrs.path_dash = null)
+            ? (this.当前对象数据.attrsproxy.path_dash = null)
             : null;
-          let 对象数据 = await this.$数据库.links.get(this.当前对象数据.id);
-          对象数据 ? (对象数据.attrs.path_dash = null) : null;
-          this.当前对象数据 ? this.$事件总线.$emit("保存数据", 对象数据) : null;
-
+          this.当前对象数据 ? this.$事件总线.$emit("保存数据", this.当前对象数据) : null;
           this.使用虚线 = false;
         }
       },

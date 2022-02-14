@@ -46,5 +46,13 @@ module.exports = {
       };
     },
   },
+  watch: {
+    画笔宽度(val) {
+      this.$当前窗口状态.画笔宽度 = val;
+    },
+    当前画笔颜色(val) {
+      this.$当前窗口状态.画笔颜色 = val;
+    },
+  },
 };
 </script>

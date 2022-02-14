@@ -536,6 +536,7 @@ Vue.prototype.$增量导入JSON数据 = async function (JSON数据) {
   }
 };
 Vue.prototype.$根据时间戳更新本地数据 = function (传入数据, 本地数据) {
+  if(传入数据.attrsproxy){return 本地数据}
   if (!传入数据) {
     return 本地数据;
   } else if (传入数据.id != 本地数据.id) {
@@ -550,7 +551,9 @@ Vue.prototype.$根据时间戳更新本地数据 = function (传入数据, 本�
 };
 Vue.prototype.$保存markdown卡片数据 = async function (卡片数据, 工作空间句柄) {
   let markdown数据 = await this.$生成卡片markdown(卡片数据);
-  let 文件名 = 卡片数据.id + "-" + 卡片数据.name + ".md";
+  let id短码=      卡片数据.id.split('@')
+  id短码 = id短码[id短码.length-1]
+  let 文件名 =  卡片数据.name+"-" +id短码+ ".md";
   let 卡片文件句柄 = await 工作空间句柄.getFileHandle(文件名, { create: true });
   let 写入管线 = await 卡片文件句柄.createWritable();
   try {
@@ -560,6 +563,7 @@ Vue.prototype.$保存markdown卡片数据 = async function (卡片数据, 工作
     await 写入管线.close();
   } catch (e) {}
 };
+
 Vue.prototype.$生成卡片markdown = function (卡片数据) {
   let markdown = 卡片数据.markdown;
   let yaml = this.$生成卡片yaml(卡片数据);

@@ -121,9 +121,7 @@ const 事务列表 = {
       return null
     }
     // 传入数据 = this.$更新数据时间戳(传入数据);
-    传入数据.type == "card"
-      ? this.$事件总线.$emit("保存卡片", 传入数据)
-      : this.$事件总线.$emit("保存链接", 传入数据);
+   
     let 数据表名 = 传入数据.type + "s";
     //console.log(数据表名)
     if (传入数据.attrsproxy) {
@@ -134,15 +132,21 @@ const 事务列表 = {
             原始数据["attrs"][属性名] = 传入数据["attrsproxy"][属性名];
           }
 
-          原始数据.updated = 传入数据.updated || this.$生成毫秒时间戳();
+          原始数据.updated =  this.$生成毫秒时间戳();
           传入数据 = 原始数据;
         }
         this.$数据库[数据表名].put(传入数据)
         数据共享总线.postMessage({"动作时间":this.$生成毫秒时间戳(),"对象数据":传入数据})
+        传入数据.type == "card"
+        ? this.$事件总线.$emit("保存卡片", 传入数据)
+        : this.$事件总线.$emit("保存链接", 传入数据);
         return null;
       });
     } else if (传入数据.id) {
       this.$数据库[数据表名].put(传入数据)
+      传入数据.type == "card"
+      ? this.$事件总线.$emit("保存卡片", 传入数据)
+      : this.$事件总线.$emit("保存链接", 传入数据);
       数据共享总线.postMessage({"动作时间":this.$生成毫秒时间戳(),"对象数据":传入数据})
       if (this.$当前窗口状态.current_workspace_handle) {
         this.$保存markdown卡片数据(
@@ -155,6 +159,11 @@ const 事务列表 = {
   
   删除数据: function (传入数据) {
     // console.log(传入数据)
+    try{
+      this.$数据库[传入数据.type+'s'].get(传入数据.id).modify(
+        data=>{data.attrs.trashed=true}
+      )
+    }catch(e){}
     let that = this;
     if (传入数据.attrs) {
       传入数据.type == "card"
@@ -265,8 +274,7 @@ const 事务列表 = {
       if (链接类型) {
         新链接.subtype = 链接类型;
       }
-      console.log(新链接);
-      //this.$数据总线.postMessage({"处理函数":"保存数据","数据":新链接})
+      console.log("创建链接",新链接);
       this.$数据库.links.put(新链接).then(() => {
         this.$事件总线.$emit("结束连接");
         this.$事件总线.$emit("添加链接", 新链接);
@@ -277,7 +285,6 @@ const 事务列表 = {
             新链接,
             this.$当前窗口状态.current_linkpreset_name
           );
-          this.$事件总线.$emit("添加链接", 新链接);
           this.$事件总线.$emit("保存链接", 新链接);
         }
       });
@@ -295,7 +302,8 @@ const 事务列表 = {
   窗口缩放: function (缩放倍数) {
     this.$当前窗口状态.缩放倍数 = 缩放倍数;
   },
-  点击画板空白处: function ($event) {
+  点击画板空白处:async function ($event) {
+    let that = this
     if (!this.$当前窗口状态.等待连接卡片) {
       //  console.log($event.target);
       this.$事件总线.$emit("清理选择");
@@ -306,12 +314,11 @@ const 事务列表 = {
         left:
           (window.pageXOffset + $event.clientX) / this.$当前窗口状态.缩放倍数,
       });
-      this.$数据库.cards.put(卡片数据).then(() => {
-        this.$事件总线.$emit("添加卡片", 卡片数据);
-        this.$事件总线.$emit("保存数据", 卡片数据);
-        this.$事件总线.$emit('结束连接')
+      await this.$数据库.cards.put(卡片数据).then(() => {
+        that.$事件总线.$emit("添加卡片", 卡片数据);
+        that.$事件总线.$emit("保存数据", 卡片数据);
+        that.$事件总线.$emit("连接卡片",[this.$当前窗口状态.等待连接卡片,卡片数据]);
 
-        this.$事件总线.$emit("连接卡片",[等待连接卡片,卡片数据]);
       });
     }
   },

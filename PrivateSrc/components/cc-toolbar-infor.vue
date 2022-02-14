@@ -152,7 +152,7 @@
                   </el-select>
                 </el-col>
               </el-row>
-              <!--   <cc-setter-path-dash :链接="当前对象数据"> </cc-setter-path-dash>-->
+              <cc-setter-path-dash :链接="当前对象数据"> </cc-setter-path-dash>
               <el-divider></el-divider>
               <cc-color-pane
                 v-model="属性对象.path_color"
@@ -331,7 +331,7 @@ module.exports = {
         if (val.id == oldval.id) {
           flag = true;
         }
-        this.设定当前标记(val, flag);
+        //this.设定当前标记(val, flag);
       },
       deep: true,
     },

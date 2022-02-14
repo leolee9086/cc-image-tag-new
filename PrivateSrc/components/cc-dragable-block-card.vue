@@ -4,7 +4,7 @@
     ref="container"
     @click="鼠标点击($event)"
     :resizable="显示控制柄"
-    :draggable="!正在编辑"
+    :draggable="!正在编辑 && !$当前窗口状态.is_drawing"
     @activated="激活 = true"
     @deactivated="激活 = false"
     @dragging="dragging"
@@ -19,6 +19,35 @@
     class-name-handle="resizer"
     class-name="cc-card-container"
   >
+    <vue-draggable-resizable
+      v-if="!hide"
+      ref="container"
+      :resizable="drawResize"
+      :draggable="false"
+      @resizing="drawresizing"
+      @resizestop="drawresizing"
+      :y="0"
+      :w="对象数据.attrs.draw_width * 窗口缩放倍数 || 100"
+      :h="对象数据.attrs.draw_height * 窗口缩放倍数 || 100"
+      :x="width + 20 * 窗口缩放倍数"
+      :z="210"
+      class-name-handle="resizer"
+      class-name="cc-card-container"
+    >
+      <v-stage
+        @mousedown="绘制中 = true"
+        @mouseup="绘制中 = false"
+        @mousemove="绘制($event)"
+        class="cc-block-card-draw"
+        ref="draw"
+        :config="configDraw()"
+      >
+        <v-layer>
+          <v-line v-for="绘制 in 对象数据.attrs.draw" :config="lineConfig(绘制)"></v-line>
+          <v-line :config="tempLineConfig"></v-line>
+        </v-layer>
+      </v-stage>
+    </vue-draggable-resizable>
     <div
       @click="鼠标点击($event)"
       :data-node-id="对象数据.id"
@@ -139,7 +168,6 @@
         aria-label="双击开始卡片连接,ctrl+点击多选"
         @dblclick="开始连接()"
         :style="`
-          
           color:${对象数据.attrs.color};
           border:${对象数据.attrs.borderStyle || 'solid'} ${对象数据.attrs.borderColor} ${
           对象数据.attrs.borderWidth || 1
@@ -154,7 +182,18 @@
           `"
         @click="鼠标点击($event)"
       >
-        <div>
+        <iframe
+          v-if="对象数据.type == 'board'"
+          src="http:`${this.思源伺服ip}/widgets/cc-image-tag-new/`"
+          data-src="http://127.0.0.1:6806/widgets/cc-markmap"
+          data-subtype="widget"
+          border="0"
+          frameborder="no"
+          framespacing="0"
+          allowfullscreen="true"
+          style="width: 100%; height: 100%"
+        ></iframe>
+        <div v-if="对象数据.type !== 'board'">
           <el-row>
             <el-col :span="12">
               <span
@@ -195,15 +234,16 @@
             :最大文字长度="23"
           ></cc-link-siyuan>
         </div>
-        <div class="cc-card-content">
+        <div class="cc-card-content" @click="开始编辑($event)">
           <div :style="`color:${对象数据.attrs.color};`"></div>
           <cc-vditor-vue
             v-model="markdown"
+            @click="开始编辑($event)"
             v-if="正在编辑"
             :toolbarconfig="{ hide: false }"
           ></cc-vditor-vue>
           <div
-            @click="正在编辑 = true"
+            @click="开始编辑($event)"
             v-if="!正在编辑 && !(思源HTML && !$当前窗口状态.show_markdown_by_default)"
             v-html="预览HTML"
           ></div>
@@ -238,8 +278,10 @@ module.exports = {
       思源HTML: "",
       def_block: "",
       预设: "",
-      绘制: "",
+      绘制中: false,
       markdown: "",
+      drawResize: false,
+      临时点数组: [],
     };
   },
   beforeMount() {
@@ -267,6 +309,17 @@ module.exports = {
   },
 
   watch: {
+    绘制中(val, oldval) {
+      if (!val) {
+        !this.对象数据.attrs.draw ? (this.对象数据.attrs.draw = []) : null;
+        this.对象数据.attrs.draw.push({
+          points: this.临时点数组,
+          stroke: this.$当前窗口状态.画笔颜色,
+          strokeWidth: this.$当前窗口状态.画笔宽度,
+        });
+        this.临时点数组 = [];
+      }
+    },
     value: {
       handler: function (val, oldval) {
         this.计算可见性();
@@ -283,42 +336,6 @@ module.exports = {
         }
 
         this.对象数据 = JSON.parse(JSON.stringify(val));
-        /* this.对象数据 = this.$填充默认值(this.对象数据);
-
-        if (this.对象数据 && this.对象数据.attrs.top < 0) {
-          this.对象数据.top = 0;
-        }
-        if (this.对象数据 && this.对象数据.attrs.left < 0) {
-          this.对象数据.left = 0;
-        }
-        let attrs = val.attrs;
-        attrs.top + "" == "NAN" || attrs.top + "" == "undefined" ? (attrs.top = 0) : null;
-        attrs.left + "" == "NAN" || attrs.left + "" == "undefined"
-          ? (attrs.left = 0)
-          : null;
-        attrs.width + "" == "NAN" || attrs.width + "" == "undefined"
-          ? (attrs.width = 100)
-          : null;
-        attrs.height + "" == "NAN" || attrs.height + "" == "undefined"
-          ? (attrs.height = 100)
-          : null;
-        attrs.offsetx + "" == "NAN" || attrs.offsetx + "" == "undefined"
-          ? (attrs.offsetx = 0)
-          : null;
-        attrs.offsety + "" == "NAN" || attrs.offsety + "" == "undefined"
-          ? (attrs.offsety = 0)
-          : null;
-        this.对象数据.type = this.数据类型;
-        this.数据类型 == "card"
-          ? (this.对象数据.subtype = val.subtype || "一般概念")
-          : (this.对象数据.subtype = val.subtype || "属于");
-        this.数据类型 == "card"
-          ? () => {
-              this.对象数据.offsetx = 0;
-              this.对象数据.offsety = 0;
-            }
-          : null;
-        this.边框宽度 = val.attrs.borderWidth || 1;*/
       },
       deep: true,
       immediate: true,
@@ -393,11 +410,14 @@ module.exports = {
         this.$事件总线.$emit("激活数据", this.对象数据);
         this.对象数据 = this.$更新数据时间戳(this.对象数据);
         this.生成html();
+        console.log(this.$当前窗口状态.is_drawing);
+        this.drawResize = this.$当前窗口状态.is_drawing;
       } else {
         this.对象数据 = this.$更新数据时间戳(this.对象数据);
         this.$事件总线.$emit("反激活数据", this.对象数据);
         this.正在编辑 = false;
         this.生成html();
+        this.drawResize = false;
       }
     },
     正在编辑(val) {
@@ -414,6 +434,19 @@ module.exports = {
     },
   },
   computed: {
+    tempLineConfig: function () {
+      return {
+        x: 0,
+        y: 0,
+        closed: false,
+        points: this.临时点数组,
+        stroke: this.$当前窗口状态.画笔颜色 || "black",
+        lineCap: "round",
+        strokeWidth: this.$当前窗口状态.画笔宽度 || 5,
+        scaleX: this.窗口缩放倍数 || 1,
+        scaleY: this.窗口缩放倍数 || 1,
+      };
+    },
     top: function () {
       let a =
         (this.对象数据.attrs.top + (this.对象数据.attrs.offsety || 0)) *
@@ -436,6 +469,39 @@ module.exports = {
     },
   },
   methods: {
+    configDraw: function () {
+      let 窗口缩放倍数 = this.窗口缩放倍数 || 1;
+      return {
+        width: this.对象数据.attrs.draw_width * 窗口缩放倍数 || 100,
+        height: this.对象数据.attrs.draw_height * 窗口缩放倍数 || 100,
+        scaleX: 窗口缩放倍数 || 1,
+        scaleY: 窗口缩放倍数 || 1,
+      };
+    },
+
+    lineConfig: function (线定义) {
+      return {
+        x: 0,
+        y: 0,
+        points: 线定义.points,
+        closed: false,
+        stroke: 线定义.stroke,
+        lineCap: "round",
+        strokeWidth: 线定义.strokeWidth,
+        scaleX: this.窗口缩放倍数 || 1,
+        scaleY: this.窗口缩放倍数 || 1,
+      };
+    },
+    绘制($event) {
+      let evt = $event.evt;
+      evt.stopPropagation();
+      console.log(evt.offsetX);
+
+      if (this.绘制中 && this.$当前窗口状态.is_drawing) {
+        let 点 = [evt.offsetX, evt.offsetY];
+        this.临时点数组 = this.临时点数组.concat(点);
+      }
+    },
     覆盖markdown() {
       let html = this.思源html;
       let 思源markdown = lute.BlockDOM2Md(this.思源HTML);
@@ -473,9 +539,17 @@ module.exports = {
     发送卡片数据到思源: function () {
       this.$事件总线.$emit("打开发送对话框", this.对象数据);
     },
+    开始编辑($event) {
+      $event.stopPropagation();
+      if (this.$当前窗口状态.show_markdown_by_default) {
+        this.正在编辑 = true;
+      }
+    },
     鼠标点击($event) {
       console.log($event);
       $event.stopPropagation();
+      this.正在编辑 = false;
+
       this.$事件总线.$emit("鼠标点击卡片", this.对象数据, $event.ctrlKey);
     },
     判断id: function ($event) {
@@ -612,7 +686,13 @@ module.exports = {
       this.保存数据();
       this.$事件总线.$emit("缩放卡片", this.对象数据);
     },
-
+    drawresizing: function (x, y, width, height) {
+      console.log(width, height);
+      this.对象数据.attrs.draw_width = width / this.窗口缩放倍数 || 100;
+      this.对象数据.attrs.draw_height = height / this.窗口缩放倍数 || 100;
+      this.对象数据 = this.$更新数据时间戳(this.对象数据);
+      this.保存数据();
+    },
     resizestop: function (x, y, width, height) {
       this.计算坐标(x, y);
       this.对象数据.attrs.width = width / this.窗口缩放倍数 || 100;
@@ -674,6 +754,15 @@ module.exports = {
       }
       if (对象数据.type == "link" && typeof 对象数据.attrs.hidetag == "undefined") {
         this.hide = !this.$当前窗口状态.show_tag_by_default;
+        this.$数据库.links
+          .filter((data) => {
+            if (data.attrs.from_id == 对象数据.id || data.attrs.to_id == 对象数据.id) {
+              return true;
+            }
+          })
+          .count((count) => {
+            count > 0 ? (this.hide = false) : null;
+          });
       }
     },
   },
