@@ -1,14 +1,8 @@
 <template>
-  <el-drawer
-    :modal="false"
-    title="画板设置"
-    size="100%"
-    :visible="显示"
-    :show-close="false"
-  >
+  <el-drawer :modal="false" title="画板设置" size="100%" :visible="显示" :show-close="false">
     <el-row>
       <el-col :span="24">
-        <el-input v-model="当前画板命名" size="mini">
+        <el-input v-model="当前画板命名" size="mini" :editable="false">
           <span slot="prepend">画板命名</span>
         </el-input>
       </el-col>
@@ -25,13 +19,7 @@
           :flile-list="JSON文件列表"
           :multiple="false"
         >
-          <el-button
-            area-label="导入文件"
-            slot="trigger"
-            size="mini"
-            class="el-icon-upload"
-            >导入旧版文件</el-button
-          >
+          <el-button area-label="导入文件" slot="trigger" size="mini" class="el-icon-upload">导入旧版文件</el-button>
         </el-upload>
       </el-col>
       <el-col :span="6">
@@ -44,13 +32,7 @@
           :flile-list="JSON文件列表"
           :multiple="false"
         >
-          <el-button
-            area-label="导入文件"
-            slot="trigger"
-            size="mini"
-            class="el-icon-upload"
-            >导入文件</el-button
-          >
+          <el-button area-label="导入文件" slot="trigger" size="mini" class="el-icon-upload">导入文件</el-button>
         </el-upload>
       </el-col>
       <el-col :span="6">
@@ -63,25 +45,10 @@
           :flile-list="JSON文件列表"
           :multiple="false"
         >
-          <el-button
-            area-label="导入文件"
-            slot="trigger"
-            size="mini"
-            class="el-icon-upload"
-            >导入markdown</el-button
-          >
+          <el-button area-label="导入文件" slot="trigger" size="mini" class="el-icon-upload">导入markdown</el-button>
         </el-upload>
       </el-col>
     </el-row>
-    <el-row>
-      <el-col :span="12">
-        <strong>当前工作空间:{{ 工作空间名 }}</strong>
-      </el-col>
-      <el-col :span="12">
-        <cc-loader-file @filechange="设定工作空间($event)"></cc-loader-file>
-      </el-col>
-    </el-row>
-
     <el-divider></el-divider>
     <cc-setter-board-background></cc-setter-board-background>
     <el-divider></el-divider>
@@ -110,12 +77,7 @@
       v-model="是否默认以思源块内容覆盖卡片markdown"
       active-text="以内容块覆盖卡片markdown"
     ></el-switch>
-    <el-switch
-      area-label="链接是否默认显示标记"
-      size="mini"
-      v-model="是否默认显示链接标记"
-      active-text="是否默认显示链接标记"
-    ></el-switch>
+    <el-switch area-label="链接是否默认显示标记" size="mini" v-model="是否默认显示链接标记" active-text="是否默认显示链接标记"></el-switch>
   </el-drawer>
 </template>
 <script>
@@ -155,6 +117,8 @@ module.exports = {
       this.批量保存卡片文件();
     },
     async 批量保存卡片文件() {
+      let 画板命名 = (await this.$数据库.metadata.get("name")).value;
+      this.$当前窗口状态.画板命名 = 画板命名;
       let 卡片数组 = await this.$数据库.cards.toArray();
       let 链接数组 = await this.$数据库.links.toArray();
       let 完全数组 = 卡片数组.concat(链接数组);
@@ -173,9 +137,9 @@ module.exports = {
 
       that.画板列表 = await that.$画板元数据库.boards.toArray();
     },
-    导入旧版JSON数据() {},
-    覆盖导入JSON数据() {},
-    覆盖导入mardown数据() {},
+    导入旧版JSON数据() { },
+    覆盖导入JSON数据() { },
+    覆盖导入mardown数据() { },
   },
   watch: {
     当前画板命名(val) {
