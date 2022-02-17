@@ -30,6 +30,7 @@ let 应用组件列表 = [
     "cc-loader-file",
     "cc-select-boards",
     "cc-shower-board",
+    "cc-draw"
   ]
   应用组件列表.forEach(组件名 => {
    Vue.component(组件名, `url:/widgets/cc-image-tag-new/PrivateSrc/components/${组件名}.vue`)}

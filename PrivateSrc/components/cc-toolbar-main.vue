@@ -113,8 +113,7 @@ module.exports = {
       使用svg渲染: false,
     };
   },
-  async mounted() {
-    await this.$画板元数据库.workspace.get(00000).then((data) => console.log(data));
+  mounted() {
     this.$事件总线.$on("保存卡片", ($event) => this.获取当前元素数据($event));
     this.$事件总线.$on("保存链接", ($event) => this.获取当前元素数据($event));
     this.$事件总线.$on("激活卡片", ($event) => this.获取当前元素数据($event));

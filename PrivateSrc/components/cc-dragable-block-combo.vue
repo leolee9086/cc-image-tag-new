@@ -492,7 +492,10 @@ module.exports = {
       移动距离y = 0;
       this.x = x;
       this.y = y;
-      this.数据数组.forEach((数据) => this.$事件总线.$emit("保存数据", 数据));
+      this.数据数组.forEach((数据) => {
+        数据 = this.$更新数据时间戳(数据);
+        this.$事件总线.$emit("保存数据", 数据);
+      });
     },
   },
 };

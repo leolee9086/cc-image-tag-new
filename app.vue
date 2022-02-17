@@ -26,6 +26,7 @@
       :当前鼠标坐标="当前鼠标坐标"
       :卡片数组="卡片数组"
       :链接数组="链接数组"
+      :画布原点="画布原点"
     ></cc-layers-cards>
 
     <!--   <cc-layers-graph
@@ -48,6 +49,12 @@
     >
     </cc-layers-konva-graph>
     <cc-layers-background class="layer" :窗口大小="窗口大小"> </cc-layers-background>
+    <el-dialog title="请求工作空间" :visible.sync="dialogVisible" width="30%">
+      <span>请求本地文件夹:{{ this.工作空间句柄.name }}访问授权</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="请求工作空间()">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -65,6 +72,7 @@ module.exports = {
       this.挂件自身元素 = self.frameElement.parentElement.parentElement;
     }
     this.开始获取数据();
+    this.获取工作空间();
   },
   data() {
     return {
@@ -73,16 +81,18 @@ module.exports = {
       新属性: { type: "原始文本", name: "newattr", label: "newattr", value: "default" },
       属性类型: ["图片", "文本", "块链接", "超链接", "原始文本", "附件"],
       数据源id: "",
-      窗口大小: { width: 2000, height: 2000 },
+      窗口大小: { width: 10000, height: 10000 },
       主界面: {},
       挂件自身元素: "",
       思源伺服ip: "",
       当前鼠标坐标: { x: "", y: "" },
       当前窗口状态: "",
-      画布原点: "",
       卡片数组: [],
       链接数组: [],
       数据时间戳: "",
+      画布原点: { x: 0, y: 0 },
+      dialogVisible: false,
+      工作空间句柄: {},
     };
   },
   watch: {
@@ -93,7 +103,42 @@ module.exports = {
       }
     },
   },
+
   methods: {
+    获取工作空间: async function () {
+      if (window.isSecureContext) {
+        let 句柄对象 = await this.$画板元数据库.workspace.get(00000);
+        this.工作空间句柄 = 句柄对象.value;
+        if (this.工作空间句柄) {
+          let Permission = await this.工作空间句柄.queryPermission({
+            mode: "readwrite",
+          });
+          if (Permission === "granted") {
+            this.$事件总线.$emit("设定工作空间", this.工作空间句柄, false);
+          } else {
+            this.dialogVisible = true;
+          }
+        }
+      }
+    },
+    async 请求工作空间() {
+      let Permission = await this.工作空间句柄.requestPermission({ mode: "readwrite" });
+      if (Permission) {
+        this.$事件总线.$emit("设定工作空间", this.工作空间句柄, false);
+        this.批量保存卡片文件();
+        this.dialogVisible = false;
+      }
+    },
+    async 批量保存卡片文件() {
+      let 画板命名 = (await this.$数据库.metadata.get("name")).value;
+      this.$当前窗口状态.画板命名 = 画板命名;
+      let 卡片数组 = await this.$数据库.cards.toArray();
+      let 链接数组 = await this.$数据库.links.toArray();
+      let 完全数组 = 卡片数组.concat(链接数组);
+      for (let i = 0, len = 完全数组.length; i < len; i++) {
+        this.$事件总线.$emit("保存数据", 完全数组[i]);
+      }
+    },
     开始获取数据: async function () {
       liveQuery(() => this.$数据库.cards.toArray()).subscribe({
         next: async (result) => {
@@ -237,18 +282,26 @@ module.exports = {
         id ? this.$事件总线.$emit("定位至卡片", id) : null;
       }
     },
-    计算坐标($event) {
+    async 计算坐标($event) {
       this.当前鼠标坐标.x = $event.clientX;
       this.当前鼠标坐标.y = $event.clientY;
       this.保存计数器 = this.保存计数器 + 1;
       if (this.保存计数器 >= 100) {
         this.保存计数器 = 1;
       }
+      let 窗口大小 = { width: 0, height: 0 };
       if ($event.clientX) {
-        this.窗口大小 = {
+        窗口大小 = {
           width: window.pageXOffset + $event.clientX + window.innerWidth,
           height: window.pageYOffset + $event.clientY + window.innerHeight,
         };
+      }
+      let flag = false;
+      this.窗口大小.width < 窗口大小.width ? (flag = true) : null;
+      this.窗口大小.height < 窗口大小.height ? (flag = true) : null;
+      if (flag) {
+        this.窗口大小.width = 窗口大小.width + 10000;
+        this.窗口大小.height = 窗口大小.height + 10000;
       }
       this.画布原点 = { x: window.pageXOffset, y: window.pageYOffset };
     },

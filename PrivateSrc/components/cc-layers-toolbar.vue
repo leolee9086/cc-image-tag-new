@@ -36,26 +36,7 @@
           aria-label="展开|关闭面板"
         ></span>
       </div>
-      <div class="drawer-button">
-        <span
-          @click="
-            当前面板名 != '画板设置' ? (当前面板名 = '画板设置') : (当前面板名 = '')
-          "
-          circle
-          class="el-icon-setting"
-          aria-label="展开|关闭面板"
-        ></span>
-      </div>
-      <div class="drawer-button">
-        <span
-          @click="
-            当前面板名 != '画板列表' ? (当前面板名 = '画板列表') : (当前面板名 = '')
-          "
-          circle
-          class="el-icon-data-board"
-          aria-label="展开|关闭面板"
-        ></span>
-      </div>
+
       <div class="drawer-button">
         <span
           @click="当前面板名 != '预设' ? (当前面板名 = '预设') : (当前面板名 = '')"
@@ -73,6 +54,26 @@
           aria-label="展开|关闭面板"
         >
         </span>
+      </div>
+      <div class="drawer-button">
+        <span
+          @click="
+            当前面板名 != '画板设置' ? (当前面板名 = '画板设置') : (当前面板名 = '')
+          "
+          circle
+          class="el-icon-data-board"
+          aria-label="展开|关闭面板"
+        ></span>
+      </div>
+      <div class="drawer-button">
+        <span
+          @click="
+            当前面板名 != '全局设置' ? (当前面板名 = '全局设置') : (当前面板名 = '')
+          "
+          circle
+          class="el-icon-setting"
+          aria-label="展开|关闭面板"
+        ></span>
       </div>
     </div>
     <cc-toolbar-main
@@ -93,7 +94,7 @@
     <cc-toolbar-set :显示="当前面板名 == '画板设置'"> </cc-toolbar-set>
     <cc-toolbar-draw :显示="当前面板名 == '绘制'"> </cc-toolbar-draw>
     <cc-toolbar-presets :显示="当前面板名 == '预设'"> </cc-toolbar-presets>
-    <cc-toolbar-boards :显示="当前面板名 == '画板列表'"> </cc-toolbar-boards>
+    <cc-toolbar-boards :显示="当前面板名 == '全局设置'"> </cc-toolbar-boards>
     <cc-toolbar-view></cc-toolbar-view>
     <cc-sydoc-searcher :思源伺服ip="思源伺服ip" :apitoken="''"></cc-sydoc-searcher>
   </div>

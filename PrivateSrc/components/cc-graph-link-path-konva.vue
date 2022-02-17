@@ -135,15 +135,9 @@ module.exports = {
       return obj;
     },
     起始节点设定: function () {
-      let realX =
-        this.起点.x * this.缩放倍数 -
-        this.真实画布原点.x -
-        this.起始节点偏移.x * this.缩放倍数;
+      let realX = this.起点.x * this.缩放倍数 - this.起始节点偏移.x * this.缩放倍数;
 
-      let realY =
-        this.起点.y * this.缩放倍数 -
-        this.真实画布原点.y -
-        this.起始节点偏移.y * this.缩放倍数;
+      let realY = this.起点.y * this.缩放倍数 - this.起始节点偏移.y * this.缩放倍数;
 
       return {
         x: realX || 0,
@@ -160,20 +154,14 @@ module.exports = {
       };
     },
     结束节点设定: function () {
-      let realX =
-        this.终点.x * this.缩放倍数 -
-        this.真实画布原点.x -
-        this.结束节点偏移.x * this.缩放倍数;
+      let realX = this.终点.x * this.缩放倍数 - this.结束节点偏移.x * this.缩放倍数;
       if (!realX) {
-        //  console.log(this.终点.x, this.缩放倍数, this.真实画布原点.x, this.结束节点偏移.x);
+        console.log("aaa", this.终点.x, this.缩放倍数, this.结束节点偏移.x);
       }
-      let offsetY = this.真实画布原点.y;
       // console.log(this.终点标记大小, this.起点标记大小);
       return {
         x: realX || 0,
-        y:
-          this.终点.y * this.缩放倍数 - offsetY - this.结束节点偏移.y * this.缩放倍数 ||
-          0,
+        y: this.终点.y * this.缩放倍数 - this.结束节点偏移.y * this.缩放倍数 || 0,
         offsetX: (this.终点标记大小 / 2) * this.缩放倍数 || 0,
         offsetY: (this.终点标记大小 / 2) * this.缩放倍数 || 0,
         width: this.终点标记大小 * this.缩放倍数,
@@ -187,20 +175,14 @@ module.exports = {
       };
     },
     中间节点设定: function () {
-      let realX =
-        this.中点.x * this.缩放倍数 -
-        this.真实画布原点.x -
-        this.中间节点偏移.x * this.缩放倍数;
+      let realX = this.中点.x * this.缩放倍数 - this.中间节点偏移.x * this.缩放倍数;
       if (!realX) {
         //  console.log(this.终点.x, this.缩放倍数, this.真实画布原点.x, this.结束节点偏移.x);
       }
-      let offsetY = this.真实画布原点.y;
       // console.log(this.终点标记大小, this.起点标记大小);
       return {
         x: realX || 0,
-        y:
-          this.中点.y * this.缩放倍数 - offsetY - this.中间节点偏移.y * this.缩放倍数 ||
-          0,
+        y: this.中点.y * this.缩放倍数 - this.中间节点偏移.y * this.缩放倍数 || 0,
         offsetX: (this.中间标记大小 / 2) * this.缩放倍数 || 0,
         offsetY: (this.中间标记大小 / 2) * this.缩放倍数 || 0,
         width: this.中间标记大小 * this.缩放倍数,
@@ -215,8 +197,6 @@ module.exports = {
     },
     链接设定: function () {
       return {
-        offsetX: this.真实画布原点.x / this.缩放倍数 || 0,
-        offsetY: this.真实画布原点.y / this.缩放倍数 || 0,
         data: this.路径.d,
         stroke:
           this.链接["attrs"]["path_color"] ||
@@ -231,8 +211,6 @@ module.exports = {
     },
     引线设定: function () {
       let 引线 = {
-        offsetX: this.真实画布原点.x / this.缩放倍数 || 0,
-        offsetY: this.真实画布原点.y / this.缩放倍数 || 0,
         data: this.引线路径.d,
         stroke:
           this.链接["attrs"]["path_color"] ||

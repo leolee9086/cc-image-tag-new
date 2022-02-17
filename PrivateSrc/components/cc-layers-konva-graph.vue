@@ -1,5 +1,5 @@
 <template>
-  <v-stage class="cc-graph" ref="stage" :config="configKonva">
+  <v-stage class="cc-graph" ref="stage" :config="configKonva()" :style="konvastyle">
     <v-layer ref="layer-links">
       <cc-graph-link-path-konva
         v-if="link"
@@ -28,18 +28,15 @@
 <script>
 module.exports = {
   name: "cc-layers-konva-graph",
-  props: ["窗口大小", "当前鼠标坐标", "画布原点","卡片数组","链接数组"],
+  props: ["窗口大小", "当前鼠标坐标", "画布原点", "卡片数组", "链接数组"],
 
   data() {
     return {
       显示虚拟连接: false,
-    
+
       虚拟连接起点: {},
       虚拟连接路径: "",
-      configKonva: {
-        width: window.innerWidth,
-        height: window.innerHeight,
-      },
+
       当前数据: {},
       当前卡片id: this.$当前窗口状态.current_cardid,
       当前链接id: this.$当前窗口状态.current_linkid,
@@ -49,7 +46,6 @@ module.exports = {
   },
 
   mounted() {
-   
     this.$事件总线.$on("选中数据集合", (event) => (this.当前数据集合 = event));
     this.$事件总线.$on("清理选择", (event) => (this.当前数据集合 = []));
 
@@ -70,15 +66,24 @@ module.exports = {
   },
 
   computed: {
+    konvastyle: function () {
+      let configKonva = this.configKonva();
+      console.log("画板设置", this.configKonva());
+      if (configKonva.x == 0 && configKonva.y == 0) {
+        return "position:absolute";
+      } else {
+        return "position:fixed !important;top:0;left:0";
+      }
+    },
     虚拟连接设定: function () {
-      let 真实起点x = this.虚拟连接起点.x * this.$当前窗口状态.缩放倍数 - this.画布原点.x;
-      let 真实起点y = this.虚拟连接起点.y * this.$当前窗口状态.缩放倍数 - this.画布原点.y;
+      let 真实起点x = this.虚拟连接起点.x * this.$当前窗口状态.缩放倍数 || 1;
+      let 真实起点y = this.虚拟连接起点.y * this.$当前窗口状态.缩放倍数 || 1;
       return {
         points: [
           真实起点x,
           真实起点y,
-          this.当前鼠标坐标.x || 0,
-          this.当前鼠标坐标.y || 0,
+          this.当前鼠标坐标.x + this.画布原点.x || 0,
+          this.当前鼠标坐标.y + this.画布原点.y || 0,
         ],
         pointerLength: 20,
         pointerWidth: 20,
@@ -94,11 +99,11 @@ module.exports = {
       return {
         x:
           (attrs
-            ? (attrs.left + attrs.offsetx) * this.$当前窗口状态.缩放倍数 - this.画布原点.x
-            : this.画布原点.x) - 5,
+            ? (attrs.left + attrs.offsetx) * this.$当前窗口状态.缩放倍数
+            : this.$当前窗口状态.缩放倍数) - 5,
         y:
           (attrs
-            ? (attrs.top + attrs.offsety) * this.$当前窗口状态.缩放倍数 - this.画布原点.y
+            ? (attrs.top + attrs.offsety) * this.$当前窗口状态.缩放倍数
             : this.画布原点.y) - 5,
         width: (attrs ? attrs.width : null || 100) + 10,
         height: (attrs ? attrs.height : null || 1000) + 10,
@@ -111,18 +116,16 @@ module.exports = {
       };
     },
   },
-  watch: {
-    当前鼠标坐标: {
-      handler: async function (val) {
-        this.configKonva = {
-          width: window.innerWidth,
-          height: window.innerHeight,
-        };
-      },
-      deep: true,
-    },
-  },
+
   methods: {
+    configKonva: function () {
+      return {
+        x: 0 - Math.max(0, this.画布原点.x || 0 - 5000),
+        y: 0 - Math.max(0, this.画布原点.y || 0 - 5000),
+        width: Math.min(this.窗口大小.width, 5000),
+        height: Math.min(this.窗口大小.height, 5000),
+      };
+    },
     生成虚拟连接($event) {
       this.虚拟连接起点 = {
         x: $event.attrs.left,

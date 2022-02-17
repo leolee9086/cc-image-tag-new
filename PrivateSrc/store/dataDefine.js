@@ -494,7 +494,11 @@ Vue.prototype.$清空画板 = async function () {
   await this.$数据库.linkpresets.clear();
 };
 Vue.prototype.$获取画板列表 = async function(){
-  return await this.$画板元数据库.boards.toArray()
+  return await this.$画板元数据库.boards
+  .filter(
+    data=>{if(data.name){return true}}
+  )
+  .toArray()
 },
 Vue.prototype.$保存历史 = async function () {
   let data = {};
@@ -549,19 +553,77 @@ Vue.prototype.$根据时间戳更新本地数据 = function (传入数据, 本�
     return 传入数据;
   }
 };
-Vue.prototype.$保存markdown卡片数据 = async function (卡片数据, 工作空间句柄) {
-  let markdown数据 = await this.$生成卡片markdown(卡片数据);
-  let id短码=      卡片数据.id.split('@')
+Vue.prototype.$id短码=function(卡片id){
+  let id短码=卡片id.split('-')
   id短码 = id短码[id短码.length-1]
+  return id短码
+}
+Vue.prototype.$删除本地旧数据=async function(卡片数据,工作空间句柄){
+  let 画板名 =  this.$当前窗口状态.画板命名
+  let 画板id短码 = this.$id短码(卡片数据.box)
+  let id短码=      this.$id短码(卡片数据.id)
+  let 画板文件夹名 =  画板名+"-" +画板id短码;
   let 文件名 =  卡片数据.name+"-" +id短码+ ".md";
-  let 卡片文件句柄 = await 工作空间句柄.getFileHandle(文件名, { create: true });
-  let 写入管线 = await 卡片文件句柄.createWritable();
-  try {
-    await 写入管线.seek(0);
-    await 写入管线.truncate(0);
-    await 写入管线.write(markdown数据);
-    await 写入管线.close();
-  } catch (e) {}
+  let 画板文件夹句柄 = await 工作空间句柄.getDirectoryHandle(画板文件夹名, { create: false });
+  console.log(画板文件夹句柄)
+  if(!画板文件夹句柄){return null}
+  try{
+  for await ( const [key, value] of 画板文件夹句柄.entries()){
+  
+    console.log({key, value})
+    if(key.indexOf(id短码)>0&&key!==文件名){
+      await 画板文件夹句柄.removeEntry(key)
+    }
+  
+  }}catch(e){}
+ /* console.log(句柄数组)
+  for(let i=0,len=句柄数组.length;i<len;i++){
+    let 句柄对象 = 句柄数组[i]
+    if(句柄对象.key.indexOf(id短码)&&句柄对象.key!==文件名){
+      await 画板文件夹句柄.removeEntry(句柄对象.key)
+    }
+  }*/
+}
+Vue.prototype.$保存markdown卡片数据 = async function (卡片数据, 工作空间句柄) {
+  let 卡片上次修改时间1 = 卡片数据.updated.slice(0,14)
+  let id短码=      this.$id短码(卡片数据.id)
+  let 画板id短码 = this.$id短码(卡片数据.box)
+  let 画板名 =  this.$当前窗口状态.画板命名
+  let 画板文件夹名 =  画板名+"-" +画板id短码;
+  let 画板文件夹句柄 = await 工作空间句柄.getDirectoryHandle(画板文件夹名, { create: true });
+  let 文件名 =  卡片数据.name+"-" +id短码+ ".md";
+  
+  let 卡片文件句柄 = await 画板文件夹句柄.getFileHandle(文件名, { create: true });
+  let 文件属性 = await 卡片文件句柄.getFile()
+  console.log(文件属性)
+  let 卡片上次修改时间 = 卡片数据.updated.slice(0,14)
+  let 文件上次修改时间date对象 = await 文件属性.lastModifiedDate
+  let 文件上次修改时间 = moment(文件上次修改时间date对象).format("YYYYMMDDHHmmssSSSS")
+  文件上次修改时间 = 文件上次修改时间.slice(0,14)
+  console.log(卡片上次修改时间1,卡片上次修改时间,文件上次修改时间)
+  try{await this.$删除本地旧数据(卡片数据,工作空间句柄)}catch(e){}
+
+  if(parseInt(卡片上次修改时间)>=parseInt(文件上次修改时间)){
+    console.log(true)
+    let 写入管线 = await 卡片文件句柄.createWritable();
+    try {
+      await 写入管线.seek(0);
+      await 写入管线.truncate(0);
+      await 写入管线.write(卡片数据.markdown);
+      await 写入管线.close();
+    } catch (e) {}
+    return (卡片数据.markdown)
+  }
+  else{
+    try{
+    console.log(false)
+    let 文件内容 = await 文件属性.text()
+    console.log(文件内容)
+    return (文件内容)
+
+    }catch(e){}
+  }
+
 };
 
 Vue.prototype.$生成卡片markdown = function (卡片数据) {
@@ -569,6 +631,9 @@ Vue.prototype.$生成卡片markdown = function (卡片数据) {
   let yaml = this.$生成卡片yaml(卡片数据);
   return yaml +"\n"+ markdown;
 };
+Vue.prototype.$去除yaml = function(markdown){
+
+},
 Vue.prototype.$生成卡片yaml = function (对象数据) {
   let yaml = `---
 id:"${对象数据.id}"

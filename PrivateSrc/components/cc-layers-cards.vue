@@ -1,11 +1,7 @@
 <template>
   <div
     aria-label="双击或者黏贴内容新建卡片"
-    @dblclick="双击画板($event)"
-    v-on:paste="黏贴内容($event)"
-    @click="点击画板($event)"
-    @mousedown="按下鼠标($event)"
-    class="cardscontainer"
+    class="cardscontainer layer"
     :style="` 
         position:absolute;
         top:0px;
@@ -15,50 +11,79 @@
         transform-origin:0% 0%;
         z-index:200`"
   >
-    <cc-dragable-block-card
-      :data-node-id="item.id"
-      :ref="item.id"
-      v-for="(item, i) in 卡片数组"
-      v-if="item && !item.hide && item.attrs"
-      :key="卡片数组[i]['id']"
-      v-model="卡片数组[i]"
-      :index="i"
-      数据类型="card"
-      @activated="当前激活标签id = i"
-      :窗口缩放倍数="$当前窗口状态.缩放倍数"
-    ></cc-dragable-block-card>
-    <cc-dragable-block-card
-      :ref="item.id"
-      :data-node-id="item.id"
-      v-for="(item, i) in 链接数组"
-      :key="链接数组[i]['id'] + 'label'"
-      v-model="链接数组[i]"
-      :index="i"
-      @activated="当前激活链接id = i"
-      style="z-index: 202"
-      数据类型="link"
-      :窗口缩放倍数="$当前窗口状态.缩放倍数"
-    ></cc-dragable-block-card>
-    <cc-dragable-block-combo
-      :窗口缩放倍数="$当前窗口状态.缩放倍数"
-      style="z-index: 600"
-      :blockList="当前卡片集合数据"
-      :collection="true"
-      :选集主id="当前选集主id"
+    <div
+      class="cardscontainer layer"
+      @dblclick="双击画板($event)"
+      v-on:paste="黏贴内容($event)"
+      @click="点击画板($event)"
+      @mousedown="按下鼠标($event)"
+      :style="` 
+        position:absolute;
+        top:0px;
+        left:0px;
+        width: ${窗口大小.width}px; 
+        height: ${窗口大小.height}px;
+        transform-origin:0% 0%;`"
     >
-    </cc-dragable-block-combo>
-    <cc-dragable-block-combo
+      <cc-dragable-block-card
+        :data-node-id="item.id"
+        :ref="item.id"
+        v-for="(item, i) in 卡片数组"
+        v-if="item && !item.hide && item.attrs"
+        :key="卡片数组[i]['id']"
+        v-model="卡片数组[i]"
+        :index="i"
+        数据类型="card"
+        @activated="当前激活标签id = i"
+        :窗口缩放倍数="$当前窗口状态.缩放倍数"
+      ></cc-dragable-block-card>
+      <cc-dragable-block-card
+        :ref="item.id"
+        :data-node-id="item.id"
+        v-for="(item, i) in 链接数组"
+        :key="链接数组[i]['id'] + 'label'"
+        v-model="链接数组[i]"
+        :index="i"
+        @activated="当前激活链接id = i"
+        style="z-index: 202"
+        数据类型="link"
+        :窗口缩放倍数="$当前窗口状态.缩放倍数"
+      ></cc-dragable-block-card>
+      <cc-dragable-block-combo
+        :窗口缩放倍数="$当前窗口状态.缩放倍数"
+        style="z-index: 600"
+        :blockList="当前卡片集合数据"
+        :collection="true"
+        :选集主id="当前选集主id"
+      >
+      </cc-dragable-block-combo>
+      <cc-dragable-block-combo
+        :窗口缩放倍数="$当前窗口状态.缩放倍数"
+        style="z-index: 600"
+        :blockList="当前选集数据"
+      >
+      </cc-dragable-block-combo>
+    </div>
+    <cc-draw
+      :style="` 
+        position:absolute;
+        top:0px;
+        left:0px;
+        z-index:${$当前窗口状态.is_drawing ? 0 : -1}
+        `"
+      v-model="画板绘制数据"
+      :宽度="窗口大小.width"
+      :高度="窗口大小.height"
       :窗口缩放倍数="$当前窗口状态.缩放倍数"
-      style="z-index: 600"
-      :blockList="当前选集数据"
+      :画布原点="画布原点"
     >
-    </cc-dragable-block-combo>
+    </cc-draw>
   </div>
 </template>
 <script>
 module.exports = {
   name: "cc-layers-cards",
-  props: ["窗口大小", "当前鼠标坐标", "卡片数组", "链接数组"],
+  props: ["窗口大小", "画布原点", "当前鼠标坐标", "卡片数组", "链接数组"],
 
   data() {
     return {
@@ -70,13 +95,24 @@ module.exports = {
       当前选集主id: "",
       当前卡片集合数据: [],
       当前激活数据: [],
+      画板绘制数据: [],
     };
   },
-  mounted() {
+  async mounted() {
     this.$事件总线.$on("选集增加", ($event) => this.增加数据($event));
     this.$事件总线.$on("清理选择", this.清理选择);
     this.$事件总线.$on("清理选集", this.清理选集);
     this.$事件总线.$on("激活数据", ($event) => this.判定归属($event));
+
+    await this.$数据库.metadata.get("draw").then((data) => {
+      console.log("全局绘制", data);
+
+      if (data) {
+        console.log(data);
+        this.画板绘制数据 = JSON.parse(data.value || "[]");
+        console.log(this.画板绘制数据);
+      }
+    });
   },
   watch: {
     当前激活标签id: {
@@ -84,8 +120,19 @@ module.exports = {
         this.$事件总线.$emit("激活卡片", val);
       },
     },
+    画板绘制数据: {
+      handler(val) {
+        console.log(val);
+
+        this.$数据库.metadata.put({
+          key: "draw",
+          value: JSON.stringify(val),
+        });
+      },
+      deep: true,
+    },
   },
-  computed: {},
+
   methods: {
     判定归属(数据) {
       if ((数据 && 数据.attrs && 数据.parent_id) || 数据.attrs.collection) {
@@ -169,7 +216,7 @@ module.exports = {
       await this.$数据库.cards.put(空标签);
     },
     双击画板: function ($event) {
-      //  console.log($event.target);
+      console.log($event.target);
 
       this.$事件总线.$emit("双击画板", $event);
     },

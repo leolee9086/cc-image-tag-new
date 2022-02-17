@@ -14,6 +14,9 @@
     <div
       v-if="图像模式 == '重复'"
       :style="`
+         position:absolute;
+        top:0px;
+        left:0px;
     background-image:url(${图像路径});
     background-repeat:repeat;
     background-size:${图像宽度 * 图像缩放倍数}px; 
@@ -27,8 +30,10 @@
       fit="scale-down"
       ref="image"
       :style="`
+        position:absolute;
+        top:0px;
+        left:0px;
           width: ${图像宽度}px; 
-
       transform:scale(${图像缩放倍数}); 
          transform-origin:0% 0%; 
      `"
@@ -48,6 +53,7 @@ module.exports = {
       当前背景色: "",
       图像宽度: 100,
       图像高度: 100,
+      画板绘制数据: [],
     };
   },
   mounted() {
@@ -58,6 +64,7 @@ module.exports = {
         result ? (this.图像路径 = result.value) : null;
       },
     });
+
     this.$事件总线.$on("缩放背景", ($event) => (this.图像缩放倍数 = $event));
     this.$事件总线.$on("改变背景图像模式", ($event) => (this.图像模式 = $event));
     this.$事件总线.$on("背景色改变", ($event) => (this.当前背景色 = $event));

@@ -389,7 +389,7 @@ html {
 }
 
 .cc-graph {
-  position: fixed !important;
+  position: absolute !important;
 }
 .toolbar.toolbar-view {
   background-color: transparent;

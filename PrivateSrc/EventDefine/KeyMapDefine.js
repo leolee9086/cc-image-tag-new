@@ -1,16 +1,14 @@
 Vue.prototype.$快捷键触发器={
     escape(){
         let that = Vue.prototype
-
         that.$事件总线.$emit("结束连接")
         that.$事件总线.$emit("清理选择")
         that.$事件总线.$emit("清理选集")
-
     }
+    
 }
 Vue.prototype.$键位数组 = []
 Vue.prototype.$快捷键处理器 = function($event){
-    console.log($event)
     let 键位数组 = Vue.prototype.$键位数组
     let that = Vue.prototype
     let 按键名 = $event.key.toLowerCase()

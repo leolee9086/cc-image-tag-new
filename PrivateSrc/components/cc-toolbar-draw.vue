@@ -29,7 +29,7 @@ module.exports = {
     return {
       画笔宽度: 4,
       自定义颜色数组: [],
-      当前画笔颜色: "",
+      当前画笔颜色: "black",
       configshower: {
         width: "300",
         height: "300",
@@ -47,11 +47,17 @@ module.exports = {
     },
   },
   watch: {
-    画笔宽度(val) {
-      this.$当前窗口状态.画笔宽度 = val;
+    画笔宽度: {
+      handler(val) {
+        this.$当前窗口状态.画笔宽度 = val;
+      },
+      immediate: true,
     },
-    当前画笔颜色(val) {
-      this.$当前窗口状态.画笔颜色 = val;
+    当前画笔颜色: {
+      handler(val) {
+        this.$当前窗口状态.画笔颜色 = val;
+      },
+      immediate: true,
     },
   },
 };

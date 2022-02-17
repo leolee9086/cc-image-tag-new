@@ -1,11 +1,8 @@
-const 数据获取器 = new Worker("./PrivateSrc/EventDefine/DataWorker.js");
+//const 数据获取器 = new Worker("./PrivateSrc/EventDefine/DataWorker.js");
 const 事件总线 = new Vue();
 let 数据共享总线 = new BroadcastChannel("数据共享总线");
 
-const 消息打印 = function (massage) {
-  massage.data && massage.data.日志 ? console.log(massage.data.日志) : null;
-  massage.data && massage.data.错误 ? console.log(massage.data.错误) : null;
-};
+
 数据共享总线.onmessage=function(massage){
     if(massage.data.对象数据){
       事件总线.$emit("接收数据",massage.data.对象数据)
@@ -189,6 +186,7 @@ const 事务列表 = {
     )
     
   },
+  
   切换链接显示: function (传入数据) {
     console.log(传入数据);
 
@@ -362,6 +360,8 @@ const 事务列表 = {
     }
   },
   双击画板: function ($event) {
+    console.log($event.target.className)
+
     if ($event.target.className != "cardscontainer layer") {
       return null;
     }
@@ -370,6 +370,8 @@ const 事务列表 = {
       left: (window.pageXOffset + $event.clientX) / this.$当前窗口状态.缩放倍数,
       
     });
+    console.log(卡片数据)
+
     this.$事件总线.$emit("添加卡片", 卡片数据);
     this.$数据库.cards
       .put(卡片数据)
@@ -533,6 +535,5 @@ for (let item in 事务列表) {
 }
 Vue.prototype.$事务列表 = 事务列表;
 Vue.prototype.$事件总线 = 事件总线;
-Vue.prototype.$数据获取器 = 数据获取器;
 Vue.prototype.$思源伺服ip = window.location.host;
 Vue.prototype.$主界面 = window.parent.document;

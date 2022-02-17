@@ -12,41 +12,38 @@
     @resizing="resizing"
     @resizestop="resizestop"
     :y="top || 0"
-    :w="width || 对象数据.attrs.width * 窗口缩放倍数 || 100"
-    :h="height || 对象数据.attrs.height * 窗口缩放倍数 || 100"
+    :w="width || 对象数据.attrs.width * 窗口缩放倍数 || 100 * 窗口缩放倍数"
+    :h="height || 对象数据.attrs.height * 窗口缩放倍数 || 100 * 窗口缩放倍数"
     :x="left || 0"
     :z="210"
     class-name-handle="resizer"
     class-name="cc-card-container"
   >
     <vue-draggable-resizable
-      v-if="!hide"
+      v-if="
+        !hide &&
+        ((对象数据.attrs.draw && 对象数据.attrs.draw[0]) || $当前窗口状态.is_drawing)
+      "
       ref="container"
       :resizable="drawResize"
       :draggable="false"
       @resizing="drawresizing"
       @resizestop="drawresizing"
-      :y="0"
-      :w="对象数据.attrs.draw_width * 窗口缩放倍数 || 100"
-      :h="对象数据.attrs.draw_height * 窗口缩放倍数 || 100"
-      :x="width + 20 * 窗口缩放倍数"
-      :z="210"
+      :y="对象数据.attrs.draw_offsetY || 0"
+      :w="对象数据.attrs.draw_width * 窗口缩放倍数 || 100 * 窗口缩放倍数"
+      :h="对象数据.attrs.draw_height * 窗口缩放倍数 || 100 * 窗口缩放倍数"
+      :x="对象数据.attrs.draw_offsetX * 窗口缩放倍数 || width + 20 * 窗口缩放倍数"
       class-name-handle="resizer"
       class-name="cc-card-container"
     >
-      <v-stage
-        @mousedown="绘制中 = true"
-        @mouseup="绘制中 = false"
-        @mousemove="绘制($event)"
-        class="cc-block-card-draw"
-        ref="draw"
-        :config="configDraw()"
+      <cc-draw
+        v-model="对象数据.attrs.draw"
+        :宽度="对象数据.attrs.draw_width * 窗口缩放倍数 || 100"
+        :高度="对象数据.attrs.draw_height * 窗口缩放倍数 || 100"
+        :窗口缩放倍数="窗口缩放倍数"
+        :画布原点="{ x: 0, y: 0 }"
       >
-        <v-layer>
-          <v-line v-for="绘制 in 对象数据.attrs.draw" :config="lineConfig(绘制)"></v-line>
-          <v-line :config="tempLineConfig"></v-line>
-        </v-layer>
-      </v-stage>
+      </cc-draw>
     </vue-draggable-resizable>
     <div
       @click="鼠标点击($event)"
@@ -76,7 +73,8 @@
           color:${对象数据.attrs.color};
           border:solid ${对象数据.attrs.borderColor} 2px;
           max-width:${对象数据.attrs.height * 窗口缩放倍数} px
-          
+                z-index:5
+
           `"
           @dblclick="开始连接()"
         >
@@ -87,9 +85,9 @@
             v-if="对象数据.attrs.def_block"
           ></span>
 
-          <span class="subtypetag" v-if="$当前窗口状态.showsubtype">{{
-            对象数据.subtype
-          }}</span>
+          <span class="subtypetag" v-if="$当前窗口状态.showsubtype">
+            {{ 对象数据.subtype }}
+          </span>
           <strong v-if="$当前窗口状态.showname">{{ 对象数据.name }}</strong>
         </div>
         <div
@@ -115,7 +113,7 @@
 
       <div v-if="激活" class="cc-card-toolbar">
         <span aria-label="卡片序号">{{ index }}</span>
-        <span aria-label="删除卡片" class="el-icon-delete" v-on:click="删除()"> </span>
+        <span aria-label="删除卡片" class="el-icon-delete" v-on:click="删除()"></span>
         <span
           aria-label="展开|关闭卡片"
           class="el-icon-full-screen"
@@ -168,18 +166,17 @@
         aria-label="双击开始卡片连接,ctrl+点击多选"
         @dblclick="开始连接()"
         :style="`
-          color:${对象数据.attrs.color};
-          border:${对象数据.attrs.borderStyle || 'solid'} ${对象数据.attrs.borderColor} ${
+        color:${对象数据.attrs.color};
+        border:${对象数据.attrs.borderStyle || 'solid'} ${对象数据.attrs.borderColor} ${
           对象数据.attrs.borderWidth || 1
         }px;
-          background-color:${对象数据.attrs.backgroundColor};
-          width:${
-            对象数据.attrs.width - 21 - (对象数据.attrs.borderWidth || 1) * 2 + 'px'
-          };
-          height:${
-            对象数据.attrs.height - 21 - (对象数据.attrs.borderWidth || 1) * 2 + 'px'
-          };
-          `"
+        background-color:${对象数据.attrs.backgroundColor};
+        width:${对象数据.attrs.width - 21 - (对象数据.attrs.borderWidth || 1) * 2 + 'px'};
+        height:${
+          对象数据.attrs.height - 21 - (对象数据.attrs.borderWidth || 1) * 2 + 'px'
+        };
+
+        `"
         @click="鼠标点击($event)"
       >
         <iframe
@@ -193,16 +190,9 @@
           allowfullscreen="true"
           style="width: 100%; height: 100%"
         ></iframe>
-        <div v-if="对象数据.type !== 'board'">
+        <div v-if="对象数据.type !== 'board'" style="z-index: 5">
           <el-row>
             <el-col :span="12">
-              <span
-                class="el-icon-siyuan"
-                @click="发送卡片数据到思源()"
-                aria-label="卡片已经连接到思源块,点击更换目标"
-                v-if="对象数据.attrs.def_block"
-              ></span>
-
               <el-input
                 :key="对象数据.id"
                 size="mini"
@@ -212,7 +202,15 @@
                 @input="保存数据($event)"
                 @change="保存数据($event)"
                 v-model="对象数据.name"
-              ></el-input>
+              >
+                <span
+                  class="el-icon-siyuan"
+                  @click="发送卡片数据到思源()"
+                  aria-label="卡片已经连接到思源块,点击更换目标"
+                  v-if="对象数据.attrs.def_block"
+                  slot="prepend"
+                ></span>
+              </el-input>
             </el-col>
             <el-col :span="12">
               <span class="subtypetag">{{ 对象数据.subtype }}</span>
@@ -239,7 +237,7 @@
           <cc-vditor-vue
             v-model="markdown"
             @click="开始编辑($event)"
-            v-if="正在编辑"
+            v-if="正在编辑 && (!思源HTML || $当前窗口状态.show_markdown_by_default)"
             :toolbarconfig="{ hide: false }"
           ></cc-vditor-vue>
           <div
@@ -351,10 +349,11 @@ module.exports = {
     },
 
     对象数据: {
-      handler: function (val, oldval) {
+      handler: async function (val, oldval) {
         if (!val.attrs) {
           return null;
         }
+
         this.folded = val.attrs.folded;
         let attrs = this.对象数据.attrs;
         attrs.top + "" == "NAN" ? (attrs.top = 0) : null;
@@ -405,15 +404,16 @@ module.exports = {
       immediate: true,
     },
     激活(val) {
+      if (this.$当前窗口状态.current_workspace_handle) {
+        this.更新卡片markdown();
+      }
       if (val) {
         console.log("hhhh", this.对象数据);
         this.$事件总线.$emit("激活数据", this.对象数据);
-        this.对象数据 = this.$更新数据时间戳(this.对象数据);
         this.生成html();
         console.log(this.$当前窗口状态.is_drawing);
         this.drawResize = this.$当前窗口状态.is_drawing;
       } else {
-        this.对象数据 = this.$更新数据时间戳(this.对象数据);
         this.$事件总线.$emit("反激活数据", this.对象数据);
         this.正在编辑 = false;
         this.生成html();
@@ -421,6 +421,9 @@ module.exports = {
       }
     },
     正在编辑(val) {
+      if (this.$当前窗口状态.current_workspace_handle) {
+        this.更新卡片markdown();
+      }
       if (val) {
         //console.log(this.对象数据);
       } else {
@@ -496,11 +499,33 @@ module.exports = {
       let evt = $event.evt;
       evt.stopPropagation();
       console.log(evt.offsetX);
-
+      let 临时点数组 = this.临时点数组;
       if (this.绘制中 && this.$当前窗口状态.is_drawing) {
         let 点 = [evt.offsetX, evt.offsetY];
+        if (this.窗口缩放倍数) {
+          点 = [
+            点[0] / this.窗口缩放倍数 / this.窗口缩放倍数,
+            点[1] / this.窗口缩放倍数 / this.窗口缩放倍数,
+          ];
+        }
+        let 上一个点 = [
+          临时点数组[临时点数组.length - 1],
+          临时点数组[临时点数组.length - 2],
+        ];
+        if (上一个点[1]) {
+          let 距离 = [点[0] - 上一个点[0], 点[1] - 上一个点[1]];
+
+          let 真实点 = [上一个点[0] + 距离[0], 上一个点[1] + 距离[1]];
+          点 = 真实点;
+        }
         this.临时点数组 = this.临时点数组.concat(点);
       }
+    },
+    async 更新卡片markdown() {
+      let 工作空间句柄 = this.$当前窗口状态.current_workspace_handle;
+      let 卡片markdown = await this.$保存markdown卡片数据(this.对象数据, 工作空间句柄);
+      console.log(卡片markdown);
+      this.markdown = 卡片markdown;
     },
     覆盖markdown() {
       let html = this.思源html;
@@ -541,9 +566,7 @@ module.exports = {
     },
     开始编辑($event) {
       $event.stopPropagation();
-      if (this.$当前窗口状态.show_markdown_by_default) {
-        this.正在编辑 = true;
-      }
+      this.正在编辑 = true;
     },
     鼠标点击($event) {
       console.log($event);
@@ -663,7 +686,6 @@ module.exports = {
     },
     dragging: function (x, y) {
       this.计算坐标(x, y);
-      this.对象数据 = this.$更新数据时间戳(this.对象数据);
 
       this.保存数据();
 
@@ -671,8 +693,9 @@ module.exports = {
     },
     dragstop(x, y) {
       this.计算坐标(x, y);
-      this.对象数据 = this.$更新数据时间戳(this.对象数据);
-
+      if (this.$当前窗口状态.current_workspace_handle) {
+        this.更新卡片markdown();
+      }
       this.保存数据();
 
       this.$事件总线.$emit("移动卡片", this.对象数据);
@@ -681,29 +704,32 @@ module.exports = {
       this.计算坐标(x, y);
       this.对象数据.attrs.width = width / this.窗口缩放倍数 || 100;
       this.对象数据.attrs.height = height / this.窗口缩放倍数 || 100;
-      this.对象数据 = this.$更新数据时间戳(this.对象数据);
 
       this.保存数据();
       this.$事件总线.$emit("缩放卡片", this.对象数据);
     },
     drawresizing: function (x, y, width, height) {
       console.log(width, height);
+      this.对象数据.attrs.draw_offsetX = x;
+      this.对象数据.attrs.draw_offsetY = y;
+
       this.对象数据.attrs.draw_width = width / this.窗口缩放倍数 || 100;
       this.对象数据.attrs.draw_height = height / this.窗口缩放倍数 || 100;
-      this.对象数据 = this.$更新数据时间戳(this.对象数据);
       this.保存数据();
     },
     resizestop: function (x, y, width, height) {
       this.计算坐标(x, y);
       this.对象数据.attrs.width = width / this.窗口缩放倍数 || 100;
       this.对象数据.attrs.height = height / this.窗口缩放倍数 || 100;
-      this.对象数据 = this.$更新数据时间戳(this.对象数据);
-
+      if (this.$当前窗口状态.current_workspace_handle) {
+        this.更新卡片markdown();
+      }
       this.保存数据();
     },
-    保存数据: function ($event) {
+    保存数据: async function ($event) {
       console.log(this.对象数据);
       $event ? (this.对象数据.name = $event) : null;
+
       this.对象数据 = this.$更新数据时间戳(this.对象数据);
       this.$事件总线.$emit("保存数据", this.对象数据);
       this.激活 ? this.$事件总线.$emit("当前对象改变", this.对象数据) : null;
