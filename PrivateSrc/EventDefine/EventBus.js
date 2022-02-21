@@ -320,6 +320,9 @@ const 事务列表 = {
       });
     }
   },
+  结束绘制:function(){
+    this.$当前窗口状态.is_drawing=false
+  },
   清理选择: function () {
     //   console.log("选择清空");
     this.$当前窗口状态.current_cardid = "";

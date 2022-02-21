@@ -76,6 +76,7 @@
       :高度="窗口大小.height"
       :窗口缩放倍数="$当前窗口状态.缩放倍数"
       :画布原点="画布原点"
+      :当前鼠标坐标="当前鼠标坐标"
     >
     </cc-draw>
   </div>
@@ -179,11 +180,14 @@ module.exports = {
     黏贴内容: function ($event) {
       let clipboardData = $event.clipboardData;
 
+      console.log(event);
+
       if (!(clipboardData && clipboardData.items)) {
         return;
       }
       for (var i = 0, len = clipboardData.items.length; i < len; i++) {
         var item = clipboardData.items[i];
+        this.解析图片(item);
         if (item.kind === "string" && item.type == "text/plain") {
           item.getAsString((str) => {
             // console.log(str);
@@ -192,6 +196,13 @@ module.exports = {
         }
       }
     },
+    解析图片(item) {
+      if (item && item.kind === "file" && item.type.match(/^image\//i)) {
+        // 读取该图片
+        console.log(item.webkitGetAsEntry());
+      }
+    },
+
     解析剪贴板内容: async function (剪贴板数据) {
       let 当前鼠标坐标 = this.当前鼠标坐标;
       let 思源伺服ip = window.location.host;

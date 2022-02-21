@@ -8,6 +8,9 @@
         <cc-loader-file @filechange="设定工作空间($event)"></cc-loader-file>
       </el-col>
     </el-row>
+    <el-row>
+      <el-switch v-model="开发模式" active-text="开启开发模式"></el-switch>
+    </el-row>
     <el-divider></el-divider>
     <el-timeline v-if="画板列表">
       <el-timeline-item
@@ -40,6 +43,7 @@ module.exports = {
     return {
       画板列表: [],
       工作空间名: "",
+      开发模式: false,
     };
   },
   async mounted() {

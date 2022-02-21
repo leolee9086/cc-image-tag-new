@@ -4,6 +4,8 @@ Vue.prototype.$快捷键触发器={
         that.$事件总线.$emit("结束连接")
         that.$事件总线.$emit("清理选择")
         that.$事件总线.$emit("清理选集")
+        that.$事件总线.$emit("结束绘制")
+
     }
     
 }

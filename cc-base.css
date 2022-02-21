@@ -258,7 +258,19 @@ body,
   font-size: 14px;
   visibility: hidden;
 }
+.el-icon-eraser {
+  background: url("/widgets/cc-baselib/icons/eraser.svg") center no-repeat;
+  background-size: contain;
+}
 
+.el-icon-eraser::before {
+  content: "\8d3a";
+  font-size: 1em;
+  visibility: hidden;
+}
+span[style~='lightblue']::before{
+  color:lightblue
+}
 .el-icon-markdown {
   background: url("/widgets/cc-baselib/icons/markdown.svg") center no-repeat;
   background-size: contain;

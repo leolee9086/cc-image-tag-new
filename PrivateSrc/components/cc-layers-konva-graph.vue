@@ -68,7 +68,6 @@ module.exports = {
   computed: {
     konvastyle: function () {
       let configKonva = this.configKonva();
-      console.log("画板设置", this.configKonva());
       if (configKonva.x == 0 && configKonva.y == 0) {
         return "position:absolute";
       } else {
