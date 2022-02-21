@@ -8,9 +8,6 @@
         <cc-loader-file @filechange="设定工作空间($event)"></cc-loader-file>
       </el-col>
     </el-row>
-    <el-row>
-      <el-switch v-model="开发模式" active-text="开启开发模式"></el-switch>
-    </el-row>
     <el-divider></el-divider>
     <el-timeline v-if="画板列表">
       <el-timeline-item
@@ -50,6 +47,7 @@ module.exports = {
     await this.获取数据();
     await this.获取画板列表();
     await this.修复画板列表();
+    this.$事件总线.$on("设定工作空间", ($event) => (this.工作空间名 = $event.name));
   },
   watch: {
     当前画板命名(val) {

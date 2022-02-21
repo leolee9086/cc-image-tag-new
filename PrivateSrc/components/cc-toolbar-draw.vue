@@ -40,7 +40,7 @@
       <el-col :span="6">
         <div class="drawer-button draw">
           <span
-            @click="绘制模式 = '绘制'"
+            @click="绘制模式 != '绘制' ? (绘制模式 = '绘制') : (绘制模式 = '')"
             circle
             class="el-icon-edit"
             aria-label="展开|关闭面板"
@@ -55,7 +55,7 @@
       <el-col :span="6">
         <div class="drawer-button draw">
           <span
-            @click="绘制模式 = '移动'"
+            @click="绘制模式 != '移动' ? (绘制模式 = '移动') : (绘制模式 = '')"
             circle
             class="el-icon-rank"
             aria-label="移动绘制元素"
@@ -70,7 +70,7 @@
       <el-col :span="6">
         <div class="drawer-button draw">
           <span
-            @click="绘制模式 = '删除'"
+            @click="绘制模式 != '删除' ? (绘制模式 = '删除') : (绘制模式 = '')"
             circle
             class="el-icon-eraser"
             aria-label="删除绘制元素"
@@ -140,10 +140,10 @@ module.exports = {
             this.$当前窗口状态.drawing_mode = "eraser";
             this.当前按钮名称 = "删除";
             break;
-          case "删除卡片":
-            this.$当前窗口状态.is_drawing = true;
-            this.$当前窗口状态.drawing_mode = "delete";
-            this.当前按钮名称 = "删除卡片";
+          default:
+            this.$当前窗口状态.is_drawing = false;
+            this.$当前窗口状态.drawing_mode = "";
+            this.当前按钮名称 = "";
             break;
         }
       },

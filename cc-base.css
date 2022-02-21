@@ -972,3 +972,8 @@ html {
 .el-divider--horizontal{
   background-color: var(--b3-theme-on-background) !important;
 }
+
+.el-drawer{
+box-shadow: 0 2px 6px 0 rgb(16 42 75 / 49%) !important;
+border:solid 1px rgba(128, 128, 128, 0.329)
+}

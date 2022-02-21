@@ -1,20 +1,25 @@
 <template>
   <el-drawer :modal="false" title="链接" size="100%" :visible="显示" :show-close="false">
     <h2 slot="title">图上连接</h2>
-    <strong>图上入链</strong>
+    <div>
+      <strong>图上入链</strong>
+    </div>
     <template v-if="展开反向链接" v-for="链接 in 当前图上反向链接列表">
       <cc-graphlink-infor
+        direction="from"
         v-if="链接"
         :linkdata="链接"
-        :cardid="链接.attrs ? 链接.attrs.to_id : null"
+        :cardid="链接.attrs ? 链接.attrs.from_id : null"
       >
       </cc-graphlink-infor>
     </template>
     <el-divider></el-divider>
-    <strong>图上出链</strong>
-
+    <div>
+      <strong>图上出链</strong>
+    </div>
     <template v-if="展开正向链接" v-for="链接 in 当前图上正向链接列表">
       <cc-graphlink-infor
+        direction="to"
         v-if="链接"
         :linkdata="链接"
         :cardid="链接.attrs ? 链接.attrs.to_id : null"

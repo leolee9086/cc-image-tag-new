@@ -3,12 +3,12 @@ const 事件总线 = new Vue();
 let 数据共享总线 = new BroadcastChannel("数据共享总线");
 
 
-数据共享总线.onmessage=function(massage){
-    if(massage.data.对象数据){
+数据共享总线.addEventListener("message",function(massage){
+  if(massage.data.对象数据){
       事件总线.$emit("接收数据",massage.data.对象数据)
     }
 }
-
+)
 const 事务列表 = {
   数据库: 数据库,
   上传当前画板文件数据到思源: async function () {
@@ -362,6 +362,9 @@ const 事务列表 = {
       this.$事件总线.$emit("选集增加", 数据);
     }
   },
+  绘制数据改变:function (画板绘制数据){
+   数据共享总线.postMessage({id:this.$baseid,"画板绘制数据":画板绘制数据.data,updated:画板绘制数据.updated})
+  },
   双击画板: function ($event) {
     console.log($event.target.className)
 
@@ -540,3 +543,4 @@ Vue.prototype.$事务列表 = 事务列表;
 Vue.prototype.$事件总线 = 事件总线;
 Vue.prototype.$思源伺服ip = window.location.host;
 Vue.prototype.$主界面 = window.parent.document;
+Vue.prototype.$数据共享总线 = 数据共享总线;

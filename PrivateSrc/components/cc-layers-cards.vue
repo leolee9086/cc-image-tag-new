@@ -91,7 +91,7 @@ module.exports = {
       当前激活标签id: "",
       当前激活链接id: "",
       窗口缩放倍数: 1,
-
+      updated: 0,
       当前选集数据: [],
       当前选集主id: "",
       当前卡片集合数据: [],
@@ -114,6 +114,9 @@ module.exports = {
         console.log(this.画板绘制数据);
       }
     });
+    this.$数据共享总线.addEventListener("message", (massage) =>
+      this.获取消息数据(massage)
+    );
   },
   watch: {
     当前激活标签id: {
@@ -123,18 +126,38 @@ module.exports = {
     },
     画板绘制数据: {
       handler(val) {
-        console.log(val);
-
         this.$数据库.metadata.put({
           key: "draw",
           value: JSON.stringify(val),
         });
+        this.updated = this.$生成毫秒时间戳();
+
+        let 数据 = { data: val, updated: this.updated };
+        this.$事件总线.$emit("绘制数据改变", 数据);
       },
       deep: true,
     },
   },
 
   methods: {
+    获取消息数据(massage) {
+      if (
+        massage &&
+        massage.data &&
+        massage.data.id == this.$baseid &&
+        parseInt(massage.data.updated) > parseInt(this.updated)
+      ) {
+        console.log(massage.data.updated, this.updated);
+
+        if (massage.data["画板绘制数据"]) {
+          let 消息数据 = massage.data.画板绘制数据;
+          if (消息数据 && JSON.stringify(消息数据) != JSON.stringify(this.画板绘制数据)) {
+            this.画板绘制数据 = 消息数据;
+            this.updated = this.$生成毫秒时间戳();
+          }
+        }
+      }
+    },
     判定归属(数据) {
       if ((数据 && 数据.attrs && 数据.parent_id) || 数据.attrs.collection) {
         if (!数据.attrs.collection) {

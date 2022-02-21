@@ -587,13 +587,8 @@ Vue.prototype.$删除本地旧数据=async function(卡片数据,工作空间句
 Vue.prototype.$保存markdown卡片数据 = async function (卡片数据, 工作空间句柄) {
   let 卡片上次修改时间1 = 卡片数据.updated.slice(0,14)
   let id短码=      this.$id短码(卡片数据.id)
-  let 画板id短码 = this.$id短码(卡片数据.box)
-  let 画板名 =  this.$当前窗口状态.画板命名
-  let 画板文件夹名 =  画板名+"-" +画板id短码;
-  let 画板文件夹句柄 = await 工作空间句柄.getDirectoryHandle(画板文件夹名, { create: true });
   let 文件名 =  卡片数据.name+"-" +id短码+ ".md";
-  
-  let 卡片文件句柄 = await 画板文件夹句柄.getFileHandle(文件名, { create: true });
+  let 卡片文件句柄 = await 工作空间句柄.getFileHandle(文件名, { create: true });
   let 文件属性 = await 卡片文件句柄.getFile()
   console.log(文件属性)
   let 卡片上次修改时间 = 卡片数据.updated.slice(0,14)
@@ -602,7 +597,6 @@ Vue.prototype.$保存markdown卡片数据 = async function (卡片数据, 工作
   文件上次修改时间 = 文件上次修改时间.slice(0,14)
   console.log(卡片上次修改时间1,卡片上次修改时间,文件上次修改时间)
   try{await this.$删除本地旧数据(卡片数据,工作空间句柄)}catch(e){}
-
   if(parseInt(卡片上次修改时间)>=parseInt(文件上次修改时间)){
     console.log(true)
     let 写入管线 = await 卡片文件句柄.createWritable();

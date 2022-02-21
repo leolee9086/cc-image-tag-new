@@ -227,7 +227,7 @@ module.exports = {
   props: ["卡片数据id", "链接数据id", "思源伺服ip", "显示"],
   data() {
     return {
-      开发模式: true,
+      开发模式: false,
       当前面板: "样式",
       apitoken: "",
       当前对象数据: "",
