@@ -577,7 +577,7 @@ module.exports = {
     },
     判断id: function ($event) {
       let that = this;
-      //  console.log("sss", $event, this.对象数据);
+      console.log("sss", $event, this.对象数据);
 
       if (!$event) {
         return null;
@@ -587,7 +587,7 @@ module.exports = {
       }
       if (
         $event.id == this.对象数据.id &&
-        parseInt($event.updated) > parseInt(this.对象数据.updated)
+        parseInt($event.updated) >= parseInt(this.对象数据.updated)
       ) {
         let 旧数据 = JSON.parse(JSON.stringify(this.对象数据 || {}));
         let 新数据 = JSON.parse(JSON.stringify($event || {}));
