@@ -114,10 +114,10 @@ module.exports = {
     };
   },
   mounted() {
-    this.$事件总线.$on("保存卡片", ($event) => this.获取当前元素数据($event));
-    this.$事件总线.$on("保存链接", ($event) => this.获取当前元素数据($event));
-    this.$事件总线.$on("激活卡片", ($event) => this.获取当前元素数据($event));
-    this.$事件总线.$on("激活链接", ($event) => this.获取当前元素数据($event));
+    this.$事件总线.$on("保存数据", ($event) => this.获取当前元素数据($event));
+    this.$事件总线.$on("保存数据", ($event) => this.获取当前元素数据($event));
+    this.$事件总线.$on("激活数据", ($event) => this.获取当前元素数据($event));
+    this.$事件总线.$on("激活数据", ($event) => this.获取当前元素数据($event));
     this.$事件总线.$on("激活数据", ($event) => this.获取当前元素数据($event));
   },
   watch: {
@@ -181,16 +181,13 @@ module.exports = {
 
     获取当前元素数据: function ($event) {
       if ($event && $event.attrs) {
-        if ($event.id == this.卡片数据id || $event.id == this.链接数据id) {
-          this.对象数据 = $event || this.对象数据;
-          this.属性对象 = this.对象数据.attrs;
-          this.当前对象名称 = this.对象数据.name;
-          this.预设名 = $event.subtype || this.预设名;
-          this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}&table=cards`;
-        }
+        this.对象数据 = $event || this.对象数据;
+        this.属性对象 = this.对象数据.attrs;
+        this.当前对象名称 = this.对象数据.name;
+        this.预设名 = $event.subtype || this.预设名;
+        this.卡片超链接 = `/widgets/cc-image-tag-new/vditor-card-editor.html?id=${this.对象数据.id}&baseid=${this.$baseid}&table=cards`;
       }
     },
-
     聚焦到卡片: function (对象数据) {
       if (this.$当前窗口状态.缩放倍数 < 1) {
         this.$事件总线.$emit("窗口缩放", 1);
