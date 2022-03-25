@@ -307,6 +307,9 @@ module.exports = {
           this.预设名 = val.subtype;
           this.获取预设();
         }
+        if (val && oldval && val.id == oldval.id && val.subtype === oldval.subtype) {
+          this.变更预设();
+        }
         this.当前数据类型 = val.type;
         this.属性对象 = val.attrs || this.属性对象;
       },
@@ -331,7 +334,6 @@ module.exports = {
         if (val.id == oldval.id) {
           flag = true;
         }
-        //this.设定当前标记(val, flag);
       },
       deep: true,
     },
@@ -371,10 +373,17 @@ module.exports = {
       }
       await this.新建预设();
     },
-    变更预设值: function (属性名, 预设项目) {
-      this.预设.type = this.当前对象数据.type;
-      this.预设.attrs[属性名] = this.属性对象[属性名];
-      this.$事件总线.$emit("变更预设值", 属性名, this.预设);
+
+    变更预设: function () {
+      for (属性名 in this.预设.attrs) {
+        if (this.预设.attrs[属性名] === "byref") {
+          return;
+        }
+        this.预设.type = this.当前对象数据.type;
+
+        this.预设.attrs[属性名] = this.属性对象[属性名];
+        this.$事件总线.$emit("变更预设值", 属性名, this.预设);
+      }
     },
 
     设为实例值: async function (属性名, 预设项目) {
@@ -452,14 +461,14 @@ module.exports = {
       this.预设名 = "";
       this.预设名 = 预设名;
     },
-    获取预设: async function () {
+    获取预设: async function (flag) {
       if (!this.当前对象数据.type) {
         return null;
       }
       let 预设表名 = this.当前对象数据.type + "presets";
       this.预设列表 = await this.$获取预设表(预设表名);
       if (this.预设名) {
-        // this.预设 = (await this.$获取预设(预设表名, this.预设名)) || this.预设 || {};
+        this.预设 = (await this.$获取预设(预设表名, this.预设名)) || this.预设 || {};
       }
     },
     新建预设: async function () {
@@ -509,38 +518,6 @@ module.exports = {
         }
       }
       await this.获取预设();
-    },
-
-    设定当前标记: function (val, flag) {
-      let 上传数据 = { id: "", subtype: this.预设.name, attrsproxy: {} };
-      上传数据.id = this.当前对象数据.id;
-      上传数据.type = this.当前对象数据.type;
-
-      let 属性列表 = this.属性列表;
-
-      for (序号 in 属性列表) {
-        let 属性名 = 属性列表[序号];
-        上传数据["attrsproxy"][属性名] = val[属性名];
-        //console.log(属性名, 上传数据["attrsproxy"][属性名]);
-      }
-      if (this.当前对象数据.type == "card") {
-        console.log(上传数据);
-        //this.$事件总线.$emit("保存卡片", 上传数据);
-      }
-      if (this.当前对象数据.type == "link") {
-        console.log(上传数据);
-
-        // this.$事件总线.$emit("保存链接", 上传数据);
-      }
-      for (序号 in 属性列表) {
-        let 属性名 = 属性列表[序号];
-        if (this.预设.attrs !== undefined && flag) {
-          // console.log(this.预设.attrs);
-          if (this.预设.attrs[属性名] != "byref") {
-            this.变更预设值(属性名);
-          }
-        }
-      }
     },
 
     设定链接(link) {

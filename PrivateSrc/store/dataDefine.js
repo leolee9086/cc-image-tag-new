@@ -559,23 +559,17 @@ Vue.prototype.$id短码=function(卡片id){
   return id短码
 }
 Vue.prototype.$删除本地旧数据=async function(卡片数据,工作空间句柄){
-  let 画板名 =  this.$当前窗口状态.画板命名
-  let 画板id短码 = this.$id短码(卡片数据.box)
   let id短码=      this.$id短码(卡片数据.id)
-  let 画板文件夹名 =  画板名+"-" +画板id短码;
   let 文件名 =  卡片数据.name+"-" +id短码+ ".md";
-  let 画板文件夹句柄 = await 工作空间句柄.getDirectoryHandle(画板文件夹名, { create: false });
-  console.log(画板文件夹句柄)
-  if(!画板文件夹句柄){return null}
   try{
-  for await ( const [key, value] of 画板文件夹句柄.entries()){
+  for await ( const [key, value] of 工作空间句柄.entries()){
   
     console.log({key, value})
     if(key.indexOf(id短码)>0&&key!==文件名){
-      await 画板文件夹句柄.removeEntry(key)
+      await 工作空间句柄.removeEntry(key)
     }
   
-  }}catch(e){}
+  }}catch(e){console.log(e)}
  /* console.log(句柄数组)
   for(let i=0,len=句柄数组.length;i<len;i++){
     let 句柄对象 = 句柄数组[i]
@@ -596,7 +590,7 @@ Vue.prototype.$保存markdown卡片数据 = async function (卡片数据, 工作
   let 文件上次修改时间 = moment(文件上次修改时间date对象).format("YYYYMMDDHHmmssSSSS")
   文件上次修改时间 = 文件上次修改时间.slice(0,14)
   console.log(卡片上次修改时间1,卡片上次修改时间,文件上次修改时间)
-  try{await this.$删除本地旧数据(卡片数据,工作空间句柄)}catch(e){}
+  try{await this.$删除本地旧数据(卡片数据,工作空间句柄)}catch(e){console.log(e)}
   if(parseInt(卡片上次修改时间)>=parseInt(文件上次修改时间)){
     console.log(true)
     let 写入管线 = await 卡片文件句柄.createWritable();

@@ -449,7 +449,7 @@ const 事务列表 = {
         this.$事件总线.$emit("保存数据", 传出数据);
       });
   },
-  删除预设: async function (预设项目, 预设表名, callback) {
+  删除预设: async function (预设项目, 预设表名) {
     let 数据表名 = 预设表名.replace("presets", "s");
     let 预设名 = 预设项目.name;
 
@@ -466,11 +466,9 @@ const 事务列表 = {
           value.subtype = 预设表名 == "cardpresets" ? "一般概念" : "属于";
         }
       });
-    await this.$数据库[预设表名].delete(预设项目.id);
+    await this.$数据库[预设表名].delete(预设项目.id)
 
-    if (callback) {
-      callback.apply();
-    }
+    
   },
   变更预设值: function (属性名, 预设项目) {
     if (!预设项目) {
@@ -482,7 +480,7 @@ const 事务列表 = {
     let 预设表名 = 预设项目.type + "presets";
     let 数据表名 = 预设项目.type + "s";
     let 预设名 = 预设项目.name;
-    //  console.log(预设表名);
+      console.log(预设表名);
     if (属性名 && 预设表名) {
       this.$数据库[预设表名].put(预设项目).then(() =>
         this.$数据库[数据表名]

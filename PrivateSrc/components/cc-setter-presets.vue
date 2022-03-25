@@ -1,6 +1,6 @@
 <template>
   <el-collapse>
-    <el-collapse-item v-for="(预设项目, i) in 卡片预设列表">
+    <el-collapse-item v-for="(预设项目, i) in 预设列表">
       <div slot="title">
         {{ 预设项目.name }}
         <el-button
@@ -50,10 +50,10 @@
 <script>
 module.exports = {
   name: "cc-setter-presets",
+  props: ["当前对象数据"],
   data() {
     return {
-      卡片预设列表: "",
-      链接预设列表: "",
+      预设列表: "",
       内置属性名对照标: [
         { name: "color", label: "文字颜色", type: "color" },
         { name: "borderColor", label: "边框颜色", type: "color" },
@@ -61,13 +61,40 @@ module.exports = {
     };
   },
   async mounted() {
-    this.卡片预设列表 = await this.$数据库.cardpresets.toArray();
-    this.链接预设列表 = await this.$数据库.linkpresets.toArray();
+    await this.获取预设表();
   },
-  methods:{
-    删除预设(预设数据){
-      this.$事件总线.$emit("删除预设",预设数据)
-    }
+  watch: {
+    当前对象数据: {
+      async handler(val, oldval) {
+        if (!oldval) {
+          return null;
+        } else {
+          await this.获取预设表();
+        }
+      },
+      deep: true,
+    },
+  },
+  methods: {
+    async 获取预设表() {
+      let 当前预设表 = this.当前对象数据.type + "presets";
+      this.预设列表 = await this.$数据库[当前预设表].toArray();
+    },
+    删除预设(预设数据) {
+      let 当前预设表 = this.当前对象数据.type + "presets";
+
+      this.$事件总线.$emit("删除预设", 预设数据, 当前预设表);
+      this.获取预设表();
+    },
+    async 设为预设值(属性名, 预设项目) {
+      let 预设id = 预设项目.id;
+      let 当前对象数据 = this.当前对象数据;
+      let 属性值 = 当前对象数据.attrs[属性名];
+      let 当前预设表 = this.当前对象数据.type + "presets";
+      let 当前预设 = await this.$数据库[当前预设表].get(预设项目.id);
+      当前预设.attrs[属性名] = 属性值;
+      await this.$数据库[当前预设表].put(当前预设).then(await this.获取预设表());
+    },
   },
 };
 </script>
