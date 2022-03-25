@@ -192,7 +192,7 @@
         ></iframe>
         <div v-if="对象数据.type !== 'board'" style="z-index: 5">
           <el-row>
-            <el-col :span="12">
+            <el-col :span="18">
               <el-input
                 :key="对象数据.id"
                 size="mini"
@@ -202,6 +202,7 @@
                 @input="保存数据($event)"
                 @change="保存数据($event)"
                 v-model="对象数据.name"
+                type="textarea"
               >
                 <span
                   class="el-icon-siyuan"
@@ -212,17 +213,14 @@
                 ></span>
               </el-input>
             </el-col>
-            <el-col :span="12">
+            <el-col :span="6">
               <span class="subtypetag">{{ 对象数据.subtype }}</span>
             </el-col>
           </el-row>
         </div>
         <div>
           <span v-if="对象数据.attrs.def_block && !$当前窗口状态.show_markdown_by_default"
-            >引用自:</span
-          >
-          <span v-if="对象数据.attrs.def_block && !$当前窗口状态.show_markdown_by_default"
-            >连接到:</span
+            >连接到思源块:</span
           >
 
           <cc-link-siyuan
