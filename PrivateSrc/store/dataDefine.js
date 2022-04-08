@@ -494,6 +494,7 @@ Vue.prototype.$填充默认值 = function (数据) {
     await this.$数据库.metadata.clear();
     await this.$数据库.cardpresets.clear();
     await this.$数据库.linkpresets.clear();
+    console.log("清空")
   };
   Vue.prototype.$获取画板列表 = async function () {
     return await this.$画板元数据库.boards

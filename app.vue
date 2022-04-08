@@ -130,7 +130,7 @@ module.exports = {
         this.$事件总线.$emit("保存数据", 完全数组[i]);
       }
     },
-    开始获取数据: async function () {
+    开始获取数据:  function () {
       liveQuery(() => this.$数据库.cards.toArray()).subscribe({
         next: async (result) => {
           this.卡片数组 = result;
