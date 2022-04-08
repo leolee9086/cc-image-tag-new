@@ -29,15 +29,7 @@
       :画布原点="画布原点"
     ></cc-layers-cards>
 
-    <!--   <cc-layers-graph
-      v-if="$当前窗口状态.使用svg"
-      class="layer"
-      :当前鼠标坐标="当前鼠标坐标"
-      :窗口大小="窗口大小"
-      :画布原点="画布原点"
-      :卡片数组="卡片数组"
-      :链接数组="链接数组"
-    ></cc-layers-graph>-->
+   
     <cc-layers-konva-graph
       class="layer"
       :当前鼠标坐标="当前鼠标坐标"
