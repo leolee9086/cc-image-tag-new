@@ -35,7 +35,7 @@ module.exports = {
     },
     获取画板列表: function () {
       this.$获取画板列表().then((data) => {
-        console.log(data);
+        //console.log(data);
         this.画板列表 = data;
       });
     },

@@ -152,7 +152,7 @@ module.exports = {
   watch: {
     blocklist: {
       handler(val) {
-        console.log(val);
+       // //console.log(val);
         if (val && val[1]) {
           this.数据去重(val);
         } else {
@@ -163,7 +163,7 @@ module.exports = {
     },
     窗口缩放倍数: {
       handler(val) {
-        //console.log("当前选集", val.length);
+        ////console.log("当前选集", val.length);
         this.计算边界框();
       },
     },
@@ -362,7 +362,7 @@ module.exports = {
         let 数据 = 数据数组[i];
         try {
           let 数据类型 = 数据.type + "s";
-          //console.log(数据类型);
+          ////console.log(数据类型);
           if (!数据.attrs.trashed && !数据.attrsproxy) {
             数据 = this.$更新数据时间戳(数据);
 
@@ -371,7 +371,7 @@ module.exports = {
             });
           }
         } catch (e) {
-          console.log(e);
+         // //console.log(e);
         }
       }
     },
@@ -421,14 +421,14 @@ module.exports = {
       this.显示 = true;
     },
     计算边界框: function () {
-      //console.log(this.数据数组);
+      ////console.log(this.数据数组);
       if (!this.数据数组) {
         return null;
       }
       let 左上角点 = { x: 10000000000, y: 100000000000 };
       let 右下角点 = { x: 0, y: 0 };
 
-      //console.log(this.数据数组);
+      ////console.log(this.数据数组);
 
       数据 = {};
       for (i = 0; i < this.数据数组.length; i++) {
@@ -463,11 +463,11 @@ module.exports = {
       if (!this.数据数组) {
         return null;
       }
-      // console.log(1, x, y);
-      // console.log(2, this.x, this.y);
+      // //console.log(1, x, y);
+      // //console.log(2, this.x, this.y);
       let 移动距离y = (y - this.y) / 窗口缩放倍数;
       let 移动距离x = (x - this.x) / 窗口缩放倍数;
-      // console.log(3, 移动距离x, 移动距离y);
+      // //console.log(3, 移动距离x, 移动距离y);
 
       this.数据数组.forEach((数据) => {
         if (数据 && 数据.attrs) {
@@ -475,17 +475,17 @@ module.exports = {
           let { top, left, offsetx, offsety } = attrs;
           let 数据类型 = 数据.type;
           if (数据类型 == "card") {
-            // console.log(4, 移动距离x, 移动距离y);
-            // console.log(5, 数据.attrs.left, 数据.attrs.top);
+            // //console.log(4, 移动距离x, 移动距离y);
+            // //console.log(5, 数据.attrs.left, 数据.attrs.top);
 
             数据.attrs.top = 数据.attrs.top + 移动距离y + 10;
             数据.attrs.left = 数据.attrs.left + 移动距离x + 10;
-            // console.log(6, 数据.attrs.left, 数据.attrs.top);
+            // //console.log(6, 数据.attrs.left, 数据.attrs.top);
           } else {
             数据.attrs.offsetx = 数据.attrs.offsetx + 移动距离y + 10;
             数据.attrs.offsety = 数据.attrs.offsety + 移动距离x + 10;
           }
-          // console.log(7, 数据.attrs.top, 数据.attrs.left);
+          // //console.log(7, 数据.attrs.top, 数据.attrs.left);
         }
       });
       移动距离x = 0;

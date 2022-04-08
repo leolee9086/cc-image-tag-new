@@ -64,9 +64,9 @@
       >
       </cc-dragable-block-combo>
     </div>
-    <cc-draw
+   <cc-draw
       :style="` 
-        position:absolute;
+        position:fixed;
         top:0px;
         left:0px;
         z-index:${$当前窗口状态.is_drawing ? 0 : -1}
@@ -106,12 +106,12 @@ module.exports = {
     this.$事件总线.$on("激活数据", ($event) => this.判定归属($event));
 
     await this.$数据库.metadata.get("draw").then((data) => {
-      console.log("全局绘制", data);
+      //console.log("全局绘制", data);
 
       if (data) {
-        console.log(data);
+        //console.log(data);
         this.画板绘制数据 = JSON.parse(data.value || "[]");
-        console.log(this.画板绘制数据);
+        //console.log(this.画板绘制数据);
       }
     });
     this.$数据共享总线.addEventListener("message", (massage) =>
@@ -147,7 +147,7 @@ module.exports = {
         massage.data.id == this.$baseid &&
         parseInt(massage.data.updated) > parseInt(this.updated)
       ) {
-        console.log(massage.data.updated, this.updated);
+        //console.log(massage.data.updated, this.updated);
 
         if (massage.data["画板绘制数据"]) {
           let 消息数据 = massage.data.画板绘制数据;
@@ -181,7 +181,7 @@ module.exports = {
       }
     },
     清理选择: function () {
-      console.log("清理");
+      //console.log("清理");
       this.当前选集数据 = [];
       this.当前卡片集合数据 = [];
     },
@@ -192,7 +192,7 @@ module.exports = {
       this.当前选集数据.push($event);
     },
     点击画板: function ($event) {
-      //  console.log($event.target);
+      //  //console.log($event.target);
       $event.target.getAttribute("class") == "cardscontainer layer"
         ? this.$事件总线.$emit("点击画板空白处", $event)
         : null;
@@ -203,7 +203,7 @@ module.exports = {
     黏贴内容: function ($event) {
       let clipboardData = $event.clipboardData;
 
-      console.log(event);
+      //console.log(event);
 
       if (!(clipboardData && clipboardData.items)) {
         return;
@@ -213,7 +213,7 @@ module.exports = {
         this.解析图片(item);
         if (item.kind === "string" && item.type == "text/plain") {
           item.getAsString((str) => {
-            // console.log(str);
+            // //console.log(str);
             this.解析剪贴板内容(str + "");
           });
         }
@@ -222,7 +222,7 @@ module.exports = {
     解析图片(item) {
       if (item && item.kind === "file" && item.type.match(/^image\//i)) {
         // 读取该图片
-        console.log(item.webkitGetAsEntry());
+        //console.log(item.webkitGetAsEntry());
       }
     },
 
@@ -235,9 +235,9 @@ module.exports = {
         left: (window.pageXOffset + 当前鼠标坐标.x) / this.$当前窗口状态.缩放倍数,
       });
       let id = 剪贴板数据.replace("((", "").replace("))", "").slice(0, 22);
-      // console.log(id);
+      // //console.log(id);
       let 思源块属性 = await 以id获取思源块信息(思源伺服ip, apitoken, id);
-      //  console.log(思源块属性);
+      //  //console.log(思源块属性);
 
       if (思源块属性["id"]) {
         空标签["attrs"]["def_block"] = 思源块属性["id"];
@@ -246,11 +246,11 @@ module.exports = {
         空标签.markdown = 剪贴板数据;
       }
 
-      //  console.log(空标签);
+      //  //console.log(空标签);
       await this.$数据库.cards.put(空标签);
     },
     双击画板: function ($event) {
-      console.log($event.target);
+      //console.log($event.target);
 
       this.$事件总线.$emit("双击画板", $event);
     },

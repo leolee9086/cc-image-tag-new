@@ -86,7 +86,7 @@ module.exports = {
       try {
         that.保存时间间隔 = (await that.$数据库.metadata.get("autosaveinteger")).value;
       } catch (e) {
-        console.log(e);
+        //console.log(e);
         that.保存时间间隔 = 5;
         that.$数据库.metadata.put({ key: "autosaveinteger", value: 5 });
       }
@@ -95,14 +95,14 @@ module.exports = {
           await that.$数据库.metadata.get("maxhistorycount")
         ).value;
       } catch (e) {
-        console.log(e);
+        //console.log(e);
         that.历史版本数量上限 = 30;
         that.$数据库.metadata.put({ key: "maxhistorycount", value: 30 });
       }
       try {
         that.保存并刷新历史();
       } catch (error) {
-        console.log("加载出错", error);
+        //console.log("加载出错", error);
         alert("加载挂件块数据失败,注意手动保存数据");
       }
     },
@@ -116,11 +116,11 @@ module.exports = {
       let that = this;
       await this.清空画板();
 
-      // console.log("aaa", data.file);
+      // //console.log("aaa", data.file);
       var reader = new FileReader();
       reader.onload = function (evt) {
         that.增量导入JSON数据(JSON.parse(evt.target.result));
-        //  console.log(evt.target.result);
+        //  //console.log(evt.target.result);
       };
 
       reader
@@ -129,7 +129,7 @@ module.exports = {
           that.增量导入JSON数据(JSON.parse(result));
         })
         .catch((err) => {
-          //   console.log(err);
+          //   //console.log(err);
         });
     },
     覆盖导入旧版JSON数据: async function (旧版数据) {
@@ -144,7 +144,7 @@ module.exports = {
       var reader = new FileReader(data.file);
       reader.onload = function (evt) {
         that.解析旧版JSON数据(JSON.parse(evt.target.result));
-        //  console.log(evt.target.result);
+        //  //console.log(evt.target.result);
       };
 
       reader
@@ -198,7 +198,7 @@ module.exports = {
           let markdown = yaml + cards[i]["markdown"];
           zip.file(`${"卡片" + i + cards[i]["name"]}.md`, markdown);
         } catch (e) {
-          //   console.log(i, links[i]["id"], e);
+          //   //console.log(i, links[i]["id"], e);
         }
       }
       for (i in links) {
@@ -207,7 +207,7 @@ module.exports = {
           let markdown = yaml + links[i]["markdown"];
           zip.file(`${"关系" + i + links[i]["name"]}.md`, markdown);
         } catch (e) {
-          //   console.log(i, links[i]["id"], e);
+          //   //console.log(i, links[i]["id"], e);
         }
       }
       let zip = new JSZip();
@@ -298,7 +298,7 @@ module.exports = {
         try {
           await this.$数据库.cards.add(historycards[i]);
         } catch (e) {
-          //    console.log(historycards[i], i, e);
+          //    //console.log(historycards[i], i, e);
         }
       }
       let historylinks = 版本数据.links;
@@ -306,7 +306,7 @@ module.exports = {
         try {
           await this.$数据库.links.add(historylinks[j]);
         } catch (e) {
-          //  console.log(historylinks[j], j, e);
+          //  //console.log(historylinks[j], j, e);
         }
       }
       let historymeta = 版本数据.metadata;
@@ -314,7 +314,7 @@ module.exports = {
         try {
           await this.$数据库.metadata.add(historymeta[j]);
         } catch (e) {
-          //  console.log(historylinks[j], j, e);
+          //  //console.log(historylinks[j], j, e);
         }
       }
       let historycardpresets = 版本数据.cardpresets;
@@ -322,7 +322,7 @@ module.exports = {
         try {
           await this.$数据库.cardpresets.add(historycardpresets[j]);
         } catch (e) {
-          //  console.log(historylinks[j], j, e);
+          //  //console.log(historylinks[j], j, e);
         }
       }
       let historylinkpresets = 版本数据.linkpresets;
@@ -330,7 +330,7 @@ module.exports = {
         try {
           await this.$数据库.linkpresets.add(historylinkpresets[j]);
         } catch (e) {
-          //  console.log(historylinks[j], j, e);
+          //  //console.log(historylinks[j], j, e);
         }
       }
     },

@@ -18,14 +18,14 @@
         :key="i"
         @mousemove="清除($event, i)"
       ></v-line>
-
-      <v-rect
-        v-for="(geom, i) in draw"
-        v-if="geom && geom.type == 'rect'"
-        :config="geom['config']"
-        @dragend="handleDragEnd($event, i)"
-        @mousemove="清除($event, i)"
-      ></v-rect>
+      <template v-for="(geom, i) in draw">
+        <v-rect
+          v-if="geom && geom.type == 'rect'"
+          :config="geom['config']"
+          @dragend="handleDragEnd($event, i)"
+          @mousemove="清除($event, i)"
+        ></v-rect>
+      </template>
       <v-circle
         v-if="
           当前鼠标坐标 &&
@@ -52,6 +52,7 @@ module.exports = {
     };
   },
   watch: {
+  
     value(val, oldval) {
       this.draw = val || [];
     },
@@ -72,7 +73,7 @@ module.exports = {
     坐标数组() {
       let 宽度坐标数组 = this.生成自然数数组(this.宽度方向画板数量);
       let 高度坐标数组 = this.生成自然数数组(this.宽度方向画板数量);
-      console.log(宽度坐标数组, 高度坐标数组);
+      //console.log(宽度坐标数组, 高度坐标数组);
       let 数组 = [];
       宽度坐标数组.forEach((宽度序号) => {
         高度坐标数组.forEach((高度序号) => {
@@ -119,9 +120,9 @@ module.exports = {
       }
     },
     handleDragEnd: function ($event, 序号) {
-      console.log($event.target, 序号);
+      //console.log($event.target, 序号);
       let geom = this.draw[序号];
-      console.log(geom);
+      //console.log(geom);
       let attrs = $event.target.attrs;
       if (geom) {
         geom.x = attrs.x;
@@ -137,6 +138,7 @@ module.exports = {
       evt.stopPropagation();
     },
     configBrush: function () {
+
       return {
         x: (this.当前鼠标坐标.x + this.画布原点.x) / this.窗口缩放倍数,
         y: (this.当前鼠标坐标.y + this.画布原点.y) / this.窗口缩放倍数,
@@ -147,16 +149,15 @@ module.exports = {
     },
     configDraw: function () {
       let 窗口缩放倍数 = this.窗口缩放倍数 || 1;
-      let 真实原点x = this.宽度 - this.画布原点.x < 0 ? this.画布原点.x : 0;
-      let 真实原点y = this.高度 - this.画布原点.y < 0 ? this.画布原点.y : 0;
-      return {
-        x: 真实原点x,
-        y: 真实原点y,
-        width: Math.min(10000, this.宽度),
-        height: Math.min(10000, this.高度),
+      let newconfigDraw = {
+        x: 0 - Math.max(0, this.画布原点.x || 0 - 5000),
+        y: 0 - Math.max(0, this.画布原点.y || 0 - 5000),
+        width: Math.min(window.innerWidth, this.宽度),
+        height: Math.min(window.innerHeight, this.高度),
         scaleX: 窗口缩放倍数 || 1,
         scaleY: 窗口缩放倍数 || 1,
       };
+      return newconfigDraw
     },
 
     lineConfig: function (线定义) {
@@ -208,6 +209,7 @@ module.exports = {
     },
     绘制($event) {
       let evt = $event.evt;
+
       if (evt.altKey) {
         return null;
       }
@@ -222,7 +224,7 @@ module.exports = {
       if (this.绘制中 && this.$当前窗口状态.is_drawing) {
         evt.stopPropagation();
 
-        let 点 = [evt.offsetX || 0, evt.offsetY || 0];
+        let 点 = [evt.offsetX+this.画布原点.x || 0, evt.offsetY+this.画布原点.y  || 0];
         if (this.窗口缩放倍数) {
           点 = [
             点[0] / this.窗口缩放倍数 / this.窗口缩放倍数,

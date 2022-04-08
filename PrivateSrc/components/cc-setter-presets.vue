@@ -86,14 +86,78 @@ module.exports = {
       this.$事件总线.$emit("删除预设", 预设数据, 当前预设表);
       this.获取预设表();
     },
-    async 设为预设值(属性名, 预设项目) {
-      let 预设id = 预设项目.id;
-      let 当前对象数据 = this.当前对象数据;
-      let 属性值 = 当前对象数据.attrs[属性名];
-      let 当前预设表 = this.当前对象数据.type + "presets";
-      let 当前预设 = await this.$数据库[当前预设表].get(预设项目.id);
-      当前预设.attrs[属性名] = 属性值;
-      await this.$数据库[当前预设表].put(当前预设).then(await this.获取预设表());
+
+    设为实例值: async function (属性名, 预设项目) {
+      预设项目.attrs[属性名] = "byref";
+      if (属性名.indexOf("to") >= 0) {
+        预设项目.attrs.to_anchor_rotate = "byref";
+        预设项目.attrs.to_anchor_image = "byref";
+        预设项目.attrs.to_anchor_size = "byref";
+        预设项目.attrs.to_anchor_rotate_offset = "byref";
+      }
+      if (属性名.indexOf("from") >= 0) {
+        预设项目.attrs.from_anchor_rotate = "byref";
+        预设项目.attrs.from_anchor_image = "byref";
+        预设项目.attrs.from_anchor_size = "byref";
+        预设项目.attrs.from_anchor_rotate_offset = "byref";
+      }
+      if (属性名.indexOf("mid") >= 0) {
+        预设项目.attrs.mid_anchor_rotate = "byref";
+        预设项目.attrs.mid_anchor_image = "byref";
+        预设项目.attrs.mid_anchor_size = "byref";
+        预设项目.attrs.mid_anchor_rotate_offset = "byref";
+      }
+      if (属性名.indexOf("path") >= 0) {
+        预设项目.attrs.path_width = "byref";
+        预设项目.attrs.path_type = "byref";
+        预设项目.attrs.path_color = "byref";
+      }
+      if (this.当前对象数据.type == "link") {
+        await this.$数据库.linkpresets.put(预设项目);
+        // //console.log(this.预设列表);
+      }
+      if (this.当前对象数据.type == "card") {
+        //  //console.log(this.预设列表);
+
+        await this.$数据库.cardpresets.put(预设项目);
+      }
+      await this.获取预设表();
+    },
+    设为预设值: async function (属性名, 预设项目) {
+      预设项目.attrs[属性名] = undefined;
+      if (属性名.indexOf("to") >= 0) {
+        预设项目.attrs.to_anchor_rotate = undefined;
+        预设项目.attrs.to_anchor_image = undefined;
+        预设项目.attrs.to_anchor_size = undefined;
+        预设项目.attrs.to_anchor_rotate_offset = undefined;
+      }
+      if (属性名.indexOf("from") >= 0) {
+        预设项目.attrs.from_anchor_rotate = undefined;
+        预设项目.attrs.from_anchor_image = undefined;
+        预设项目.attrs.from_anchor_size = undefined;
+        预设项目.attrs.from_anchor_rotate_offset = undefined;
+      }
+      if (属性名.indexOf("mid") >= 0) {
+        预设项目.attrs.mid_anchor_rotate = undefined;
+        预设项目.attrs.mid_anchor_image = undefined;
+        预设项目.attrs.mid_anchor_size = undefined;
+        预设项目.attrs.mid_anchor_rotate_offset = undefined;
+      }
+      if (属性名.indexOf("path") >= 0) {
+        预设项目.attrs.path_width = undefined;
+        预设项目.attrs.path_type = undefined;
+        预设项目.attrs.path_color = undefined;
+      }
+      if (this.当前对象数据.type == "link") {
+        await this.$数据库.linkpresets.put(预设项目);
+        ////console.log(this.预设列表);
+      }
+      if (this.当前对象数据.type == "card") {
+        // //console.log(this.预设列表);
+
+        await this.$数据库.cardpresets.put(预设项目);
+      }
+      await this.获取预设表();
     },
   },
 };

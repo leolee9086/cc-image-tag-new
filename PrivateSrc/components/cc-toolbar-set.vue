@@ -142,7 +142,7 @@ module.exports = {
       await this.$画板元数据库.workspace.put(obj);
       this.工作空间名 = $event.name;
       this.$事件总线.$emit("设定工作空间", $event, false);
-      console.log($event);
+      //console.log($event);
       this.批量保存卡片文件();
     },
     async 批量保存卡片文件() {

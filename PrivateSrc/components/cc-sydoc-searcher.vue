@@ -61,7 +61,7 @@ module.exports = {
       let 思源伺服ip = window.location.host;
       let apitoken = "";
 
-     // console.log(path, markdown);
+     // //console.log(path, markdown);
       let res = await 通过markdown创建文档(
         思源伺服ip,
         apitoken,
@@ -69,7 +69,7 @@ module.exports = {
         hpath,
         markdown
       );
-     // console.log("成功", res.data);
+     // //console.log("成功", res.data);
       if (res.code == 0) {
         let res1 = await 重命名思源文档(
           思源伺服ip,
@@ -78,7 +78,7 @@ module.exports = {
           path + "/" + res.data + ".sy",
           title
         );
-      //  console.log(res1.data);
+      //  //console.log(res1.data);
       }
       if (res.data) {
         this.待发送数据.attrs.def_block = res.data;
@@ -100,7 +100,7 @@ module.exports = {
         let apitoken = "";
         let 搜索结果列表 = await 以关键词搜索文档(思源伺服ip, apitoken, val);
         this.搜索结果列表 = 搜索结果列表.data;
-       // console.log(this.搜索结果列表);
+       // //console.log(this.搜索结果列表);
       },
     },
   },

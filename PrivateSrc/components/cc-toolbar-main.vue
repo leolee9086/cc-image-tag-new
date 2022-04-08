@@ -84,9 +84,6 @@
           </el-col>
         </el-row>
       </el-col>
-      <el-col :span="3">
-        <el-button circle><span class="el-icon-edit"></span></el-button>
-      </el-col>
     </el-row>
   </div>
 </template>
@@ -151,7 +148,7 @@ module.exports = {
     搜索结果id: {
       handler: async function (val, oldval) {
         if (val) {
-          // console.log(val);
+          // //console.log(val);
         }
       },
     },

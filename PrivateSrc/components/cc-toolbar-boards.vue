@@ -66,7 +66,7 @@ module.exports = {
       await this.$画板元数据库.workspace.put(obj);
       this.工作空间名 = $event.name;
       this.$事件总线.$emit("设定工作空间", $event, false);
-      console.log($event);
+      //console.log($event);
       this.工作空间句柄 = $event;
       this.批量保存卡片文件();
     },
@@ -81,7 +81,7 @@ module.exports = {
       }
     },
     隐藏画板: function (序号) {
-      console.log(序号);
+      //console.log(序号);
       this.画板列表[序号].hide = true;
       this.画板列表 = JSON.parse(JSON.stringify(this.画板列表));
     },
@@ -93,7 +93,7 @@ module.exports = {
     },
     获取画板列表: function () {
       this.$获取画板列表().then((data) => {
-        console.log(data);
+        //console.log(data);
         this.画板列表 = data;
       });
     },
@@ -126,7 +126,7 @@ module.exports = {
           name ? this.$画板元数据库.boards.put({ id: element, name: name.value }) : null;
         } catch (e) {}
       }
-      console.log(databases);
+      //console.log(databases);
     },
   },
 };

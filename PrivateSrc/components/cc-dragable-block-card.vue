@@ -22,7 +22,8 @@
     <vue-draggable-resizable
       v-if="
         !hide &&
-        ((对象数据.attrs.draw && 对象数据.attrs.draw[0]) || $当前窗口状态.is_drawing)
+        ((对象数据.attrs.draw && 对象数据.attrs.draw[0]) ||
+          $当前窗口状态.is_drawing)
       "
       ref="container"
       :resizable="drawResize"
@@ -32,7 +33,9 @@
       :y="对象数据.attrs.draw_offsetY || 0"
       :w="对象数据.attrs.draw_width * 窗口缩放倍数 || 100 * 窗口缩放倍数"
       :h="对象数据.attrs.draw_height * 窗口缩放倍数 || 100 * 窗口缩放倍数"
-      :x="对象数据.attrs.draw_offsetX * 窗口缩放倍数 || width + 20 * 窗口缩放倍数"
+      :x="
+        对象数据.attrs.draw_offsetX * 窗口缩放倍数 || width + 20 * 窗口缩放倍数
+      "
       class-name-handle="resizer"
       class-name="cc-card-container"
     >
@@ -113,7 +116,11 @@
 
       <div v-if="激活" class="cc-card-toolbar">
         <span aria-label="卡片序号">{{ index }}</span>
-        <span aria-label="删除卡片" class="el-icon-delete" v-on:click="删除()"></span>
+        <span
+          aria-label="删除卡片"
+          class="el-icon-delete"
+          v-on:click="删除()"
+        ></span>
         <span
           aria-label="展开|关闭卡片"
           class="el-icon-full-screen"
@@ -167,13 +174,21 @@
         @dblclick="开始连接()"
         :style="`
         color:${对象数据.attrs.color};
-        border:${对象数据.attrs.borderStyle || 'solid'} ${对象数据.attrs.borderColor} ${
-          对象数据.attrs.borderWidth || 1
-        }px;
+        border:${对象数据.attrs.borderStyle || 'solid'} ${
+          对象数据.attrs.borderColor
+        } ${对象数据.attrs.borderWidth || 1}px;
         background-color:${对象数据.attrs.backgroundColor};
-        width:${对象数据.attrs.width - 21 - (对象数据.attrs.borderWidth || 1) * 2 + 'px'};
+        width:${
+          对象数据.attrs.width -
+          21 -
+          (对象数据.attrs.borderWidth || 1) * 2 +
+          'px'
+        };
         height:${
-          对象数据.attrs.height - 21 - (对象数据.attrs.borderWidth || 1) * 2 + 'px'
+          对象数据.attrs.height -
+          21 -
+          (对象数据.attrs.borderWidth || 1) * 2 +
+          'px'
         };
 
         `"
@@ -192,7 +207,7 @@
         ></iframe>
         <div v-if="对象数据.type !== 'board'" style="z-index: 5">
           <el-row>
-            <el-col :span="12">
+            <el-col :span="18">
               <el-input
                 :key="对象数据.id"
                 size="mini"
@@ -202,6 +217,7 @@
                 @input="保存数据($event)"
                 @change="保存数据($event)"
                 v-model="对象数据.name"
+                type="textarea"
               >
                 <span
                   class="el-icon-siyuan"
@@ -212,17 +228,18 @@
                 ></span>
               </el-input>
             </el-col>
-            <el-col :span="12">
+            <el-col :span="6">
               <span class="subtypetag">{{ 对象数据.subtype }}</span>
             </el-col>
           </el-row>
         </div>
         <div>
-          <span v-if="对象数据.attrs.def_block && !$当前窗口状态.show_markdown_by_default"
-            >引用自:</span
-          >
-          <span v-if="对象数据.attrs.def_block && !$当前窗口状态.show_markdown_by_default"
-            >连接到:</span
+          <span
+            v-if="
+              对象数据.attrs.def_block &&
+              !$当前窗口状态.show_markdown_by_default
+            "
+            >连接到思源块:</span
           >
 
           <cc-link-siyuan
@@ -237,12 +254,17 @@
           <cc-vditor-vue
             v-model="markdown"
             @click="开始编辑($event)"
-            v-if="正在编辑 && (!思源HTML || $当前窗口状态.show_markdown_by_default)"
+            v-if="
+              正在编辑 && (!思源HTML || $当前窗口状态.show_markdown_by_default)
+            "
             :toolbarconfig="{ hide: false }"
           ></cc-vditor-vue>
           <div
             @click="开始编辑($event)"
-            v-if="!正在编辑 && !(思源HTML && !$当前窗口状态.show_markdown_by_default)"
+            v-if="
+              !正在编辑 &&
+              !(思源HTML && !$当前窗口状态.show_markdown_by_default)
+            "
             v-html="预览HTML"
           ></div>
           <div
@@ -280,6 +302,7 @@ module.exports = {
       markdown: "",
       drawResize: false,
       临时点数组: [],
+      保存计数: 0,
     };
   },
   beforeMount() {
@@ -325,7 +348,7 @@ module.exports = {
           return null;
         }
         if (parseInt(val.updated) <= parseInt(this.对象数据.updated)) {
-          console.log(val.updated, this.对象数据.updated);
+          //  console.log(val.updated, this.对象数据.updated);
           return null;
         }
         if (!val.attrs || (val.attrs && val.attrs.trashed)) {
@@ -380,7 +403,8 @@ module.exports = {
           !val.attrs.trashed
         ) {
           console.log("保存数据");
-          this.保存数据();
+            this.保存数据();
+          
         }
 
         this.$refs.cardname ? this.$refs.cardname.focus() : null;
@@ -408,10 +432,10 @@ module.exports = {
         this.更新卡片markdown();
       }
       if (val) {
-        console.log("hhhh", this.对象数据);
+        //    console.log("hhhh", this.对象数据);
         this.$事件总线.$emit("激活数据", this.对象数据);
         this.生成html();
-        console.log(this.$当前窗口状态.is_drawing);
+        //    console.log(this.$当前窗口状态.is_drawing);
         this.drawResize = this.$当前窗口状态.is_drawing;
       } else {
         this.$事件总线.$emit("反激活数据", this.对象数据);
@@ -498,7 +522,7 @@ module.exports = {
     绘制($event) {
       let evt = $event.evt;
       evt.stopPropagation();
-      console.log(evt.offsetX);
+      //   console.log(evt.offsetX);
       let 临时点数组 = this.临时点数组;
       if (this.绘制中 && this.$当前窗口状态.is_drawing) {
         let 点 = [evt.offsetX, evt.offsetY];
@@ -523,8 +547,11 @@ module.exports = {
     },
     async 更新卡片markdown() {
       let 工作空间句柄 = this.$当前窗口状态.current_workspace_handle;
-      let 卡片markdown = await this.$保存markdown卡片数据(this.对象数据, 工作空间句柄);
-      console.log(卡片markdown);
+      let 卡片markdown = await this.$保存markdown卡片数据(
+        this.对象数据,
+        工作空间句柄
+      );
+      // console.log(卡片markdown);
       this.markdown = 卡片markdown;
     },
     覆盖markdown() {
@@ -569,7 +596,7 @@ module.exports = {
       this.正在编辑 = true;
     },
     鼠标点击($event) {
-      console.log($event);
+      //  console.log($event);
       $event.stopPropagation();
       this.正在编辑 = false;
 
@@ -577,7 +604,7 @@ module.exports = {
     },
     判断id: function ($event) {
       let that = this;
-      console.log("sss", $event, this.对象数据);
+      // console.log("sss", $event, this.对象数据);
 
       if (!$event) {
         return null;
@@ -686,9 +713,11 @@ module.exports = {
     },
     dragging: function (x, y) {
       this.计算坐标(x, y);
-
-      this.保存数据();
-
+      this.保存计数 = this.保存计数 + 1;
+      if (this.保存计数 >= 10) {
+        this.保存数据();
+        this.保存计数 = 0;
+      }
       this.$事件总线.$emit("移动卡片", this.对象数据);
     },
     dragstop(x, y) {
@@ -709,7 +738,7 @@ module.exports = {
       this.$事件总线.$emit("缩放卡片", this.对象数据);
     },
     drawresizing: function (x, y, width, height) {
-      console.log(width, height);
+      // console.log(width, height);
       this.对象数据.attrs.draw_offsetX = x;
       this.对象数据.attrs.draw_offsetY = y;
 
@@ -727,7 +756,8 @@ module.exports = {
       this.保存数据();
     },
     保存数据: async function ($event) {
-      console.log(this.对象数据);
+      //console.log(this.对象数据);
+
       $event ? (this.对象数据.name = $event) : null;
 
       this.对象数据 = this.$更新数据时间戳(this.对象数据);
@@ -768,7 +798,9 @@ module.exports = {
         pageYOffset > (top + offsety + height) * 缩放倍数 ||
         pageYOffset + innerHeight < (top + offsety) * 缩放倍数 ||
         pageXOffset > (left + offsetx + width) * 缩放倍数 ||
-        (pageXOffset + innerWidth < (left + offsetx) * 缩放倍数 && left > 0 && top > 0)
+        (pageXOffset + innerWidth < (left + offsetx) * 缩放倍数 &&
+          left > 0 &&
+          top > 0)
       ) {
         // 不可见标记数组.push(标记);
         this.hide = true;
@@ -778,11 +810,17 @@ module.exports = {
       if (对象数据.type == "link" && 对象数据.attrs.hidetag) {
         this.hide = true;
       }
-      if (对象数据.type == "link" && typeof 对象数据.attrs.hidetag == "undefined") {
+      if (
+        对象数据.type == "link" &&
+        typeof 对象数据.attrs.hidetag == "undefined"
+      ) {
         this.hide = !this.$当前窗口状态.show_tag_by_default;
         this.$数据库.links
           .filter((data) => {
-            if (data.attrs.from_id == 对象数据.id || data.attrs.to_id == 对象数据.id) {
+            if (
+              data.attrs.from_id == 对象数据.id ||
+              data.attrs.to_id == 对象数据.id
+            ) {
               return true;
             }
           })

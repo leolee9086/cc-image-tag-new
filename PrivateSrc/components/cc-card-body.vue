@@ -80,7 +80,7 @@ module.exports = {
     绘制($event) {
       let evt = $event.evt;
       evt.stopPropagation();
-      console.log(evt.offsetX);
+      //////console.log(evt.offsetX);
       let 临时点数组 = this.临时点数组;
       if (this.绘制中 && this.$当前窗口状态.is_drawing) {
         let 点 = [evt.offsetX, evt.offsetY];
