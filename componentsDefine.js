@@ -11,6 +11,8 @@ let 应用组件列表 = [
     "cc-layers-konva-graph",
     "cc-presets-selector",
     "cc-sydoc-searcher",
+    "cc-sydoc-searcherdialog",
+
     "cc-setter-anchor",
     "cc-setter-board-background",
     "cc-setter-path-dash",

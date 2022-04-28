@@ -89,7 +89,10 @@
     <cc-toolbar-presets :显示="当前面板名 == '预设'"> </cc-toolbar-presets>
     <cc-toolbar-boards :显示="当前面板名 == '全局设置'"> </cc-toolbar-boards>
     <cc-toolbar-view></cc-toolbar-view>
-    <cc-sydoc-searcher :思源伺服ip="思源伺服ip" :apitoken="''"></cc-sydoc-searcher>
+    <cc-sydoc-searcherdialog
+      :思源伺服ip="思源伺服ip"
+      :apitoken="''"
+    ></cc-sydoc-searcherdialog>
   </div>
 </template>
 <script>

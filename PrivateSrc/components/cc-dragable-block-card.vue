@@ -19,11 +19,30 @@
     class-name-handle="resizer"
     class-name="cc-card-container"
   >
+    <div
+      class="cc-card-appender"
+      v-if="激活 && 对象数据 && 对象数据.attrs.def_block"
+      style="position: absolute; top: 0; left: calc(30px + 100%)"
+    >
+      <div class="subtypetag" v-if="$当前窗口状态.showsubtype">
+        预设:{{ 对象数据.subtype }}
+      </div>
+      <div v-if="$当前窗口状态.showname">命名:{{ 对象数据.name }}</div>
+
+      <el-row>
+        <el-button size="mini">反向链接</el-button>
+      </el-row>
+      <el-row>
+        <el-button size="mini">正向链接</el-button>
+      </el-row>
+      <el-row>
+        <el-button size="mini">提及</el-button>
+      </el-row>
+    </div>
     <vue-draggable-resizable
       v-if="
         !hide &&
-        ((对象数据.attrs.draw && 对象数据.attrs.draw[0]) ||
-          $当前窗口状态.is_drawing)
+        ((对象数据.attrs.draw && 对象数据.attrs.draw[0]) || $当前窗口状态.is_drawing)
       "
       ref="container"
       :resizable="drawResize"
@@ -33,9 +52,7 @@
       :y="对象数据.attrs.draw_offsetY || 0"
       :w="对象数据.attrs.draw_width * 窗口缩放倍数 || 100 * 窗口缩放倍数"
       :h="对象数据.attrs.draw_height * 窗口缩放倍数 || 100 * 窗口缩放倍数"
-      :x="
-        对象数据.attrs.draw_offsetX * 窗口缩放倍数 || width + 20 * 窗口缩放倍数
-      "
+      :x="对象数据.attrs.draw_offsetX * 窗口缩放倍数 || width + 20 * 窗口缩放倍数"
       class-name-handle="resizer"
       class-name="cc-card-container"
     >
@@ -101,27 +118,33 @@
         `"
         >
           <cc-link-siyuan
+            v-if="对象数据 && 对象数据.attrs.def_block"
             :style="`color:${对象数据.attrs.color};`"
             :锚文本="对象数据.attrs.anchor"
             :链接id="对象数据.attrs.def_block"
           >
           </cc-link-siyuan>
 
-          <div
-            v-html="思源HTML || 预览HTML"
-            class="protyle-wysiwyg protyle-wysiwyg--attr"
-            :style="`font-size:xx-small;color:${对象数据.attrs.color}`"
-          ></div>
+          <iframe
+            v-if="对象数据 && 对象数据.attrs.def_block"
+            @dblclick="开始连接()"
+            ref="siyuanEditor"
+            :src="`/stage/build/mobile?id=${def_block}`"
+            data-src=""
+            border="0"
+            frameborder="no"
+            framespacing="0"
+            allowfullscreen="true"
+            style="margin: 0%; padding: 0%; width: 100%; height: 100%"
+            @load="修改编辑器()"
+          ></iframe>
         </div>
       </el-popover>
 
       <div v-if="激活" class="cc-card-toolbar">
         <span aria-label="卡片序号">{{ index }}</span>
-        <span
-          aria-label="删除卡片"
-          class="el-icon-delete"
-          v-on:click="删除()"
-        ></span>
+
+        <span aria-label="删除卡片" class="el-icon-delete" v-on:click="删除()"></span>
         <span
           aria-label="展开|关闭卡片"
           class="el-icon-full-screen"
@@ -137,14 +160,14 @@
         <span
           aria-label="就地编辑卡片内容"
           class="el-icon-edit"
-          v-if="!正在编辑 && !思源HTML"
-          @click="正在编辑 = true"
+          v-if="!正在编辑"
+          @click="正在编辑 = !正在编辑"
         ></span>
         <span
           aria-label="停止编辑卡片内容"
           class="el-icon-check"
           v-if="正在编辑"
-          @click="正在编辑 = false"
+          @click="正在编辑 = !正在编辑"
         ></span>
         <span
           class="el-icon-focus"
@@ -161,13 +184,8 @@
           aria-label="返回连接线中点"
           @click="返回原始点()"
         ></span>
-        <span
-          class="el-icon-siyuan"
-          aria-label="发送卡片到思源作为文档"
-          v-if="!对象数据.attrs.def_block"
-          @click="发送卡片数据到思源()"
-        ></span>
       </div>
+
       <div
         :class="`cc-card-body cc-${数据类型} not-folded`"
         v-if="!对象数据.attrs.folded"
@@ -175,130 +193,41 @@
         @dblclick="开始连接()"
         :style="`
         color:${对象数据.attrs.color};
-        border:${对象数据.attrs.borderStyle || 'solid'} ${
-          对象数据.attrs.borderColor
-        } ${对象数据.attrs.borderWidth || 1}px;
+        border:${对象数据.attrs.borderStyle || 'solid'} ${对象数据.attrs.borderColor} ${
+          对象数据.attrs.borderWidth || 1
+        }px;
         background-color:${对象数据.attrs.backgroundColor};
-        width:${
-          对象数据.attrs.width -
-          21 -
-          (对象数据.attrs.borderWidth || 1) * 2 +
-          'px'
-        };
+        width:${对象数据.attrs.width - 21 - (对象数据.attrs.borderWidth || 1) * 2 + 'px'};
         height:${
-          对象数据.attrs.height -
-          21 -
-          (对象数据.attrs.borderWidth || 1) * 2 +
-          'px'
+          对象数据.attrs.height - 21 - (对象数据.attrs.borderWidth || 1) * 2 + 'px'
         };
 
         `"
         @click="鼠标点击($event)"
       >
+        <cc-sydoc-searcher
+          :思源伺服ip="$思源伺服ip"
+          apitoken=""
+          mode=""
+          :待发送数据="对象数据"
+          v-if="对象数据.attrs && !对象数据.attrs.def_block"
+        ></cc-sydoc-searcher>
+        <div
+          :style="`position:absolute;margin: 0%; padding: 0%; min-width: 100%; min-height: 100%;z-index:${iframeindex}`"
+        ></div>
         <iframe
-          v-if="对象数据.type == 'board'"
-          src="http:`${this.思源伺服ip}/widgets/cc-image-tag-new/`"
-          data-src="http://127.0.0.1:6806/widgets/cc-markmap"
-          data-subtype="widget"
+          v-if="对象数据.attrs && 对象数据.attrs.def_block"
+          @dblclick="开始连接()"
+          ref="siyuanEditor"
+          :src="`/stage/build/mobile?id=${def_block}`"
+          data-src=""
           border="0"
           frameborder="no"
           framespacing="0"
           allowfullscreen="true"
-          style="width: 100%; height: 100%"
+          :style="`margin: 0%; padding: 0%; width: 100%; height: 100%;`"
+          @load="修改编辑器()"
         ></iframe>
-        <div v-if="对象数据.type !== 'board'" style="z-index: 5">
-          <el-row>
-            <el-col :span="18">
-              <el-input
-                :key="对象数据.id"
-                size="mini"
-                class="cc-card-name"
-                :ref="'cardname' + 对象数据.id"
-                autofix="ture"
-                @input="保存数据($event)"
-                @change="保存数据($event)"
-                v-model="对象数据.name"
-                type="textarea"
-              >
-                <span
-                  class="el-icon-siyuan"
-                  @click="发送卡片数据到思源()"
-                  aria-label="卡片已经连接到思源块,点击更换目标"
-                  v-if="对象数据.attrs.def_block"
-                  slot="prepend"
-                ></span>
-              </el-input>
-            </el-col>
-            <el-col :span="6">
-              <span class="subtypetag">{{ 对象数据.subtype }}</span>
-            </el-col>
-          </el-row>
-        </div>
-        <div>
-<<<<<<< HEAD
-          <span v-if="对象数据.attrs.def_block && $当前窗口状态.show_markdown_by_default"
-            >连接到思源块:</span
-          >
-          <!-- <cc-link-siyuan
-=======
-          <span
-            v-if="
-              对象数据.attrs.def_block &&
-              !$当前窗口状态.show_markdown_by_default
-            "
-            >连接到思源块:</span
-          >
-
-          <cc-link-siyuan
->>>>>>> b287cc763c6259ffa729277ae4e952e1f247e99c
-            v-if="对象数据.attrs.def_block"
-            :style="`color:${对象数据.attrs.color};`"
-            :链接id="对象数据.attrs.def_block"
-            :最大文字长度="23"
-          ></cc-link-siyuan>-->
-        </div>
-        <div
-          class="cc-card-content"
-          @click="开始编辑($event)"
-          style="position: absolute; top: 100px; bottom: 0%; width: calc(100% - 20px)"
-        >
-          <div :style="`color:${对象数据.attrs.color};`"></div>
-          <cc-vditor-vue
-            v-model="markdown"
-            @click="开始编辑($event)"
-            v-if="
-              正在编辑 && (!思源HTML || $当前窗口状态.show_markdown_by_default)
-            "
-            :toolbarconfig="{ hide: false }"
-          >
-          </cc-vditor-vue>
-          <div
-            @click="开始编辑($event)"
-            v-if="
-              !正在编辑 &&
-              !(思源HTML && !$当前窗口状态.show_markdown_by_default)
-            "
-            v-html="预览HTML"
-          ></div>
-          <div
-            class="protyle-wysiwyg protyle-wysiwyg--attr"
-            v-if="思源HTML && !$当前窗口状态.show_markdown_by_default"
-            style="margin: 0%; padding: 0%; width: 100%; height: 100%"
-          >
-            <iframe
-              @dblclick="开始连接()"
-              ref="siyuanEditor"
-              :src="`/stage/build/mobile?id=${def_block}`"
-              data-src=""
-              border="0"
-              frameborder="no"
-              framespacing="0"
-              allowfullscreen="true"
-              style="margin: 0%; padding: 0%; width: 100%; height: 100%"
-              @load="修改编辑器()"
-            ></iframe>
-          </div>
-        </div>
       </div>
     </div>
   </vue-draggable-resizable>
@@ -311,6 +240,7 @@ module.exports = {
   model: { prop: "value", event: "change" },
   data() {
     return {
+      iframeindex: 0,
       对象数据: {},
       预览HTML: "",
       激活: false,
@@ -429,8 +359,7 @@ module.exports = {
           !val.attrs.trashed
         ) {
           console.log("保存数据");
-            this.保存数据();
-          
+          this.保存数据();
         }
 
         this.$refs.cardname ? this.$refs.cardname.focus() : null;
@@ -465,9 +394,9 @@ module.exports = {
         this.drawResize = this.$当前窗口状态.is_drawing;
       } else {
         this.$事件总线.$emit("反激活数据", this.对象数据);
-        this.正在编辑 = false;
         this.生成html();
         this.drawResize = false;
+        this.正在编辑 = false;
       }
     },
     正在编辑(val) {
@@ -475,9 +404,11 @@ module.exports = {
         this.更新卡片markdown();
       }
       if (val) {
-        //console.log(this.对象数据);
+        console.log(this.iframeindex);
+        this.iframeindex = -10;
       } else {
         this.生成html();
+        this.iframeindex = 0;
       }
     },
     markdown(val) {
@@ -524,7 +455,7 @@ module.exports = {
   methods: {
     async 修改编辑器() {
       let that = this;
-      console.log("编辑器窗口加载");
+      //console.log("编辑器窗口加载");
       let 编辑器DOM = that.$refs.siyuanEditor.contentDocument;
       let 编辑器窗口 = that.$refs.siyuanEditor.contentWindow;
       //console.log(编辑器DOM);
@@ -582,6 +513,13 @@ module.exports = {
         编辑器窗口.addEventListener("dbclick", that.开始连接);
         编辑器DOM.addEventListener("dbclick", that.开始连接);
       }, 100);
+      let head = 编辑器DOM.head;
+      let style = 编辑器DOM.createElement("style");
+      style.innerHTML = `
+      :root{--b3-theme-on-background:${this.对象数据.attrs.color};
+      --b3-theme-background:${this.对象数据.attrs.backgroundColor}
+      }`;
+      head.appendChild(style);
     },
 
     打开块id: function (id, 主界面) {
@@ -653,14 +591,7 @@ module.exports = {
     },
     async 更新卡片markdown() {
       let 工作空间句柄 = this.$当前窗口状态.current_workspace_handle;
-<<<<<<< HEAD
       let 卡片markdown = await this.$保存markdown卡片数据(this.对象数据, 工作空间句柄);
-=======
-      let 卡片markdown = await this.$保存markdown卡片数据(
-        this.对象数据,
-        工作空间句柄
-      );
->>>>>>> b287cc763c6259ffa729277ae4e952e1f247e99c
       // console.log(卡片markdown);
       this.markdown = 卡片markdown;
     },
@@ -703,12 +634,10 @@ module.exports = {
     },
     开始编辑($event) {
       $event.stopPropagation();
-      this.正在编辑 = true;
     },
     鼠标点击($event) {
       //  console.log($event);
       $event.stopPropagation();
-      this.正在编辑 = false;
 
       this.$事件总线.$emit("鼠标点击卡片", this.对象数据, $event.ctrlKey);
     },
@@ -908,9 +837,7 @@ module.exports = {
         pageYOffset > (top + offsety + height) * 缩放倍数 ||
         pageYOffset + innerHeight < (top + offsety) * 缩放倍数 ||
         pageXOffset > (left + offsetx + width) * 缩放倍数 ||
-        (pageXOffset + innerWidth < (left + offsetx) * 缩放倍数 &&
-          left > 0 &&
-          top > 0)
+        (pageXOffset + innerWidth < (left + offsetx) * 缩放倍数 && left > 0 && top > 0)
       ) {
         // 不可见标记数组.push(标记);
         this.hide = true;
@@ -920,17 +847,11 @@ module.exports = {
       if (对象数据.type == "link" && 对象数据.attrs.hidetag) {
         this.hide = true;
       }
-      if (
-        对象数据.type == "link" &&
-        typeof 对象数据.attrs.hidetag == "undefined"
-      ) {
+      if (对象数据.type == "link" && typeof 对象数据.attrs.hidetag == "undefined") {
         this.hide = !this.$当前窗口状态.show_tag_by_default;
         this.$数据库.links
           .filter((data) => {
-            if (
-              data.attrs.from_id == 对象数据.id ||
-              data.attrs.to_id == 对象数据.id
-            ) {
+            if (data.attrs.from_id == 对象数据.id || data.attrs.to_id == 对象数据.id) {
               return true;
             }
           })
