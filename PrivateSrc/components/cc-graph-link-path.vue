@@ -68,7 +68,7 @@ module.exports = {
 
         this.链接.subtype = val.subtype || "属于";
 
-        // console.log(this.路径类型);
+        // //console.log(this.路径类型);
       },
       deep: true,
       immediate: true,
@@ -87,7 +87,7 @@ module.exports = {
   },
   methods: {
     判断id: async function ($event) {
-      console.log($event);
+      //console.log($event);
       if ($event.attrsproxy) {
         return null;
       }
@@ -121,7 +121,7 @@ module.exports = {
       }
     },
     测试连接() {
-      //  console.log(this.link);
+      //  //console.log(this.link);
     },
     矢量加(矢量1, 矢量2) {
       return { x: 矢量1.x + 矢量2.x, y: 矢量1.y + 矢量2.y };
@@ -207,7 +207,7 @@ module.exports = {
         this.链接 = this.$更新数据时间戳(this.链接);
 
         if (Math.abs(this.链接.attrs.offsetx) > 50 || this.链接.attrs.offsety > 50) {
-          // console.log("计算引线");
+          // //console.log("计算引线");
           this.显示引线 = true;
           this.计算引线(this.链接);
         } else {
@@ -231,9 +231,9 @@ module.exports = {
       let 引线起点 = this.矩形与矢量交点(真实矩形, 引线矢量);
 
       let 引线线段 = { 起点: 引线起点, 终点: 引线终点 };
-      //   console.log(JSON.stringify(引线线段));
+      //   //console.log(JSON.stringify(引线线段));
       this.引线路径 = this.生成直线路径(引线线段);
-      // console.log("引线", this.引线路径);
+      // //console.log("引线", this.引线路径);
     },
 
     生成直线路径: function (路径线段) {
@@ -331,7 +331,7 @@ module.exports = {
     },
     矩形与矢量交点(矩形, 矢量) {
       let 矩形中心 = this.计算中心(矩形);
-      //    console.log(矩形中心);
+      //    //console.log(矩形中心);
       x偏移 = Math.abs(((矩形.height / 2) * 矢量.x) / 矢量.y);
       y偏移 = Math.abs(((矩形.width / 2) * 矢量.y) / 矢量.x);
       if (Math.abs(y偏移) > Math.abs(矩形.height / 2)) {

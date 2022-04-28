@@ -27,11 +27,16 @@
         )}月${版本.timestamp.slice(6, 8)}日${版本.timestamp.slice(
           8,
           10
-        )}时${版本.timestamp.slice(10, 12)}分${版本.timestamp.slice(12, 14)}秒 `"
+        )}时${版本.timestamp.slice(10, 12)}分${版本.timestamp.slice(
+          12,
+          14
+        )}秒 `"
         placement="top"
       >
         <el-card>
-          <strong>{{ 版本.metadata[版本.metadata.length - 1]["value"] }}</strong>
+          <strong>{{
+            版本.metadata[版本.metadata.length - 1]["value"]
+          }}</strong>
 
           <div>
             卡片数量:{{ 版本.cards.length }} 链接数量:{{ 版本.links.length }}
@@ -84,9 +89,11 @@ module.exports = {
     初始化: async function () {
       let that = this;
       try {
-        that.保存时间间隔 = (await that.$数据库.metadata.get("autosaveinteger")).value;
+        that.保存时间间隔 = (
+          await that.$数据库.metadata.get("autosaveinteger")
+        ).value;
       } catch (e) {
-        console.log(e);
+        //console.log(e);
         that.保存时间间隔 = 5;
         that.$数据库.metadata.put({ key: "autosaveinteger", value: 5 });
       }
@@ -95,14 +102,14 @@ module.exports = {
           await that.$数据库.metadata.get("maxhistorycount")
         ).value;
       } catch (e) {
-        console.log(e);
+        //console.log(e);
         that.历史版本数量上限 = 30;
         that.$数据库.metadata.put({ key: "maxhistorycount", value: 30 });
       }
       try {
         that.保存并刷新历史();
       } catch (error) {
-        console.log("加载出错", error);
+        //console.log("加载出错", error);
         alert("加载挂件块数据失败,注意手动保存数据");
       }
     },
@@ -116,11 +123,11 @@ module.exports = {
       let that = this;
       await this.清空画板();
 
-      // console.log("aaa", data.file);
+      // //console.log("aaa", data.file);
       var reader = new FileReader();
       reader.onload = function (evt) {
         that.增量导入JSON数据(JSON.parse(evt.target.result));
-        //  console.log(evt.target.result);
+        //  //console.log(evt.target.result);
       };
 
       reader
@@ -129,7 +136,7 @@ module.exports = {
           that.增量导入JSON数据(JSON.parse(result));
         })
         .catch((err) => {
-          //   console.log(err);
+          //   //console.log(err);
         });
     },
     覆盖导入旧版JSON数据: async function (旧版数据) {
@@ -144,7 +151,7 @@ module.exports = {
       var reader = new FileReader(data.file);
       reader.onload = function (evt) {
         that.解析旧版JSON数据(JSON.parse(evt.target.result));
-        //  console.log(evt.target.result);
+        //  //console.log(evt.target.result);
       };
 
       reader
@@ -180,9 +187,15 @@ module.exports = {
       await this.$数据库.history.delete(版本数据.id);
       this.文件历史列表 = (await this.$数据库.history.toArray()) || [];
     },
-    导出版本数据(版本) {
+    导出版本数据: async function (版本数据) {
       let JSON数据 = 版本数据;
-      let 文件名 = `${this.当前画板命名}.cccards`;
+      let 当前画板命名 = await this.$数据库.metadata
+        .get("name")
+        .then((data) => {
+          return data.value;
+        });
+
+      let 文件名 = `${当前画板命名}.cccards`;
       let 文件数据 = this.$从数据生成文件(JSON数据, "application/json", 文件名);
       this.保存(文件数据, 文件名);
     },
@@ -190,30 +203,38 @@ module.exports = {
       let that = this;
       let cards = {};
       let links = {};
-      cards = 版本数据.cards;
-      links = 版本数据.links;
+      cards = 版本数据["cards"];
+      links = 版本数据["links"];
+      console.log(cards,links)
+      let 当前画板id = this.$baseid;
+      let 当前画板命名 = await this.$数据库.metadata
+        .get("name")
+        .then((data) => {
+          return data.value;
+        });
+      let zip = new JSZip();
+
       for (i in cards) {
         try {
-          let yaml = this.$生成yaml(cards[i]);
+          let yaml = this.$生成卡片yaml(cards[i]);
           let markdown = yaml + cards[i]["markdown"];
           zip.file(`${"卡片" + i + cards[i]["name"]}.md`, markdown);
         } catch (e) {
-          //   console.log(i, links[i]["id"], e);
+          console.log(i, links[i], e);
         }
       }
       for (i in links) {
         try {
-          let yaml = this.$生成yaml(links[i]);
+          let yaml = this.$生成卡片yaml(links[i]);
           let markdown = yaml + links[i]["markdown"];
           zip.file(`${"关系" + i + links[i]["name"]}.md`, markdown);
         } catch (e) {
-          //   console.log(i, links[i]["id"], e);
+          console.log(i, links[i], e);
         }
       }
-      let zip = new JSZip();
 
       zip.generateAsync({ type: "blob" }).then((content) => {
-        that.保存(content, `${that.当前画板命名}-${that.当前画板id}.zip`);
+        that.保存(content, `${当前画板命名}-${当前画板id}.zip`);
       });
     },
     下载当前版本: async function () {
@@ -298,7 +319,7 @@ module.exports = {
         try {
           await this.$数据库.cards.add(historycards[i]);
         } catch (e) {
-          //    console.log(historycards[i], i, e);
+          //    //console.log(historycards[i], i, e);
         }
       }
       let historylinks = 版本数据.links;
@@ -306,7 +327,7 @@ module.exports = {
         try {
           await this.$数据库.links.add(historylinks[j]);
         } catch (e) {
-          //  console.log(historylinks[j], j, e);
+          //  //console.log(historylinks[j], j, e);
         }
       }
       let historymeta = 版本数据.metadata;
@@ -314,7 +335,7 @@ module.exports = {
         try {
           await this.$数据库.metadata.add(historymeta[j]);
         } catch (e) {
-          //  console.log(historylinks[j], j, e);
+          //  //console.log(historylinks[j], j, e);
         }
       }
       let historycardpresets = 版本数据.cardpresets;
@@ -322,7 +343,7 @@ module.exports = {
         try {
           await this.$数据库.cardpresets.add(historycardpresets[j]);
         } catch (e) {
-          //  console.log(historylinks[j], j, e);
+          //  //console.log(historylinks[j], j, e);
         }
       }
       let historylinkpresets = 版本数据.linkpresets;
@@ -330,7 +351,7 @@ module.exports = {
         try {
           await this.$数据库.linkpresets.add(historylinkpresets[j]);
         } catch (e) {
-          //  console.log(historylinks[j], j, e);
+          //  //console.log(historylinks[j], j, e);
         }
       }
     },

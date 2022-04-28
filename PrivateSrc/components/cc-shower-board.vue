@@ -1,6 +1,8 @@
 <template>
   <el-card>
-    <strong>{{ 画板.name }}</strong>
+    <el-link :href="`/widgets/cc-image-tag-new/?baseid=${画板.id}`">{{
+      画板.name
+    }}</el-link>
     <div>
       卡片数量:{{ 卡片总数 }} 链接数量:{{ 链接总数 }} 历史版本数量:{{ 历史版本数量 }}
       <span

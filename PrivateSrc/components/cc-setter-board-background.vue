@@ -91,7 +91,7 @@ module.exports = {
       handler(val) {
         this.$事件总线.$emit("自定义颜色改变", val);
         this.$数据库.metadata.put({ key: "customcolors", value: val });
-        console.log(val);
+        //console.log(val);
       },
       deep: true,
     },

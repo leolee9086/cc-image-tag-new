@@ -1,6 +1,5 @@
 <template>
   <el-drawer :modal="false" title="链接" size="100%" :visible="显示" :show-close="false">
-    <h2 slot="title">思源链接</h2>
     <el-input size="mini" v-model="当前思源块id">
       <span slot="prepend">
         <span class="el-icon-siyuan"></span>
@@ -135,11 +134,11 @@ module.exports = {
         top: 属性对象.top,
         left: 属性对象.left + 属性对象.width + 200,
       });
-      // console.log(待发送数据);
+      // //console.log(待发送数据);
 
       待发送数据.attrs.def_block = id;
       let 卡片数组 = [];
-      // console.log(this.当前对象数据);
+      // //console.log(this.当前对象数据);
       if (!反向) {
         卡片数组 = [this.当前对象数据, 待发送数据];
       } else {
@@ -151,7 +150,7 @@ module.exports = {
           this.$事件总线.$emit("添加卡片", 待发送数据);
         })
         .then(() => {
-          //  console.log("链接", 卡片数组);
+          //  //console.log("链接", 卡片数组);
           this.$事件总线.$emit("连接卡片", 卡片数组, 类型.replace("正向", ""));
         });
     },
@@ -174,7 +173,7 @@ module.exports = {
       this.思源伺服ip = window.location.host;
 
       let that = this;
-      // console.log("aaa", this.$思源伺服ip);
+      // //console.log("aaa", this.$思源伺服ip);
       if (id) {
         let 原始反向链接列表 = await 以id获取反向链接(that.思源伺服ip, this.apitoken, id);
         return 原始反向链接列表["data"];
@@ -202,7 +201,7 @@ module.exports = {
           this.当前反向链接列表 = [];
           this.当前正向链接列表 = [];
         }
-        //  console.log(this.当前反向链接列表, this.当前正向链接列表);
+        //  //console.log(this.当前反向链接列表, this.当前正向链接列表);
       },
     },
   },

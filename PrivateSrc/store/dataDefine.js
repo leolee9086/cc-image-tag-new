@@ -117,8 +117,8 @@ Vue.prototype.$生成毫秒时间戳 = function () {
   return str;
 };
 Vue.prototype.$更新数据时间戳 = function (数据) {
- // console.log(数据)
-  数据?数据.updated = this.$生成毫秒时间戳():null;
+  // //console.log(数据)
+  数据 ? 数据.updated = this.$生成毫秒时间戳() : null;
   return 数据;
 };
 Vue.prototype.$生成ial = function (属性数组, 卡片数据) {
@@ -157,7 +157,7 @@ Vue.prototype.$根据属性生成卡片 = function (属性对象) {
       width: 200,
       height: 100,
       folded: false,
-      backgroundColor: "lightblue",
+      backgroundColor: "#d0dfe6",
       color: "black",
       borderColor: "black",
       borderWidth: 1,
@@ -203,7 +203,7 @@ Vue.prototype.$根据属性生成卡片 = function (属性对象) {
       height: 100,
       path_type: "simpleLine",
       folded: true,
-      backgroundColor: "lightblue",
+      backgroundColor: "#cad3c3",
       color: "black",
       borderColor: "black",
       mid_anchor_rotate: true,
@@ -227,149 +227,149 @@ Vue.prototype.$根据属性生成卡片 = function (属性对象) {
     return 文件;
   });
 Vue.prototype.$预设属性默认值列表 = {
-  color:{
+  color: {
     name: "color",
     label: "文字颜色",
     cardDefault: "black",
     linkDefault: "black",
   },
-  borderColor:{
+  borderColor: {
     name: "borderColor",
     label: "边框颜色",
     cardDefault: "black",
     linkDefault: "black",
   },
-  backgroundColor:{
+  backgroundColor: {
     name: "backgroundColor",
     label: "背景色",
-    cardDefault: "lightblue",
-    linkDefault: "lightblue",
+    cardDefault: "#d0dfe6",
+    linkDefault: "#cad3c3",
   },
-  def_block:{ 
-    name: "def_block", 
-    label: "思源块id", 
-    cardDefault: "", 
-    linkDefault: "" 
+  def_block: {
+    name: "def_block",
+    label: "思源块id",
+    cardDefault: "",
+    linkDefault: ""
   },
-  borderWidth:{ 
-    name: "borderWidth", 
-    label: "边框宽度", 
-    cardDefault: 1, 
-    linkDefault: 1 
+  borderWidth: {
+    name: "borderWidth",
+    label: "边框宽度",
+    cardDefault: 1,
+    linkDefault: 1
   },
-  fixed_anchor:{
+  fixed_anchor: {
     name: "fixed_anchor",
     label: "锚点定位于中点",
     cardDefault: false,
     linkDefault: false,
   },
-  borderStyle:{
+  borderStyle: {
     name: "borderStyle",
     label: "边框线型",
     cardDefault: "solid",
     linkDefault: "solid",
   },
-  path_width:{
+  path_width: {
     name: "path_width",
     label: "连接线宽度",
     cardDefault: 5 / 0.382,
     linkDefault: 5 / 0.382,
   },
-  borderStyle:{
+  borderStyle: {
     name: "borderStyle",
     label: "边框线型",
     cardDefault: "solid",
     linkDefault: "solid",
   },
-  path_type:{
+  path_type: {
     name: "path_type",
     label: "连接线线型",
     cardDefault: "直线",
     linkDefault: "直线",
   },
-  path_color:{
+  path_color: {
     name: "path_color",
     label: "连接线颜色",
     cardDefault: "black",
     linkDefault: "black",
   },
-  path_dash:{
+  path_dash: {
     name: "path_dash",
     label: "连接线颜色",
     cardDefault: null,
     linkDefault: null,
   },
 
-  from_anchor_size:{
+  from_anchor_size: {
     name: "from_anchor_size",
     label: "起点标记大小",
     cardDefault: 30,
     linkDefault: 30,
   },
-  to_anchor_size:{
+  to_anchor_size: {
     name: "to_anchor_size",
     label: "终点标记大小",
     cardDefault: 30,
     linkDefault: 30,
   },
-  mid_anchor_size:{
+  mid_anchor_size: {
     name: "mid_anchor_size",
     label: "中间标记大小",
     cardDefault: 30,
     linkDefault: 30,
   },
 
-  from_anchor_image:{
+  from_anchor_image: {
     name: "from_anchor_image",
     label: "起点标记图片路径",
     cardDefault: "./PrivateSrc/icon/arrow1.png",
     linkDefault: "./PrivateSrc/icon/arrow1.png",
   },
-  to_anchor_image:{
+  to_anchor_image: {
     name: "to_anchor_image",
     label: "终点标记图片路径",
     cardDefault: "./PrivateSrc/icon/arrow1.png",
     linkDefault: "./PrivateSrc/icon/arrow1.png",
   },
-  mid_anchor_image:{
+  mid_anchor_image: {
     name: "mid_anchor_image",
     label: "中间标记图片路径",
     cardDefault: "./PrivateSrc/icon/arrow1.png",
     linkDefault: "./PrivateSrc/icon/arrow1.png",
   },
 
-  from_anchor_rotate:{
+  from_anchor_rotate: {
     name: "from_anchor_rotate",
     label: "起点标记自动旋转",
     cardDefault: false,
     linkDefault: false,
   },
-  to_anchor_rotate:{
+  to_anchor_rotate: {
     name: "to_anchor_rotate",
     label: "终点标记自动旋转",
     cardDefault: false,
     linkDefault: false,
   },
-  mid_anchor_rotate:{
+  mid_anchor_rotate: {
     name: "mid_anchor_rotate",
     label: "中间标记图片路径",
     cardDefault: false,
     linkDefault: false,
   },
 
-  from_anchor_rotate_offset:{
+  from_anchor_rotate_offset: {
     name: "from_anchor_rotate_offset",
     label: "起点标记角度偏移",
     cardDefault: 0,
     linkDefault: 0,
   },
-  to_anchor_rotate_offset:{
+  to_anchor_rotate_offset: {
     name: "to_anchor_rotate_offset",
     label: "终点标记角度偏移",
     cardDefault: 270,
     linkDefault: 180,
   },
-  mid_anchor_rotate_offset:{
+  mid_anchor_rotate_offset: {
     name: "mid_anchor_rotate_offset",
     label: "中间标记角度偏移",
     cardDefault: 0,
@@ -408,7 +408,7 @@ Vue.prototype.$卡片预设属性默认值 = {
 Vue.prototype.$卡片属性默认值 = {
   color: "black",
   borderColor: "black",
-  backgroundColor: "lightblue",
+  backgroundColor: "#d0dfe6",
   def_block: "",
   borderWidth: 1,
   fixed_anchor: false,
@@ -439,191 +439,199 @@ Vue.prototype.$填充默认值 = function (数据) {
   if (数据 && 数据.attrs) {
     for (属性名 in this.$预设属性默认值列表) {
       if (数据["attrs"][属性名] === undefined) {
-        try{
-        数据["attrs"][属性名] = 数据["type"]=="card"?this.$预设属性默认值列表[属性名]["cardDefault"]:this.$预设属性默认值列表[属性名]["linkDefault"];}
-        catch(e){console.log(e,属性名)}
+        try {
+          数据["attrs"][属性名] = 数据["type"] == "card" ? this.$预设属性默认值列表[属性名]["cardDefault"] : this.$预设属性默认值列表[属性名]["linkDefault"];
+        }
+        catch (e) {//console.log(e,属性名)
+        }
+        }
       }
     }
-  }
-  return 数据;
-};
-Vue.prototype.$获取预设表 = async function (预设表名) {
-  console.log(预设表名)
-  try{
-    return await this.$数据库[预设表名].toArray();
-  }catch(e){
-    console.log(e)
-  }
-};
-
-Vue.prototype.$获取预设 = async function (预设表名, 预设名) {
-  let 预设数组 = await this.$数据库[预设表名]
-    .filter((data) => {
-      if (data.name == this.预设名) {
-        return true;
-      }
-    })
-    .toArray();
-  return 预设数组[0] || null;
-};
-
-const 窗口状态对象 = {
-  current_linkid: "",
-  current_cardid: "",
-  current_card: "",
-  current_link: "",
-  editMode: "",
-  lastviewcentter: "",
-  等待连接卡片id: "",
-  缩放倍数: 1,
-  使用svg: false,
-  showname: true,
-  showsubtype: true,
-  current_cardid_array: [],
-  current_cardpreset_name: "",
-  current_linkpreset_name: "",
-  show_tag_by_default: true,
-};
-Vue.prototype.$当前窗口状态 = 窗口状态对象;
-
-Vue.prototype.$清空画板 = async function () {
-  await this.$数据库.cards.clear();
-  await this.$数据库.links.clear();
-  await this.$数据库.metadata.clear();
-  await this.$数据库.cardpresets.clear();
-  await this.$数据库.linkpresets.clear();
-};
-Vue.prototype.$获取画板列表 = async function(){
-  return await this.$画板元数据库.boards
-  .filter(
-    data=>{if(data.name){return true}}
-  )
-  .toArray()
-},
-Vue.prototype.$保存历史 = async function () {
-  let data = {};
-  data.cards = await this.$数据库.cards.toArray();
-  data.links = await this.$数据库.links.toArray();
-  data.metadata = await this.$数据库.metadata.toArray();
-  data.states = await this.$数据库.states.toArray();
-  data.linkpresets = await this.$数据库.linkpresets.toArray();
-  data.cardpresets = await this.$数据库.cardpresets.toArray();
-  data.timestamp = this.$用Lute生成时间戳();
-  let 文件历史列表 = await this.$数据库.history.toArray();
-  await this.$数据库.history.put(data);
-};
-Vue.prototype.$增量导入JSON数据 = async function (JSON数据) {
-  let cards = JSON数据.cards;
-  let links = JSON数据.links;
-  let metadata = JSON数据.metadata;
-  let cardpresets = JSON数据.cardpresets;
-  let linkpresets = JSON数据.linkpresets;
-
-  try {
-    for (i in cards) {
-      await this.$数据库.cards.add(cards[i]);
-    }
-    for (i in links) {
-      await this.$数据库.links.add(links[i]);
-    }
-    for (i in metadata) {
-      await this.$数据库.metadata.add(metadata[i]);
-    }
-    for (i in linkpresets) {
-      await this.$数据库.linkpresets.add(linkpresets[i]);
-    }
-    for (i in cardpresets) {
-      await this.$数据库.cardpresets.add(cardpresets[i]);
-    }
-  } catch (e) {
-    alert("导入出错", e);
-  }
-};
-Vue.prototype.$根据时间戳更新本地数据 = function (传入数据, 本地数据) {
-  if(传入数据.attrsproxy){return 本地数据}
-  if (!传入数据) {
-    return 本地数据;
-  } else if (传入数据.id != 本地数据.id) {
-    return 本地数据;
-  } else if (!传入数据.attrs) {
-    return 本地数据;
-  } else if (parseInt(传入数据.updated) < parseInt(本地数据.updated)) {
-    return 本地数据;
-  } else {
-    return 传入数据;
-  }
-};
-Vue.prototype.$id短码=function(卡片id){
-  let id短码=卡片id.split('-')
-  id短码 = id短码[id短码.length-1]
-  return id短码
-}
-Vue.prototype.$删除本地旧数据=async function(卡片数据,工作空间句柄){
-  let id短码=      this.$id短码(卡片数据.id)
-  let 文件名 =  卡片数据.name+"-" +id短码+ ".md";
-  try{
-  for await ( const [key, value] of 工作空间句柄.entries()){
-  
-    console.log({key, value})
-    if(key.indexOf(id短码)>0&&key!==文件名){
-      await 工作空间句柄.removeEntry(key)
-    }
-  
-  }}catch(e){console.log(e)}
- /* console.log(句柄数组)
-  for(let i=0,len=句柄数组.length;i<len;i++){
-    let 句柄对象 = 句柄数组[i]
-    if(句柄对象.key.indexOf(id短码)&&句柄对象.key!==文件名){
-      await 画板文件夹句柄.removeEntry(句柄对象.key)
-    }
-  }*/
-}
-Vue.prototype.$保存markdown卡片数据 = async function (卡片数据, 工作空间句柄) {
-  let 卡片上次修改时间1 = 卡片数据.updated.slice(0,14)
-  let id短码=      this.$id短码(卡片数据.id)
-  let 文件名 =  卡片数据.name+"-" +id短码+ ".md";
-  let 卡片文件句柄 = await 工作空间句柄.getFileHandle(文件名, { create: true });
-  let 文件属性 = await 卡片文件句柄.getFile()
-  console.log(文件属性)
-  let 卡片上次修改时间 = 卡片数据.updated.slice(0,14)
-  let 文件上次修改时间date对象 = await 文件属性.lastModifiedDate
-  let 文件上次修改时间 = moment(文件上次修改时间date对象).format("YYYYMMDDHHmmssSSSS")
-  文件上次修改时间 = 文件上次修改时间.slice(0,14)
-  console.log(卡片上次修改时间1,卡片上次修改时间,文件上次修改时间)
-  try{await this.$删除本地旧数据(卡片数据,工作空间句柄)}catch(e){console.log(e)}
-  if(parseInt(卡片上次修改时间)>=parseInt(文件上次修改时间)){
-    console.log(true)
-    let 写入管线 = await 卡片文件句柄.createWritable();
+    return 数据;
+  };
+  Vue.prototype.$获取预设表 = async function (预设表名) {
+    //console.log(预设表名)
     try {
-      await 写入管线.seek(0);
-      await 写入管线.truncate(0);
-      await 写入管线.write(卡片数据.markdown);
-      await 写入管线.close();
-    } catch (e) {}
-    return (卡片数据.markdown)
+      return await this.$数据库[预设表名].toArray();
+    } catch (e) {
+      //console.log(e)
+    }
+  };
+
+  Vue.prototype.$获取预设 = async function (预设表名, 预设名) {
+    let 预设数组 = await this.$数据库[预设表名]
+      .filter((data) => {
+        if (data.name == this.预设名) {
+          return true;
+        }
+      })
+      .toArray();
+    return 预设数组[0] || null;
+  };
+
+  const 窗口状态对象 = {
+    current_linkid: "",
+    current_cardid: "",
+    current_card: "",
+    current_link: "",
+    editMode: "",
+    lastviewcentter: "",
+    等待连接卡片id: "",
+    缩放倍数: 1,
+    使用svg: false,
+    showname: true,
+    showsubtype: true,
+    current_cardid_array: [],
+    current_cardpreset_name: "",
+    current_linkpreset_name: "",
+    show_tag_by_default: true,
+  };
+  Vue.prototype.$当前窗口状态 = 窗口状态对象;
+
+  Vue.prototype.$清空画板 = async function () {
+    await this.$数据库.cards.clear();
+    await this.$数据库.links.clear();
+    await this.$数据库.metadata.clear();
+    await this.$数据库.cardpresets.clear();
+    await this.$数据库.linkpresets.clear();
+    console.log("清空")
+  };
+  Vue.prototype.$获取画板列表 = async function () {
+    return await this.$画板元数据库.boards
+      .filter(
+        data => { if (data.name) { return true } }
+      )
+      .toArray()
+  },
+    Vue.prototype.$保存历史 = async function () {
+      let data = {};
+      data.cards = await this.$数据库.cards.toArray();
+      data.links = await this.$数据库.links.toArray();
+      data.metadata = await this.$数据库.metadata.toArray();
+      data.states = await this.$数据库.states.toArray();
+      data.linkpresets = await this.$数据库.linkpresets.toArray();
+      data.cardpresets = await this.$数据库.cardpresets.toArray();
+      data.timestamp = this.$用Lute生成时间戳();
+      let 文件历史列表 = await this.$数据库.history.toArray();
+      await this.$数据库.history.put(data);
+    };
+  Vue.prototype.$增量导入JSON数据 = async function (JSON数据) {
+    let cards = JSON数据.cards;
+    let links = JSON数据.links;
+    let metadata = JSON数据.metadata;
+    let cardpresets = JSON数据.cardpresets;
+    let linkpresets = JSON数据.linkpresets;
+
+    try {
+      for (i in cards) {
+        await this.$数据库.cards.add(cards[i]);
+      }
+      for (i in links) {
+        await this.$数据库.links.add(links[i]);
+      }
+      for (i in metadata) {
+        await this.$数据库.metadata.add(metadata[i]);
+      }
+      for (i in linkpresets) {
+        await this.$数据库.linkpresets.add(linkpresets[i]);
+      }
+      for (i in cardpresets) {
+        await this.$数据库.cardpresets.add(cardpresets[i]);
+      }
+    } catch (e) {
+      alert("导入出错", e);
+    }
+  };
+  Vue.prototype.$根据时间戳更新本地数据 = function (传入数据, 本地数据) {
+    if (传入数据.attrsproxy) { return 本地数据 }
+    if (!传入数据) {
+      return 本地数据;
+    } else if (传入数据.id != 本地数据.id) {
+      return 本地数据;
+    } else if (!传入数据.attrs) {
+      return 本地数据;
+    } else if (parseInt(传入数据.updated) < parseInt(本地数据.updated)) {
+      return 本地数据;
+    } else {
+      return 传入数据;
+    }
+  };
+  Vue.prototype.$id短码 = function (卡片id) {
+    let id短码 = 卡片id.split('-')
+    id短码 = id短码[id短码.length - 1]
+    return id短码
   }
-  else{
-    try{
-    console.log(false)
-    let 文件内容 = await 文件属性.text()
-    console.log(文件内容)
-    return (文件内容)
+  Vue.prototype.$删除本地旧数据 = async function (卡片数据, 工作空间句柄) {
+    let id短码 = this.$id短码(卡片数据.id)
+    let 文件名 = 卡片数据.name + "-" + id短码 + ".md";
+    try {
+      for await (const [key, value] of 工作空间句柄.entries()) {
 
-    }catch(e){}
+        //console.log({key, value})
+        if (key.indexOf(id短码) > 0 && key !== 文件名) {
+          await 工作空间句柄.removeEntry(key)
+        }
+
+      }
+    } catch (e) {
+      console.log(e)
+    }
+    /* //console.log(句柄数组)
+     for(let i=0,len=句柄数组.length;i<len;i++){
+       let 句柄对象 = 句柄数组[i]
+       if(句柄对象.key.indexOf(id短码)&&句柄对象.key!==文件名){
+         await 画板文件夹句柄.removeEntry(句柄对象.key)
+       }
+     }*/
   }
+  Vue.prototype.$保存markdown卡片数据 = async function (卡片数据, 工作空间句柄) {
+    let 卡片上次修改时间1 = 卡片数据.updated.slice(0, 14)
+    let id短码 = this.$id短码(卡片数据.id)
+    let 文件名 = 卡片数据.name + "-" + id短码 + ".md";
+    let 卡片文件句柄 = await 工作空间句柄.getFileHandle(文件名, { create: true });
+    let 文件属性 = await 卡片文件句柄.getFile()
+    //console.log(文件属性)
+    let 卡片上次修改时间 = 卡片数据.updated.slice(0, 14)
+    let 文件上次修改时间date对象 = await 文件属性.lastModifiedDate
+    let 文件上次修改时间 = moment(文件上次修改时间date对象).format("YYYYMMDDHHmmssSSSS")
+    文件上次修改时间 = 文件上次修改时间.slice(0, 14)
+    //console.log(卡片上次修改时间1,卡片上次修改时间,文件上次修改时间)
+    try { await this.$删除本地旧数据(卡片数据, 工作空间句柄) } catch (e) {
+      //console.log(e)
+    }
+    if (parseInt(卡片上次修改时间) >= parseInt(文件上次修改时间)) {
+      //console.log(true)
+      let 写入管线 = await 卡片文件句柄.createWritable();
+      try {
+        await 写入管线.seek(0);
+        await 写入管线.truncate(0);
+        await 写入管线.write(卡片数据.markdown);
+        await 写入管线.close();
+      } catch (e) { }
+      return (卡片数据.markdown)
+    }
+    else {
+      try {
+        //console.log(false)
+        let 文件内容 = await 文件属性.text()
+        //console.log(文件内容)
+        return (文件内容)
 
-};
+      } catch (e) { }
+    }
 
-Vue.prototype.$生成卡片markdown = function (卡片数据) {
-  let markdown = 卡片数据.markdown;
-  let yaml = this.$生成卡片yaml(卡片数据);
-  return yaml +"\n"+ markdown;
-};
-Vue.prototype.$去除yaml = function(markdown){
+  };
 
-},
-Vue.prototype.$生成卡片yaml = function (对象数据) {
-  let yaml = `---
+  Vue.prototype.$生成卡片markdown = function (卡片数据) {
+    let markdown = 卡片数据.markdown;
+    let yaml = this.$生成卡片yaml(卡片数据);
+    return yaml + "\n" + markdown;
+  };
+  Vue.prototype.$去除yaml = function (markdown) {
+
+  },
+    Vue.prototype.$生成卡片yaml = function (对象数据) {
+      let yaml = `---
 id:"${对象数据.id}"
 parent_id:"${对象数据.parent_id}"
 root_id:"${对象数据.root_id}"
@@ -644,5 +652,6 @@ updated:"${对象数据.updated}"
 attrs:'${JSON.stringify(对象数据.attrs)}'
 ---
         `;
-  return yaml;
-};
+      return yaml;
+    }
+

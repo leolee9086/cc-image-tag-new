@@ -79,7 +79,7 @@ module.exports = {
             // 打印
             this.图像宽度 = img.width;
             this.图像高度 = img.height;
-            console.log(this.图像大小);
+            //console.log(this.图像大小);
           };
         }
       },

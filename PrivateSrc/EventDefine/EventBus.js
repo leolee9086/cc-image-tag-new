@@ -41,7 +41,7 @@ const 事务列表 = {
       })
       .then(function (resData) {
         let succMap = resData["data"]["succMap"];
-        //  console.log(succMap);
+        //  //console.log(succMap);
         for (let item in succMap) {
           filepath = filepath + succMap[item];
           设置思源块属性(
@@ -93,7 +93,7 @@ const 事务列表 = {
     this.$事件总线.$emit("保存数据", 卡片数据, true);
 
     if (this.$当前窗口状态.current_cardpreset_name) {
-      //  console.log(this.$当前窗口状态.current_cardpreset_name)
+      //  //console.log(this.$当前窗口状态.current_cardpreset_name)
       this.$事件总线.$emit(
         "改变数据预设",
         卡片数据,
@@ -120,7 +120,7 @@ const 事务列表 = {
     // 传入数据 = this.$更新数据时间戳(传入数据);
    
     let 数据表名 = 传入数据.type + "s";
-    //console.log(数据表名)
+    ////console.log(数据表名)
     if (传入数据.attrsproxy) {
       this.$数据库[数据表名].get(传入数据.id).then((原始数据) => {
         if (原始数据) {
@@ -155,7 +155,7 @@ const 事务列表 = {
   },
   
   删除数据: function (传入数据) {
-    // console.log(传入数据)
+    // //console.log(传入数据)
     try{
       this.$数据库[传入数据.type+'s'].get(传入数据.id).modify(
         data=>{data.attrs.trashed=true}
@@ -188,7 +188,7 @@ const 事务列表 = {
   },
   
   切换链接显示: function (传入数据) {
-    console.log(传入数据);
+    //console.log(传入数据);
 
     if (!传入数据) {
       return null;
@@ -218,20 +218,20 @@ const 事务列表 = {
     );
   },
   清理选集: function () {
-    //console.log("选集清空")
+    ////console.log("选集清空")
     this.$当前窗口状态.current_cardid_array = [];
   },
   激活数据: function (数据) {
     let 数据类型 = 数据.type;
     this.$当前窗口状态.current_cardpreset_name = 数据.subtype;
 
-    // console.log(数据类型)
+    // //console.log(数据类型)
     数据类型 == "card"
       ? this.$事件总线.$emit("激活卡片", 数据)
       : this.$事件总线.$emit("激活链接", 数据);
   },
   激活卡片: function (数据) {
-    console.log(数据);
+    //console.log(数据);
     this.$当前窗口状态.current_linkid = "";
     this.$当前窗口状态.current_cardid = 数据.id;
     this.$当前窗口状态.current_link = "";
@@ -272,7 +272,7 @@ const 事务列表 = {
       if (链接类型) {
         新链接.subtype = 链接类型;
       }
-      console.log("创建链接",新链接);
+      //console.log("创建链接",新链接);
       this.$数据库.links.put(新链接).then(() => {
         this.$事件总线.$emit("结束连接");
         this.$事件总线.$emit("添加链接", 新链接);
@@ -303,7 +303,7 @@ const 事务列表 = {
   点击画板空白处:async function ($event) {
     let that = this
     if (!this.$当前窗口状态.等待连接卡片) {
-      //  console.log($event.target);
+      //  //console.log($event.target);
       this.$事件总线.$emit("清理选择");
     } else {
       let 卡片数据 = this.$根据属性生成卡片({
@@ -324,7 +324,7 @@ const 事务列表 = {
     this.$当前窗口状态.is_drawing=false
   },
   清理选择: function () {
-    //   console.log("选择清空");
+    //   //console.log("选择清空");
     this.$当前窗口状态.current_cardid = "";
     this.$当前窗口状态.current_linkid = "";
     this.$当前窗口状态.current_linkid_array = [];
@@ -343,15 +343,15 @@ const 事务列表 = {
   },
   鼠标点击卡片: function (数据, ctrl键被按下) {
     let id数组 = this.$当前窗口状态.current_cardid_array;
-    //console.log(id数组)
+    ////console.log(id数组)
     let flag = true;
     id数组.forEach((id) => (id == 数据.id ? (flag = false) : null));
     if (id数组[0]) {
       if (!ctrl键被按下) {
-        //  console.log(id数组, 数据.id);
+        //  //console.log(id数组, 数据.id);
         flag ? this.$事件总线.$emit("清理选集") : null;
       } else {
-        // console.log(id数组, 数据.id);
+        // //console.log(id数组, 数据.id);
 
         this.$当前窗口状态.current_cardid_array.push(数据.id);
 
@@ -366,7 +366,7 @@ const 事务列表 = {
    数据共享总线.postMessage({id:this.$baseid,"画板绘制数据":画板绘制数据.data,updated:画板绘制数据.updated})
   },
   双击画板: function ($event) {
-    console.log($event.target.className)
+    //console.log($event.target.className)
 
     if ($event.target.className != "cardscontainer layer") {
       return null;
@@ -376,7 +376,7 @@ const 事务列表 = {
       left: (window.pageXOffset + $event.clientX) / this.$当前窗口状态.缩放倍数,
       
     });
-    console.log(卡片数据)
+    //console.log(卡片数据)
 
     this.$事件总线.$emit("添加卡片", 卡片数据);
     this.$数据库.cards
@@ -394,7 +394,7 @@ const 事务列表 = {
     this.$画板元数据库.boards.put(画板元数据);
   },
   发送卡片数据到思源: function (对象数据) {
-    //  console.log(对象数据)
+    //  //console.log(对象数据)
   },
   打开发送对话框: function (对象数据) {
     this.$当前窗口状态.待发送数据 = 对象数据;
@@ -427,7 +427,7 @@ const 事务列表 = {
       })
       .then(() => {
         let attrsproxy = {};
-        //  console.log(预设值)
+        //  //console.log(预设值)
         if (预设值) {
           for (属性名 in 预设值.attrs) {
             预设值[属性名];
@@ -444,8 +444,8 @@ const 事务列表 = {
         传出数据.type = 对象数据.type;
         传出数据.subtype = 预设名;
         传出数据.attrsproxy = attrsproxy;
-        // console.log(传出数据)
-        // console.log(attrsproxy)
+        // //console.log(传出数据)
+        // //console.log(attrsproxy)
         this.$事件总线.$emit("保存数据", 传出数据);
       });
   },
@@ -480,7 +480,7 @@ const 事务列表 = {
     let 预设表名 = 预设项目.type + "presets";
     let 数据表名 = 预设项目.type + "s";
     let 预设名 = 预设项目.name;
-      console.log(预设表名);
+      //console.log(预设表名);
     if (属性名 && 预设表名) {
       this.$数据库[预设表名].put(预设项目).then(() =>
         this.$数据库[数据表名]

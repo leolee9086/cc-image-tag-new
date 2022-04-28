@@ -29,17 +29,8 @@
       :画布原点="画布原点"
     ></cc-layers-cards>
 
-    <!--   <cc-layers-graph
-      v-if="$当前窗口状态.使用svg"
-      class="layer"
-      :当前鼠标坐标="当前鼠标坐标"
-      :窗口大小="窗口大小"
-      :画布原点="画布原点"
-      :卡片数组="卡片数组"
-      :链接数组="链接数组"
-    ></cc-layers-graph>-->
+   
     <cc-layers-konva-graph
-      v-if="!$当前窗口状态.使用svg"
       class="layer"
       :当前鼠标坐标="当前鼠标坐标"
       :窗口大小="窗口大小"
@@ -139,7 +130,7 @@ module.exports = {
         this.$事件总线.$emit("保存数据", 完全数组[i]);
       }
     },
-    开始获取数据: async function () {
+    开始获取数据:  function () {
       liveQuery(() => this.$数据库.cards.toArray()).subscribe({
         next: async (result) => {
           this.卡片数组 = result;
@@ -233,7 +224,7 @@ module.exports = {
     挂载全局事件() {
       window.addEventListener("mousewheel", this.计算坐标, { passive: false });
       window.addEventListener("mousewheel", this.缩放, { passive: false });
-      window.addEventListener("mousemove", this.计算坐标);
+      window.addEventListener("mousemove", this.计算坐标, { passive: false });
       window.addEventListener("scroll", this.计算坐标);
       window.addEventListener("keydown", this.$快捷键处理器);
     },
@@ -282,7 +273,7 @@ module.exports = {
         id ? this.$事件总线.$emit("定位至卡片", id) : null;
       }
     },
-    async 计算坐标($event) {
+    计算坐标($event) {
       this.当前鼠标坐标.x = $event.clientX;
       this.当前鼠标坐标.y = $event.clientY;
       this.保存计数器 = this.保存计数器 + 1;

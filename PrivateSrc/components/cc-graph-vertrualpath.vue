@@ -14,7 +14,7 @@ module.exports = {
   name: "cc-graph-link",
   props: ["虚拟起始标记", "当前鼠标坐标"],
   async mounted() {
-    //  console.log(this.虚拟起始标记)
+    //  //console.log(this.虚拟起始标记)
     this.计算路径();
   },
   data() {

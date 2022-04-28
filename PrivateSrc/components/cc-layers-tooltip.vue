@@ -29,11 +29,11 @@ module.exports = {
     this.$事件总线.$on("显示提示", ($event) => this.开始显示提示($event));
     this.$事件总线.$on("提示内容改变", this.提示内容改变);
     this.$事件总线.$on("隐藏提示", this.隐藏提示);
-    window.document.addEventListener("mouseover", ($event) => this.读取提示($event));
+    window.document.addEventListener("mouseover", this.读取提示);
     window.document.addEventListener("mouseout", this.隐藏提示);
   },
   methods: {
-    读取提示($event) {
+    async 读取提示($event) {
       let target = $event.target;
       if (target.getAttribute("aria-label")) {
         this.当前提示内容 = target.getAttribute("aria-label");
@@ -50,7 +50,7 @@ module.exports = {
       }
     },
     开始显示提示($event) {
-      //  console.log("显示提示")
+      //  //console.log("显示提示")
       this.当前提示内容 = $event;
       this.显示提示 = true;
     },

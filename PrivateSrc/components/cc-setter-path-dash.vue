@@ -87,7 +87,7 @@ module.exports = {
         }
         this.当前对象数据.attrsproxy = {};
         if (val && val[0]) {
-          console.log(this.当前对象数据);
+          //console.log(this.当前对象数据);
           this.当前对象数据 && this.当前对象数据.attrs
             ? (this.当前对象数据.attrsproxy.path_dash = val)
             : null;
