@@ -474,9 +474,13 @@ module.exports = {
   methods: {
     async 修改编辑器() {
       let that = this;
+      if (!that.$refs.siyuanEditor) {
+        return null;
+      }
+      let 编辑器 = that.$refs.siyuanEditor;
       console.log("编辑器窗口加载");
-      let 编辑器DOM = that.$refs.siyuanEditor.contentDocument;
-      let 编辑器窗口 = that.$refs.siyuanEditor.contentWindow;
+      let 编辑器DOM = 编辑器.contentDocument;
+      let 编辑器窗口 = 编辑器.contentWindow;
       //console.log(编辑器DOM);
       //console.log(编辑器窗口.siyuan);
       if (!编辑器窗口.siyuan.mobileEditor) {
@@ -490,8 +494,8 @@ module.exports = {
       clearTimeout(that.修改编辑器);
 
       setTimeout(function () {
-        let 编辑器DOM = that.$refs.siyuanEditor.contentDocument;
-        let 编辑器窗口 = that.$refs.siyuanEditor.contentWindow;
+        let 编辑器DOM = 编辑器.contentDocument;
+        let 编辑器窗口 = 编辑器.contentWindow;
         if (!编辑器DOM) {
           setTimeout(that.修改编辑器, 100);
           return null;

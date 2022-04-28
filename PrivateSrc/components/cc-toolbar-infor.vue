@@ -119,6 +119,7 @@
                 </el-select>
               </el-row>
             </el-tab-pane>
+            <el-tab-pane label="主题" name="主题"> </el-tab-pane>
           </el-tabs>
         </el-collapse-item>
         <el-collapse-item title="链接样式" v-if="当前数据类型 == 'link'">
@@ -269,6 +270,7 @@ module.exports = {
     //console.log(this.属性列表);
     this.获取预设();
     this.添加监听器();
+    this.获取思源主题列表();
   },
 
   watch: {
@@ -333,6 +335,7 @@ module.exports = {
         let flag = false;
         if (val.id == oldval.id) {
           flag = true;
+          this.变更预设();
         }
       },
       deep: true,
@@ -340,6 +343,13 @@ module.exports = {
   },
 
   methods: {
+    获取思源主题列表: async function () {
+      let temp = await 获取思源配置(this.$思源伺服ip, this.apitoken);
+      this.思源配置对象 = temp.data;
+      console.log(this.思源配置对象);
+      this.黑暗模式主题列表 = this.思源配置对象.appearance.darkThemes;
+      this.明亮模式主题列表 = this.思源配置对象.appearance.lightThemes;
+    },
     添加监听器: function () {
       this.$事件总线.$on(
         "激活卡片",
@@ -380,7 +390,6 @@ module.exports = {
           return;
         }
         this.预设.type = this.当前对象数据.type;
-
         this.预设.attrs[属性名] = this.属性对象[属性名];
         this.$事件总线.$emit("变更预设值", 属性名, this.预设);
       }
