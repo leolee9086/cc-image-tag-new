@@ -65,7 +65,7 @@
       >
       </cc-dragable-block-combo>
     </div>
-    <cc-draw
+   <cc-draw
       :style="` 
         position:fixed;
         top:0px;
