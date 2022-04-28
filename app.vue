@@ -2,7 +2,10 @@
   <div
     id="app"
     :style="`width: ${窗口大小.width}px; 
-        height:${窗口大小.height}px;`"
+        height:${窗口大小.height}px;
+        cursor:${光标形状};`"
+    @mouseup="结束拖拽($event)"
+    @mousedown="开始拖拽($event)"
   >
     <div>
       <cc-layers-toolbar
@@ -82,6 +85,8 @@ module.exports = {
       画布原点: { x: 0, y: 0 },
       dialogVisible: false,
       工作空间句柄: {},
+      左键拖拽中: false,
+      光标形状: "auto",
     };
   },
   watch: {
@@ -271,7 +276,31 @@ module.exports = {
         id ? this.$事件总线.$emit("定位至卡片", id) : null;
       }
     },
+    开始拖拽($event) {
+      console.log($event);
+      if (!$event.target.classList.contains("layer")) {
+        return null;
+      }
+
+      $event.button == 0 ? (this.左键拖拽中 = true) : null;
+    },
+    结束拖拽($event) {
+      console.log($event);
+      this.光标形状 = "auto";
+
+      $event.button == 0 ? (this.左键拖拽中 = false) : null;
+    },
     计算坐标($event) {
+      if (this.左键拖拽中) {
+        $event.preventDefault();
+        this.光标形状 = "grabbing";
+        let 拖拽x = $event.clientX - this.当前鼠标坐标.x;
+        let 拖拽y = $event.clientY - this.当前鼠标坐标.y;
+        if (window.pageXOffset - 拖拽x && window.pageYOffset - 拖拽y) {
+          window.scrollTo(window.pageXOffset - 拖拽x, window.pageYOffset - 拖拽y);
+          console.log(window.pageXOffset + 拖拽x, window.pageYOffset + 拖拽y);
+        }
+      }
       this.当前鼠标坐标.x = $event.clientX;
       this.当前鼠标坐标.y = $event.clientY;
       this.保存计数器 = this.保存计数器 + 1;

@@ -205,23 +205,26 @@
         `"
         @click="鼠标点击($event)"
       >
-        <cc-sydoc-searcher
-          :思源伺服ip="$思源伺服ip"
-          apitoken=""
-          mode=""
-          :待发送数据="对象数据"
-          v-if="对象数据.attrs && !对象数据.attrs.def_block"
-        ></cc-sydoc-searcher>
-        <span v-if="对象数据.attrs && !对象数据.attrs.def_block"
-          >可以在下面以markdown语法输入草稿,连接到思源文档时草稿将导入思源</span
-        >
-        <cc-vditor-vue
-          v-model="markdown"
-          @click="开始编辑($event)"
-          v-if="对象数据.attrs && !对象数据.attrs.def_block"
-          :toolbarconfig="{ hide: false }"
-        ></cc-vditor-vue>
+        <div>
+          <cc-sydoc-searcher
+            :思源伺服ip="$思源伺服ip"
+            apitoken=""
+            mode=""
+            :待发送数据="对象数据"
+            v-if="对象数据.attrs && !对象数据.attrs.def_block"
+          ></cc-sydoc-searcher>
+          <span v-if="对象数据.attrs && !对象数据.attrs.def_block"
+            >连接到思源文档时草稿将导入思源</span
+          >
+          <cc-vditor-vue
+            v-model="markdown"
+            @click="开始编辑($event)"
+            v-if="对象数据.attrs && !对象数据.attrs.def_block"
+            :toolbarconfig="{ hide: false }"
+          ></cc-vditor-vue>
+        </div>
         <div
+          v-if="对象数据.attrs && 对象数据.attrs.def_block"
           :style="`position:absolute;margin: 0%; padding: 0%; min-width: 100%; min-height: 100%;z-index:${iframeindex}`"
         ></div>
         <iframe

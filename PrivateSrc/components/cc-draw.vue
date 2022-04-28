@@ -52,7 +52,6 @@ module.exports = {
     };
   },
   watch: {
-  
     value(val, oldval) {
       this.draw = val || [];
     },
@@ -138,7 +137,6 @@ module.exports = {
       evt.stopPropagation();
     },
     configBrush: function () {
-
       return {
         x: (this.当前鼠标坐标.x + this.画布原点.x) / this.窗口缩放倍数,
         y: (this.当前鼠标坐标.y + this.画布原点.y) / this.窗口缩放倍数,
@@ -157,7 +155,7 @@ module.exports = {
         scaleX: 窗口缩放倍数 || 1,
         scaleY: 窗口缩放倍数 || 1,
       };
-      return newconfigDraw
+      return newconfigDraw;
     },
 
     lineConfig: function (线定义) {
@@ -223,8 +221,8 @@ module.exports = {
 
       if (this.绘制中 && this.$当前窗口状态.is_drawing) {
         evt.stopPropagation();
-
-        let 点 = [evt.offsetX+this.画布原点.x || 0, evt.offsetY+this.画布原点.y  || 0];
+        evt.preventDefault();
+        let 点 = [evt.offsetX + this.画布原点.x || 0, evt.offsetY + this.画布原点.y || 0];
         if (this.窗口缩放倍数) {
           点 = [
             点[0] / this.窗口缩放倍数 / this.窗口缩放倍数,
