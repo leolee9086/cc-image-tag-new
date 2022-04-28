@@ -180,17 +180,6 @@
         `"
         @click="鼠标点击($event)"
       >
-        <iframe
-          v-if="对象数据.type == 'board'"
-          src="http:`${this.思源伺服ip}/widgets/cc-image-tag-new/`"
-          data-src="http://127.0.0.1:6806/widgets/cc-markmap"
-          data-subtype="widget"
-          border="0"
-          frameborder="no"
-          framespacing="0"
-          allowfullscreen="true"
-          style="width: 100%; height: 100%"
-        ></iframe>
         <div v-if="对象数据.type !== 'board'" style="z-index: 5">
           <el-row>
             <el-col :span="18">
@@ -223,12 +212,6 @@
           <span v-if="对象数据.attrs.def_block && $当前窗口状态.show_markdown_by_default"
             >连接到思源块:</span
           >
-          <!-- <cc-link-siyuan
-            v-if="对象数据.attrs.def_block"
-            :style="`color:${对象数据.attrs.color};`"
-            :链接id="对象数据.attrs.def_block"
-            :最大文字长度="23"
-          ></cc-link-siyuan>-->
         </div>
         <div
           class="cc-card-content"
