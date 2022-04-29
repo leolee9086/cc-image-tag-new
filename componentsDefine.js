@@ -39,3 +39,4 @@ let 应用组件列表 = [
   应用组件列表.forEach(组件名 => {
    Vue.component(组件名, `url:/widgets/cc-image-tag-new/PrivateSrc/components/${组件名}.vue`)}
   )
+  Vue.prototype.baseLibPath=`/widgets/cc-image-tag-new/cc-baselib`

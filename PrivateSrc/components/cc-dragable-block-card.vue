@@ -223,9 +223,7 @@
             :待发送数据="对象数据"
             v-if="激活"
           ></cc-sydoc-searcher>
-          <span v-if="对象数据.attrs && !对象数据.attrs.def_block"
-            >连接到思源文档时草稿将导入思源</span
-          >
+          <span v-if="激活">连接到思源文档时草稿将导入思源</span>
           <cc-vditor-vue
             v-model="markdown"
             @click="开始编辑($event)"
