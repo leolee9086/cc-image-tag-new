@@ -205,21 +205,23 @@ module.exports = {
         : null;
     },
     黏贴内容: function ($event) {
-      let clipboardData = $event.clipboardData;
+      if ($event.target == $event.curentarget) {
+        let clipboardData = $event.clipboardData;
 
-      //console.log(event);
+        //console.log(event);
 
-      if (!(clipboardData && clipboardData.items)) {
-        return;
-      }
-      for (var i = 0, len = clipboardData.items.length; i < len; i++) {
-        var item = clipboardData.items[i];
-        this.解析图片(item);
-        if (item.kind === "string" && item.type == "text/plain") {
-          item.getAsString((str) => {
-            // //console.log(str);
-            this.解析剪贴板内容(str + "");
-          });
+        if (!(clipboardData && clipboardData.items)) {
+          return;
+        }
+        for (var i = 0, len = clipboardData.items.length; i < len; i++) {
+          var item = clipboardData.items[i];
+          this.解析图片(item);
+          if (item.kind === "string" && item.type == "text/plain") {
+            item.getAsString((str) => {
+              // //console.log(str);
+              this.解析剪贴板内容(str + "");
+            });
+          }
         }
       }
     },

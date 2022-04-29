@@ -47,7 +47,7 @@
   top: -40px;
   transform-origin: 0% 40px;
 }
-.cc-card-body.not-folded {
+.cc-card-body.not-folded,.cc-card-appender {
   position: absolute;
   overflow: hidden;
   padding: 10px;

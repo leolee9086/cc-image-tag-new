@@ -1,8 +1,9 @@
 <template>
-  <div>
+  <div style="position: relative">
     <el-input v-model="搜索关键词"> </el-input>
     <div class="cc-list fn__flex-1 cc-list--background">
       <div
+        style="position: relative"
         @click="链接内容到(item)"
         v-for="(item, i) in 搜索结果列表"
         class="cc-list-item"

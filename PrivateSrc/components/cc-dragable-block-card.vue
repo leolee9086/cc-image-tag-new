@@ -21,18 +21,46 @@
   >
     <div
       class="cc-card-appender"
-      v-if="激活 && 对象数据 && 对象数据.attrs.def_block && !$当前窗口状态.is_drawing"
+      v-if="激活 && 对象数据 && !$当前窗口状态.is_drawing"
       :style="`
       position:absolute; 
+      padding:5px;
+      
       top: 0; 
+      color:${对象数据.attrs.color};
+      backgroundColor:${对象数据.attrs.backgroundColor};
       left: calc(30px + 100%);
       width:300px;
       max-height:${
         height || 对象数据.attrs.height * 窗口缩放倍数 || 100 * 窗口缩放倍数
       }px;
-      overflow-y: scroll;`"
+      overflow-y:${对象数据.attrs.def_block ? 'scroll' : 'hide'} ;`"
     >
-      <cc-shower-ref :分割="false" :显示="true" :value="对象数据"></cc-shower-ref>
+      <span v-if="激活 && !对象数据.attrs.def_block">连接到思源文档时草稿将导入思源</span>
+
+      <cc-sydoc-searcher
+        :思源伺服ip="$思源伺服ip"
+        apitoken=""
+        mode=""
+        :待发送数据="对象数据"
+        v-if="激活 && !对象数据.attrs.def_block"
+      ></cc-sydoc-searcher>
+      <el-input
+        v-if="激活 && 对象数据.attrs.def_block"
+        v-model="对象数据.attrs.def_block"
+        size="mini"
+      >
+        <span slot="prepend">
+          <span class="el-icon-siyuan"></span>
+          <span>id:</span>
+        </span></el-input
+      >
+      <cc-shower-ref
+        :分割="false"
+        :显示="true"
+        :value="对象数据"
+        v-if="对象数据 && 对象数据.attrs.def_block"
+      ></cc-shower-ref>
     </div>
     <vue-draggable-resizable
       v-if="
@@ -216,14 +244,6 @@
         @click="鼠标点击($event)"
       >
         <div v-if="对象数据.attrs && !对象数据.attrs.def_block">
-          <cc-sydoc-searcher
-            :思源伺服ip="$思源伺服ip"
-            apitoken=""
-            mode=""
-            :待发送数据="对象数据"
-            v-if="激活"
-          ></cc-sydoc-searcher>
-          <span v-if="激活">连接到思源文档时草稿将导入思源</span>
           <cc-vditor-vue
             v-model="markdown"
             @click="开始编辑($event)"
@@ -381,6 +401,9 @@ module.exports = {
           !val.attrs.trashed
         ) {
           console.log("保存数据");
+          if (val.attrs.def_block) {
+            await this.修改编辑器();
+          }
           this.保存数据();
         }
 
@@ -554,7 +577,10 @@ module.exports = {
         编辑器DOM.addEventListener("dbclick", that.开始连接);
       }, 100);
       let head = 编辑器DOM.head;
+      let oldstyle = 编辑器DOM.querySelector("#widgetset");
+      oldstyle ? oldstyle.remove() : null;
       let style = 编辑器DOM.createElement("style");
+      style.setAttribute("id", "widgetset");
       style.innerHTML = `
       :root{--b3-theme-on-background:${this.对象数据.attrs.color};
       --b3-theme-background:${this.对象数据.attrs.backgroundColor}
