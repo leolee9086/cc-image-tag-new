@@ -65,7 +65,7 @@
       >
       </cc-dragable-block-combo>
     </div>
-   <cc-draw
+    <cc-draw
       :style="` 
         position:fixed;
         top:0px;
@@ -243,7 +243,7 @@ module.exports = {
       let 思源块属性 = await 以id获取思源块信息(思源伺服ip, apitoken, id);
       //  //console.log(思源块属性);
 
-      if (思源块属性["id"]) {
+      if (思源块属性 && 思源块属性["id"]) {
         空标签["attrs"]["def_block"] = 思源块属性["id"];
         空标签["attrs"]["def_block_name"] = 思源块属性["name"];
       } else {

@@ -288,7 +288,7 @@ module.exports = {
       console.log($event);
       this.光标形状 = "auto";
 
-      $event.button == 0 ? (this.左键拖拽中 = false) : null;
+      this.左键拖拽中 = false;
     },
     计算坐标($event) {
       if (this.左键拖拽中) {
@@ -297,8 +297,9 @@ module.exports = {
         let 拖拽x = $event.clientX - this.当前鼠标坐标.x;
         let 拖拽y = $event.clientY - this.当前鼠标坐标.y;
         if (window.pageXOffset - 拖拽x && window.pageYOffset - 拖拽y) {
-          window.scrollTo(window.pageXOffset - 拖拽x, window.pageYOffset - 拖拽y);
-          console.log(window.pageXOffset + 拖拽x, window.pageYOffset + 拖拽y);
+          if (Math.abs(拖拽x) < 100 && Math.abs(拖拽y) < 100) {
+            window.scrollTo(window.pageXOffset - 拖拽x, window.pageYOffset - 拖拽y);
+          }
         }
       }
       this.当前鼠标坐标.x = $event.clientX;

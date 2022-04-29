@@ -11,13 +11,13 @@
           @click="删除预设(预设项目)"
         ></el-button>
       </div>
-      <el-row v-for="(i, 属性名) in $卡片预设属性默认值">
+      <el-row v-for="(属性, i) in 内置属性名对照表">
         <el-col :span="20">
-          <span>{{ 属性名 }}</span>
+          <span :aria-label="属性['name']">{{ 属性["label"] }}</span>
         </el-col>
         <el-col :span="4">
           <el-tooltip
-            v-if="预设项目.attrs && 'byref' != 预设项目.attrs[属性名]"
+            v-if="预设项目.attrs && 'byref' != 预设项目.attrs[属性['name']]"
             content="设为实例值,设为实例值之后,改变某一个引用不会改变所有使用了预设的元素"
           >
             <div slot="content">
@@ -28,10 +28,13 @@
             <span
               class="el-icon-delete"
               size="mini"
-              @click="设为实例值(属性名, 预设项目)"
+              @click="设为实例值(属性['name'], 预设项目)"
             ></span>
           </el-tooltip>
-          <el-tooltip v-if="预设项目.attrs && 'byref' == 预设项目.attrs[属性名]" content>
+          <el-tooltip
+            v-if="预设项目.attrs && 'byref' == 预设项目.attrs[属性['name']]"
+            content
+          >
             <div slot="content">
               设为预设值,
               <br />改变某一个引用时 <br />会改变所有使用了预设的元素
@@ -39,7 +42,7 @@
             <span
               class="el-icon-check"
               size="mini"
-              @click="设为预设值(属性名, 预设项目)"
+              @click="设为预设值(属性['name'], 预设项目)"
             ></span>
           </el-tooltip>
         </el-col>
@@ -54,9 +57,31 @@ module.exports = {
   data() {
     return {
       预设列表: "",
-      内置属性名对照标: [
+      内置属性名对照表: [
         { name: "color", label: "文字颜色", type: "color" },
         { name: "borderColor", label: "边框颜色", type: "color" },
+        { name: "backgroundColor", label: "背景颜色", type: "color" },
+        { name: "def_block", label: "定义块", type: "color" },
+        { name: "borderWidth", label: "边框宽度", type: "color" },
+        { name: "fixed_anchor", label: "固定锚点方向", type: "color" },
+        { name: "borderStyle", label: "边框样式", type: "color" },
+        { name: "path_width", label: "路径宽度", type: "color" },
+        { name: "path_type", label: "途径样式", type: "color" },
+        { name: "path_color", label: "路径颜色", type: "color" },
+        { name: "from_anchor_size", label: "起点大小", type: "color" },
+        { name: "from_anchor_image", label: "起点标记", type: "color" },
+        { name: "from_anchor_rotate", label: "起点旋转", type: "color" },
+        { name: "from_anchor_rotate_offset", label: "起点偏角", type: "color" },
+
+        { name: "to_anchor_size", label: "终点大小", type: "color" },
+        { name: "to_anchor_image", label: "终点标记", type: "color" },
+        { name: "to_anchor_rotate", label: "终点旋转", type: "color" },
+        { name: "to_anchor_rotate_offset", label: "终点偏角", type: "color" },
+
+        { name: "mid_anchor_size", label: "中点大小", type: "color" },
+        { name: "mid_anchor_image", label: "中点标记", type: "color" },
+        { name: "mid_anchor_rotate", label: "中点旋转", type: "color" },
+        { name: "mid_anchor_rotate_offset", label: "终点偏角", type: "color" },
       ],
     };
   },

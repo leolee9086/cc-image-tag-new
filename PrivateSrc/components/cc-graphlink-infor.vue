@@ -10,6 +10,14 @@
               {{ 当前数据.name }}
             </h2>
           </el-col>
+          <el-col :span="3">
+            <span
+              v-if="当前数据.type == 'link'"
+              class="el-icon-view"
+              aria-label="显示链接标记"
+              @click="显示卡片(当前数据)"
+            ></span>
+          </el-col>
         </el-row>
         <div @click="定位至卡片(当前数据)" v-html="预览HTML"></div>
       </el-card>
@@ -89,6 +97,12 @@ module.exports = {
     定位至卡片: function (卡片数据) {
       //console.log(卡片数据);
       卡片数据.id ? this.$事件总线.$emit("定位至卡片", 卡片数据) : null;
+    },
+    显示卡片: function (卡片数据) {
+      if (卡片数据.id) {
+        卡片数据.attrs.hidetag = false;
+        this.$事件总线.$emit("显示卡片", 卡片数据);
+      }
     },
   },
 };

@@ -22,18 +22,17 @@
     <div
       class="cc-card-appender"
       v-if="激活 && 对象数据 && 对象数据.attrs.def_block && !$当前窗口状态.is_drawing"
-      style="`position: absolute; top: 0; left: calc(30px + 100%);width:300px;height:${height || 对象数据.attrs.height * 窗口缩放倍数 || 100 * 窗口缩放倍数}`"
+      :style="`
+      position:absolute; 
+      top: 0; 
+      left: calc(30px + 100%);
+      width:300px;
+      max-height:${
+        height || 对象数据.attrs.height * 窗口缩放倍数 || 100 * 窗口缩放倍数
+      }px;
+      overflow-y: scroll;`"
     >
-      <cc-shower-ref :显示="true" :value="对象数据"></cc-shower-ref>
-      <el-row>
-        <el-button size="mini">反向链接</el-button>
-      </el-row>
-      <el-row>
-        <el-button size="mini">正向链接</el-button>
-      </el-row>
-      <el-row>
-        <el-button size="mini">提及</el-button>
-      </el-row>
+      <cc-shower-ref :分割="false" :显示="true" :value="对象数据"></cc-shower-ref>
     </div>
     <vue-draggable-resizable
       v-if="
@@ -185,6 +184,12 @@
           aria-label="返回连接线中点"
           @click="返回原始点()"
         ></span>
+        <span
+          v-if="对象数据.type == 'link'"
+          class="el-icon-view"
+          aria-label="隐藏链接标记"
+          @click="隐藏()"
+        ></span>
         <span class="subtypetag" v-if="$当前窗口状态.showsubtype">
           预设:{{ 对象数据.subtype }}
         </span>
@@ -210,13 +215,13 @@
         `"
         @click="鼠标点击($event)"
       >
-        <div>
+        <div v-if="对象数据.attrs && !对象数据.attrs.def_block">
           <cc-sydoc-searcher
             :思源伺服ip="$思源伺服ip"
             apitoken=""
             mode=""
             :待发送数据="对象数据"
-            v-if="对象数据.attrs && !对象数据.attrs.def_block"
+            v-if="激活"
           ></cc-sydoc-searcher>
           <span v-if="对象数据.attrs && !对象数据.attrs.def_block"
             >连接到思源文档时草稿将导入思源</span
@@ -276,6 +281,7 @@ module.exports = {
       drawResize: false,
       临时点数组: [],
       保存计数: 0,
+      强制隐藏: false,
     };
   },
   beforeMount() {
@@ -354,7 +360,7 @@ module.exports = {
         let attrs = this.对象数据.attrs;
         attrs.top + "" == "NAN" ? (attrs.top = 0) : null;
         attrs.left + "" == "NAN" ? (attrs.left = 0) : null;
-        attrs.width + "" == "NAN" ? (attrs.width = 100) : null;
+        attrs.width + "" == "NAN" ? (attrs.width = 300) : null;
         attrs.height + "" == "NAN" ? (attrs.height = 100) : null;
         attrs.offsetx + "" == "NAN" ? (attrs.offsetx = 0) : null;
         attrs.offsety + "" == "NAN" ? (attrs.offsety = 0) : null;
@@ -470,13 +476,30 @@ module.exports = {
     },
   },
   methods: {
+    async 隐藏() {
+      this.对象数据.attrs.hidetag = true;
+      this.保存数据();
+    },
     async 修改编辑器() {
       let that = this;
       //console.log("编辑器窗口加载");
-      let 编辑器DOM = that.$refs.siyuanEditor.contentDocument;
-      let 编辑器窗口 = that.$refs.siyuanEditor.contentWindow;
+      let 编辑器 = that.$refs.siyuanEditor;
+      if (!编辑器) {
+        setTimeout(that.修改编辑器, 100);
+        return null;
+      }
+      let 编辑器DOM = 编辑器.contentDocument;
+      let 编辑器窗口 = 编辑器.contentWindow;
       //console.log(编辑器DOM);
       //console.log(编辑器窗口.siyuan);
+      if (!编辑器窗口.siyuan) {
+        setTimeout(that.修改编辑器, 100);
+        return null;
+      }
+      if (!编辑器DOM) {
+        setTimeout(that.修改编辑器, 100);
+        return null;
+      }
       if (!编辑器窗口.siyuan.mobileEditor) {
         setTimeout(that.修改编辑器, 100);
         return null;
@@ -488,8 +511,8 @@ module.exports = {
       clearTimeout(that.修改编辑器);
 
       setTimeout(function () {
-        let 编辑器DOM = that.$refs.siyuanEditor.contentDocument;
-        let 编辑器窗口 = that.$refs.siyuanEditor.contentWindow;
+        let 编辑器DOM = 编辑器.contentDocument;
+        let 编辑器窗口 = 编辑器.contentWindow;
         if (!编辑器DOM) {
           setTimeout(that.修改编辑器, 100);
           return null;
@@ -498,6 +521,7 @@ module.exports = {
         try {
           that.打开块id(that.def_block, 编辑器DOM);
         } catch (e) {
+          console.log(e);
           setTimeout(that.修改编辑器, 100);
 
           return null;
@@ -547,12 +571,43 @@ module.exports = {
         return null;
       }
       let target = 主界面.querySelector(".protyle-breadcrumb>.protyle-breadcrumb__bar");
-      if (target) {
-        let item = 主界面.createElement("span");
-        item.setAttribute("data-node-id", id);
-        target.appendChild(item);
-        item.click();
-        item.remove();
+      let target1 = 主界面.querySelector(
+        ".protyle-wysiwyg div[data-node-id] div[contenteditable]"
+      );
+      console.log(target, target1);
+      if (target && target1) {
+        let 虚拟链接 = 主界面.createElement("span");
+        虚拟链接.setAttribute("data-type", "block-ref");
+        虚拟链接.setAttribute("data-id", id);
+        let 点击事件 = 主界面.createEvent("MouseEvents");
+        点击事件.initMouseEvent(
+          "click",
+          true,
+          false,
+          window,
+          0,
+          0,
+          0,
+          0,
+          0,
+          false,
+          false,
+          false,
+          false,
+          0,
+          null
+        );
+        target1.appendChild(虚拟链接);
+
+        虚拟链接.dispatchEvent(点击事件);
+        虚拟链接.remove();
+        setTimeout(async () => {
+          let item = 主界面.createElement("span");
+          item.setAttribute("data-node-id", id);
+          target.appendChild(item);
+          item.click();
+          item.remove();
+        }, 100);
       } else {
         setTimeout(async () => that.打开块id(id, 主界面), 100);
       }
@@ -865,7 +920,8 @@ module.exports = {
       if (对象数据.type == "link" && 对象数据.attrs.hidetag) {
         this.hide = true;
       }
-      if (对象数据.type == "link" && typeof 对象数据.attrs.hidetag == "undefined") {
+      if (对象数据.type == "link" && !对象数据.attrs.hidetag) {
+        this.hide = false;
         this.hide = !this.$当前窗口状态.show_tag_by_default;
         this.$数据库.links
           .filter((data) => {
