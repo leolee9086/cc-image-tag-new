@@ -531,7 +531,9 @@ module.exports = {
         } else {
           this.显示引线 = false;
         }
-
+        if (this.链接.attrs.hidetag) {
+          this.显示引线 = false;
+        }
         this.链接 = this.$更新数据时间戳(this.链接);
         !this.链接.virtual ? this.$事件总线.$emit("保存链接", this.链接) : null;
 
