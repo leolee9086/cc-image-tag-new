@@ -229,9 +229,10 @@
           <cc-vditor-vue
             v-model="markdown"
             @click="开始编辑($event)"
-            v-if="对象数据.attrs && !对象数据.attrs.def_block"
+            v-if="激活"
             :toolbarconfig="{ hide: false }"
           ></cc-vditor-vue>
+          <div v-if="!激活" @click="开始编辑($event)" v-html="预览HTML"></div>
         </div>
         <div
           v-if="对象数据.attrs && 对象数据.attrs.def_block"

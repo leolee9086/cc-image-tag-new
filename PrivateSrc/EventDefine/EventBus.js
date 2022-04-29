@@ -14,6 +14,7 @@ const 事务列表 = {
   上传当前画板文件数据到思源: async function () {
     let that = this;
     let JSON数据 = {};
+    if(this.$baseid==="20131111000000-lpanybz"){return null}
     await that.$数据库.cards.toArray((array) => (JSON数据.cards = array));
     await that.$数据库.links.toArray((array) => (JSON数据.links = array));
     await that.$数据库.metadata.toArray((array) => (JSON数据.metadata = array));

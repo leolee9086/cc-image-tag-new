@@ -6,6 +6,10 @@ Vue.prototype.$快捷键触发器={
         that.$事件总线.$emit("清理选集")
         that.$事件总线.$emit("结束绘制")
 
+    },
+    f1(event){
+        event.preventDefault();
+        Vue.prototype.$窗口内打开超链接(`/widgets/cc-image-tag-new/`);
     }
     
 }

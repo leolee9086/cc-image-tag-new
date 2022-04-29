@@ -3,7 +3,7 @@ let url参数 = Vue.prototype.$解析url(window.location.href);
 /*挂件自身元素的获取也在baselib的commonfunctionforsiyuan里*/
 
 if (!Vue.prototype.$挂件模式()) {
-  Vue.prototype.$baseid = url参数.baseid || Lute.NewNodeID();
+  Vue.prototype.$baseid = url参数.baseid || "20131111000000-lpanybz";
 } else {
   Vue.prototype.$baseid = Vue.prototype
     .$挂件自身元素()

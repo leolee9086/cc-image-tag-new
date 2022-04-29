@@ -97,7 +97,7 @@
 </template>
 <script>
 module.exports = {
-  name: "cc-toolbar-infor",
+  name: "cc-toolbar-main",
   props: ["卡片数据id", "链接数据id", "思源伺服ip"],
   data() {
     return {
@@ -263,6 +263,60 @@ module.exports = {
         let 链接列表 = await this.$数据库.cards.toArray();
         this.搜索结果列表 = 卡片列表.concat(链接列表);
       }
+    },
+    下载当前版本: async function () {
+      let JSON数据 = {};
+      JSON数据.cards = await this.$数据库.cards.toArray();
+      JSON数据.links = await this.$数据库.links.toArray();
+      JSON数据.metadata = await this.$数据库.metadata.toArray();
+      JSON数据.cardpresets = await this.$数据库.cardpresets.toArray();
+      JSON数据.linkpresets = await this.$数据库.linkpresets.toArray();
+
+      await this.导出版本数据(JSON数据);
+    },
+    导出版本数据: async function (版本数据) {
+      let JSON数据 = 版本数据;
+      let 当前画板命名 = await this.$数据库.metadata.get("name").then((data) => {
+        return data.value;
+      });
+
+      let 文件名 = `${当前画板命名}.cccards`;
+      let 文件数据 = this.$从数据生成文件(JSON数据, "application/json", 文件名);
+      this.保存(文件数据, 文件名);
+    },
+    保存: function (blob, filename) {
+      let type = blob.type;
+      let force_saveable_type = "application/octet-stream";
+      if (type && type != force_saveable_type) {
+        // 强制下载，而非在浏览器中打开
+        var slice = blob.slice || blob.webkitSlice || blob.mozSlice;
+        blob = slice.call(blob, 0, blob.size, force_saveable_type);
+      }
+
+      let url = URL.createObjectURL(blob);
+      let save_link = document.createElement("a");
+      save_link.href = url;
+      save_link.download = filename;
+      let event = document.createEvent("MouseEvents");
+      event.initMouseEvent(
+        "click",
+        true,
+        false,
+        window,
+        0,
+        0,
+        0,
+        0,
+        0,
+        false,
+        false,
+        false,
+        false,
+        0,
+        null
+      );
+      save_link.dispatchEvent(event);
+      URL.revokeObjectURL(url);
     },
   },
   computed: {},

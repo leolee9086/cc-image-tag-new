@@ -161,6 +161,14 @@ module.exports = {
     从思源块加载数据: async function (id) {
       let that = this;
       let filepath = `assets/data-${id}.cccards`;
+      if (id == "20131111000000-lpanybz") {
+        filepath = "./widgets/cc-image-tag-new/help.cccards";
+        this.$数据库.cards.clear();
+        this.$数据库.links.clear();
+        this.$数据库.metadata.clear();
+        this.$数据库.cardpresets.clear();
+        this.$数据库.linkpresets.clear();
+      }
       if (this.$挂件模式()) {
         this.挂件自身元素 = window.frameElement.parentElement.parentElement;
         filepath =
