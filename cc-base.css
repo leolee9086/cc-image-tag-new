@@ -227,7 +227,7 @@ body,
 }
 
 .el-icon-browser {
-  background: url("/widgets/cc-baselib/icons/browser-o.svg") center no-repeat;
+  background: url("./cc-baselib/icons/browser-o.svg") center no-repeat;
   background-size: contain;
 }
 
@@ -238,7 +238,7 @@ body,
 }
 
 .el-icon-siyuan {
-  background: url("/widgets/cc-baselib/icons/siyuan.svg") center no-repeat;
+  background: url("./cc-baselib/icons/siyuan.svg") center no-repeat;
   background-size: contain;
 }
 
@@ -249,7 +249,7 @@ body,
 }
 
 .el-icon-focus {
-  background: url("/widgets/cc-baselib/icons/focus.svg") center no-repeat;
+  background: url("./cc-baselib/icons/focus.svg") center no-repeat;
   background-size: contain;
 }
 
@@ -259,7 +259,7 @@ body,
   visibility: hidden;
 }
 .el-icon-eraser {
-  background: url("/widgets/cc-baselib/icons/eraser.svg") center no-repeat;
+  background: url("./cc-baselib/icons/eraser.svg") center no-repeat;
   background-size: contain;
 }
 
@@ -272,7 +272,7 @@ span[style~='lightblue']::before{
   color:lightblue
 }
 .el-icon-markdown {
-  background: url("/widgets/cc-baselib/icons/markdown.svg") center no-repeat;
+  background: url("./cc-baselib/icons/markdown.svg") center no-repeat;
   background-size: contain;
 }
 
@@ -282,7 +282,7 @@ span[style~='lightblue']::before{
   visibility: hidden;
 }
 .el-icon-leftalign {
-  background: url("/widgets/cc-baselib/icons/左对齐.svg") center no-repeat;
+  background: url("./cc-baselib/icons/左对齐.svg") center no-repeat;
   background-size: contain;
 }
 
@@ -292,7 +292,7 @@ span[style~='lightblue']::before{
   visibility: hidden;
 }
 .el-icon-rightalign {
-  background: url("/widgets/cc-baselib/icons/左对齐.svg") center no-repeat;
+  background: url("./cc-baselib/icons/左对齐.svg") center no-repeat;
   background-size: contain;
   transform: rotate(180deg);
 }
@@ -303,7 +303,7 @@ span[style~='lightblue']::before{
   visibility: hidden;
 }
 .el-icon-upalign {
-  background: url("/widgets/cc-baselib/icons/左对齐.svg") center no-repeat;
+  background: url("./cc-baselib/icons/左对齐.svg") center no-repeat;
   background-size: contain;
   transform: rotate(90deg);
 }
@@ -314,7 +314,7 @@ span[style~='lightblue']::before{
   visibility: hidden;
 }
 .el-icon-downalign {
-  background: url("/widgets/cc-baselib/icons/左对齐.svg") center no-repeat;
+  background: url("./cc-baselib/icons/左对齐.svg") center no-repeat;
   background-size: contain;
   transform: rotate(270deg);
 }
@@ -324,7 +324,7 @@ span[style~='lightblue']::before{
   visibility: hidden;
 }
 .el-icon-width {
-  background: url("/widgets/cc-baselib/icons/宽度.svg") center no-repeat;
+  background: url("./cc-baselib/icons/宽度.svg") center no-repeat;
   background-size: contain;
 }
 .el-icon-width::before {
@@ -333,7 +333,7 @@ span[style~='lightblue']::before{
   visibility: hidden;
 }
 .el-icon-height {
-  background: url("/widgets/cc-baselib/icons/宽度.svg") center no-repeat;
+  background: url("./cc-baselib/icons/宽度.svg") center no-repeat;
   background-size: contain;
   transform: rotate(270deg);
 }
@@ -343,7 +343,7 @@ span[style~='lightblue']::before{
   visibility: hidden;
 }
 .el-icon-xspace {
-  background: url("/widgets/cc-baselib/icons/等高分布.svg") center no-repeat;
+  background: url("./cc-baselib/icons/等高分布.svg") center no-repeat;
   background-size: contain;
   transform: rotate(270deg);
 }
@@ -353,7 +353,7 @@ span[style~='lightblue']::before{
   visibility: hidden;
 }
 .el-icon-yspace {
-  background: url("/widgets/cc-baselib/icons/等高分布.svg") center no-repeat;
+  background: url("./cc-baselib/icons/等高分布.svg") center no-repeat;
   background-size: contain;
 }
 .el-icon-yspace::before {
@@ -362,7 +362,7 @@ span[style~='lightblue']::before{
   visibility: hidden;
 }
 .el-icon-explode {
-  background: url("/widgets/cc-baselib/icons/explode.svg") center no-repeat;
+  background: url("./cc-baselib/icons/explode.svg") center no-repeat;
   background-size: contain;
 }
 .el-icon-explode::before {
