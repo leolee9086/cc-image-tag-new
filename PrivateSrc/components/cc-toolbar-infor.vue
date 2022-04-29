@@ -271,6 +271,7 @@ module.exports = {
     this.获取预设();
     this.添加监听器();
     this.获取思源主题列表();
+    this.开发模式 = this.$开发模式;
   },
 
   watch: {

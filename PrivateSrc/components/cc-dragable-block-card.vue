@@ -21,14 +21,10 @@
   >
     <div
       class="cc-card-appender"
-      v-if="激活 && 对象数据 && 对象数据.attrs.def_block"
-      style="position: absolute; top: 0; left: calc(30px + 100%)"
+      v-if="激活 && 对象数据 && 对象数据.attrs.def_block && !$当前窗口状态.is_drawing"
+      style="`position: absolute; top: 0; left: calc(30px + 100%);width:300px;height:${height || 对象数据.attrs.height * 窗口缩放倍数 || 100 * 窗口缩放倍数}`"
     >
-      <div class="subtypetag" v-if="$当前窗口状态.showsubtype">
-        预设:{{ 对象数据.subtype }}
-      </div>
-      <div v-if="$当前窗口状态.showname">命名:{{ 对象数据.name }}</div>
-
+      <cc-shower-ref :显示="true" :value="对象数据"></cc-shower-ref>
       <el-row>
         <el-button size="mini">反向链接</el-button>
       </el-row>
@@ -141,9 +137,14 @@
         </div>
       </el-popover>
 
-      <div v-if="激活" class="cc-card-toolbar">
+      <div
+        v-if="激活"
+        class="cc-card-toolbar"
+        :style="`width:${
+          width || 对象数据.attrs.width * 窗口缩放倍数 || 100 * 窗口缩放倍数
+        }px`"
+      >
         <span aria-label="卡片序号">{{ index }}</span>
-
         <span aria-label="删除卡片" class="el-icon-delete" v-on:click="删除()"></span>
         <span
           aria-label="展开|关闭卡片"
@@ -184,6 +185,10 @@
           aria-label="返回连接线中点"
           @click="返回原始点()"
         ></span>
+        <span class="subtypetag" v-if="$当前窗口状态.showsubtype">
+          预设:{{ 对象数据.subtype }}
+        </span>
+        <span v-if="$当前窗口状态.showname">命名:{{ 对象数据.name }}</span>
       </div>
 
       <div
@@ -620,7 +625,8 @@ module.exports = {
 
       return markdown;
     },
-    获取预设: async function (预设名) {
+    获取预设: async function (value) {
+      let 预设名 = value.subtype;
       let 预设表名 = this.对象数据.type + "presets";
       this.预设 = await this.$获取预设(预设表名, 预设名);
 

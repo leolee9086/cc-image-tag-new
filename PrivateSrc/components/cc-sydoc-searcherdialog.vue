@@ -9,7 +9,7 @@
 </template>
 <script>
 module.exports = {
-  name: "cc-sydoc-searcher",
+  name: "cc-sydoc-searcherdialog",
   props: ["思源伺服ip", "apitoken", "mode"],
   data() {
     return {

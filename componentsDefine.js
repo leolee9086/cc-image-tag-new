@@ -32,6 +32,8 @@ let 应用组件列表 = [
     "cc-loader-file",
     "cc-select-boards",
     "cc-shower-board",
+    "cc-shower-ref",
+
     "cc-draw"
   ]
   应用组件列表.forEach(组件名 => {

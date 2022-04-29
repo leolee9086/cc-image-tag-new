@@ -84,6 +84,14 @@
           </el-col>
         </el-row>
       </el-col>
+      <el-col :span="3">
+        <el-button
+          circle
+          @click="重新加载窗口()"
+          icon="el-icon-refresh"
+          aria-label="重新加载窗口"
+        ></el-button>
+      </el-col>
     </el-row>
   </div>
 </template>
@@ -154,6 +162,9 @@ module.exports = {
     },
   },
   methods: {
+    重新加载窗口: function () {
+      window.location.reload(true);
+    },
     添加卡片名称到思源块别名: async function () {
       let 卡片名称 = this.当前对象名称;
       let 思源块内容 = await 以id获取思源块信息(
