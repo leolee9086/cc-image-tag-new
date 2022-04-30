@@ -193,15 +193,17 @@ Vue.prototype.$根据属性生成卡片 = function (属性对象) {
     created: Vue.prototype.$用Lute生成时间戳(),
     updated: Vue.prototype.$用Lute生成时间戳(),
     attrs: {
+      top:0,
+      left:0,
       offsetx: 0,
       offsety: 0,
       from_id: "",
       to_id: "",
-      path_width: 5,
+      path_width: 2,
       path_color: "",
       width: 350,
       height: 170,
-      path_type: "simpleLine",
+      path_type: "折线",
       folded: true,
       backgroundColor: "#cad3c3",
       color: "black",
@@ -272,8 +274,8 @@ Vue.prototype.$预设属性默认值列表 = {
   path_width: {
     name: "path_width",
     label: "连接线宽度",
-    cardDefault: 5 / 0.382,
-    linkDefault: 5 / 0.382,
+    cardDefault: 2,
+    linkDefault: 2,
   },
   borderStyle: {
     name: "borderStyle",
@@ -284,8 +286,8 @@ Vue.prototype.$预设属性默认值列表 = {
   path_type: {
     name: "path_type",
     label: "连接线线型",
-    cardDefault: "直线",
-    linkDefault: "直线",
+    cardDefault: "折线",
+    linkDefault: "折线",
   },
   path_color: {
     name: "path_color",
@@ -303,20 +305,20 @@ Vue.prototype.$预设属性默认值列表 = {
   from_anchor_size: {
     name: "from_anchor_size",
     label: "起点标记大小",
-    cardDefault: 30,
-    linkDefault: 30,
+    cardDefault: 10,
+    linkDefault: 10,
   },
   to_anchor_size: {
     name: "to_anchor_size",
     label: "终点标记大小",
-    cardDefault: 30,
-    linkDefault: 30,
+    cardDefault: 10,
+    linkDefault: 10,
   },
   mid_anchor_size: {
     name: "mid_anchor_size",
     label: "中间标记大小",
-    cardDefault: 30,
-    linkDefault: 30,
+    cardDefault: 10,
+    linkDefault: 10,
   },
 
   from_anchor_image: {
@@ -414,13 +416,13 @@ Vue.prototype.$卡片属性默认值 = {
   fixed_anchor: false,
   borderStyle: "solid",
 
-  path_width: 5 / 0.382,
-  path_type: "直线",
+  path_width: 2,
+  path_type: "折线",
   path_color: "black",
 
-  from_anchor_size: 30,
-  to_anchor_size: 30,
-  mid_anchor_size: 30,
+  from_anchor_size:10 ,
+  to_anchor_size: 10,
+  mid_anchor_size: 10,
 
   from_anchor_image: "./PrivateSrc/icon/arrow1.png",
   to_anchor_image: "./PrivateSrc/icon/arrow1.png",

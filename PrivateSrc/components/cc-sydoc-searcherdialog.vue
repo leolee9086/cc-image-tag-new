@@ -4,6 +4,7 @@
       :思源伺服ip="思源伺服ip"
       :apitoken="''"
       :待发送数据="待发送数据"
+      @change="显示发送对话框 = false"
     ></cc-sydoc-searcher>
   </el-dialog>
 </template>

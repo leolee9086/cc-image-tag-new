@@ -72,19 +72,19 @@ module.exports = {
 
       起始节点图片: "./PrivateSrc/icon/arrow1.png",
       起始节点图片元素: null,
-      起点标记大小: 30,
+      起点标记大小: 10,
       起点标记自动旋转: true,
       起始标记角度偏移: 0,
 
       结束节点图片元素: null,
       结束节点图片: "./PrivateSrc/icon/arrow1.png",
-      终点标记大小: 30,
+      终点标记大小: 10,
       终点标记自动旋转: true,
       结束标记角度偏移: 90,
 
       中间节点图片元素: null,
       中间节点图片: "./PrivateSrc/icon/arrow1.png",
-      中间标记大小: 30,
+      中间标记大小: 10,
       中间标记自动旋转: true,
       中间标记角度偏移: 0,
     };

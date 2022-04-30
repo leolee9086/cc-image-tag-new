@@ -301,6 +301,7 @@ module.exports = {
       临时点数组: [],
       保存计数: 0,
       强制隐藏: false,
+      上次保存时间: 0,
     };
   },
   beforeMount() {
@@ -404,11 +405,7 @@ module.exports = {
           if (val.attrs.def_block) {
             this.修改编辑器();
           }
-          this.保存计数 = this.保存计数 + 1;
-          if (this.保存计数 >= 3) {
-            this.保存数据();
-            this.保存计数 = 0;
-          }
+          this.保存数据();
         }
 
         this.$refs.cardname ? this.$refs.cardname.focus() : null;
@@ -594,7 +591,7 @@ module.exports = {
 
     打开块id: function (id, 主界面) {
       let that = this;
-      console.log("测试", 主界面);
+      //  console.log("测试", 主界面);
       if (!主界面) {
         setTimeout(that.修改编辑器, 100);
         return null;
@@ -603,7 +600,7 @@ module.exports = {
       let target1 = 主界面.querySelector(
         ".protyle-wysiwyg div[data-node-id] div[contenteditable]"
       );
-      console.log(target, target1);
+      //  console.log(target, target1);
       if (target && target1) {
         let 虚拟链接 = 主界面.createElement("span");
         虚拟链接.setAttribute("data-type", "block-ref");
@@ -856,10 +853,7 @@ module.exports = {
     dragging: function (x, y) {
       this.计算坐标(x, y);
       this.保存计数 = this.保存计数 + 1;
-      if (this.保存计数 >= 10) {
-        this.保存数据();
-        this.保存计数 = 0;
-      }
+
       this.$事件总线.$emit("移动卡片", this.对象数据);
     },
     dragstop(x, y) {
@@ -903,8 +897,13 @@ module.exports = {
       $event ? (this.对象数据.name = $event) : null;
 
       this.对象数据 = this.$更新数据时间戳(this.对象数据);
-      this.$事件总线.$emit("保存数据", this.对象数据);
-      this.激活 ? this.$事件总线.$emit("当前对象改变", this.对象数据) : null;
+      let 保存时间差 = parseInt(this.对象数据.updated) - parseInt(this.上次保存时间);
+      if (保存时间差 > 50) {
+        this.$事件总线.$emit("保存数据", this.对象数据);
+        this.上次保存时间 = parseInt(this.对象数据.updated);
+
+        this.激活 ? this.$事件总线.$emit("当前对象改变", this.对象数据) : null;
+      }
     },
     转化为卡片: function () {
       let 新数据 = JSON.parse(JSON.stringify(this.对象数据));
