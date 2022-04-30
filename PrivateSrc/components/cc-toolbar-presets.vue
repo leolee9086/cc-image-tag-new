@@ -42,6 +42,9 @@ module.exports = {
       this.正在新建预设 = true;
     },
     新建预设(预设名) {
+      if (!预设名) {
+        return null;
+      }
       let 预设类型 = this.当前对象数据.type;
       let 新预设数据 = JSON.parse(JSON.stringify(this.当前对象数据.attrs));
       新预设数据.def_block = "byref";

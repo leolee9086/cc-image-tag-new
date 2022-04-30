@@ -370,7 +370,7 @@ module.exports = {
     },
 
     对象数据: {
-      handler: async function (val, oldval) {
+      handler: function (val, oldval) {
         if (!val.attrs) {
           return null;
         }
@@ -402,9 +402,13 @@ module.exports = {
         ) {
           console.log("保存数据");
           if (val.attrs.def_block) {
-            await this.修改编辑器();
+            this.修改编辑器();
           }
-          this.保存数据();
+          this.保存计数 = this.保存计数 + 1;
+          if (this.保存计数 >= 3) {
+            this.保存数据();
+            this.保存计数 = 0;
+          }
         }
 
         this.$refs.cardname ? this.$refs.cardname.focus() : null;
@@ -846,6 +850,7 @@ module.exports = {
       this.对象数据.attrs.left = left;
       this.对象数据.attrs.offsetx = offsetx;
       this.对象数据.attrs.offsety = offsety;
+
       this.对象数据 = this.$更新数据时间戳(this.对象数据);
     },
     dragging: function (x, y) {
@@ -892,7 +897,7 @@ module.exports = {
       }
       this.保存数据();
     },
-    保存数据: async function ($event) {
+    保存数据: function ($event) {
       //console.log(this.对象数据);
 
       $event ? (this.对象数据.name = $event) : null;

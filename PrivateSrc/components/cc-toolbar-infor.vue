@@ -388,7 +388,7 @@ module.exports = {
       if ($event && $event.attrs && !$event.attrsproxy) {
         if (
           $event == this.当前对象数据.id &&
-          $event.updated >= this.当前对象数据.updated
+          $event.updated > this.当前对象数据.updated
         ) {
           !$event.attrs.trashed ? (this.当前对象数据 = $event) : null;
         }
