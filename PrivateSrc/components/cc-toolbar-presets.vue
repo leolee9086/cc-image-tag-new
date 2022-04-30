@@ -52,10 +52,14 @@ module.exports = {
   watch: {
     当前对象数据: {
       handler(val) {
+        if (val) {
+          return;
+        }
         this.当前预设名 = val.subtype;
         this.预设列表 = val.type == "card" ? this.卡片预设列表 : this.链接预设列表;
       },
       deep: true,
+      immediate: true,
     },
     当前预设名: {
       async handler(val) {

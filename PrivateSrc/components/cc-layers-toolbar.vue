@@ -82,12 +82,18 @@
       :链接数据id="当前链接数据id"
     ></cc-toolbar-infor>
 
-    <cc-toolbar-history :显示="当前面板名 == '历史'"> </cc-toolbar-history>
-    <cc-toolbar-link :显示="当前面板名 == '图上连接'"> </cc-toolbar-link>
-    <cc-toolbar-ref :显示="当前面板名 == '连接'"> </cc-toolbar-ref>
-    <cc-toolbar-set :显示="当前面板名 == '画板设置'"> </cc-toolbar-set>
-    <cc-toolbar-presets :显示="当前面板名 == '预设'"> </cc-toolbar-presets>
-    <cc-toolbar-boards :显示="当前面板名 == '全局设置'"> </cc-toolbar-boards>
+    <cc-toolbar-history v-if="当前面板名 == '历史'" :显示="当前面板名 == '历史'">
+    </cc-toolbar-history>
+    <cc-toolbar-link v-if="当前面板名 == '图上连接'" :显示="当前面板名 == '图上连接'">
+    </cc-toolbar-link>
+    <cc-toolbar-ref v-if="当前面板名 == '连接'" :显示="当前面板名 == '连接'">
+    </cc-toolbar-ref>
+    <cc-toolbar-set v-if="当前面板名 == '画板设置'" :显示="当前面板名 == '画板设置'">
+    </cc-toolbar-set>
+    <cc-toolbar-presets v-if="当前面板名 == '预设'" :显示="当前面板名 == '预设'">
+    </cc-toolbar-presets>
+    <cc-toolbar-boards v-if="当前面板名 == '全局设置'" :显示="当前面板名 == '全局设置'">
+    </cc-toolbar-boards>
     <cc-toolbar-view></cc-toolbar-view>
     <cc-sydoc-searcherdialog
       :思源伺服ip="思源伺服ip"

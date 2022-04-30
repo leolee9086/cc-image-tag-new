@@ -454,14 +454,14 @@ Vue.prototype.$填充默认值 = function (数据) {
     try {
       return await this.$数据库[预设表名].toArray();
     } catch (e) {
-      //console.log(e)
+      console.log(e)
     }
   };
 
   Vue.prototype.$获取预设 = async function (预设表名, 预设名) {
     let 预设数组 = await this.$数据库[预设表名]
       .filter((data) => {
-        if (data.name == this.预设名) {
+        if (data.name == 预设名) {
           return true;
         }
       })
@@ -655,3 +655,29 @@ attrs:'${JSON.stringify(对象数据.attrs)}'
       return yaml;
     }
 
+    Vue.prototype.$内置属性名对照表=[
+      { name: "color", label: "文字颜色", type: "color" },
+      { name: "borderColor", label: "边框颜色", type: "color" },
+      { name: "backgroundColor", label: "背景颜色", type: "color" },
+      { name: "def_block", label: "定义块", type: "color" },
+      { name: "borderWidth", label: "边框宽度", type: "color" },
+      { name: "fixed_anchor", label: "固定锚点方向", type: "color" },
+      { name: "borderStyle", label: "边框样式", type: "color" },
+      { name: "path_width", label: "路径宽度", type: "color" },
+      { name: "path_type", label: "途径样式", type: "color" },
+      { name: "path_color", label: "路径颜色", type: "color" },
+      { name: "from_anchor_size", label: "起点大小", type: "color" },
+      { name: "from_anchor_image", label: "起点标记", type: "color" },
+      { name: "from_anchor_rotate", label: "起点旋转", type: "color" },
+      { name: "from_anchor_rotate_offset", label: "起点偏角", type: "color" },
+
+      { name: "to_anchor_size", label: "终点大小", type: "color" },
+      { name: "to_anchor_image", label: "终点标记", type: "color" },
+      { name: "to_anchor_rotate", label: "终点旋转", type: "color" },
+      { name: "to_anchor_rotate_offset", label: "终点偏角", type: "color" },
+
+      { name: "mid_anchor_size", label: "中点大小", type: "color" },
+      { name: "mid_anchor_image", label: "中点标记", type: "color" },
+      { name: "mid_anchor_rotate", label: "中点旋转", type: "color" },
+      { name: "mid_anchor_rotate_offset", label: "终点偏角", type: "color" },
+    ]

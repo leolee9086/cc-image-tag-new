@@ -77,6 +77,7 @@
           </el-col>
           <el-col :span="9">
             <cc-presets-selector
+              v-if="对象数据.id"
               :数据id="对象数据.id || ''"
               :数据表名="对象数据.type + 's' || ''"
               v-model="当前预设名"
@@ -120,10 +121,7 @@ module.exports = {
   },
   mounted() {
     this.$事件总线.$on("保存数据", ($event) => this.获取当前元素数据($event));
-    this.$事件总线.$on("保存数据", ($event) => this.获取当前元素数据($event));
-    this.$事件总线.$on("激活数据", ($event) => this.获取当前元素数据($event));
-    this.$事件总线.$on("激活数据", ($event) => this.获取当前元素数据($event));
-    this.$事件总线.$on("激活数据", ($event) => this.获取当前元素数据($event));
+    this.$事件总线.$on("激活数据", ($event) => (this.对象数据 = $event));
   },
   watch: {
     使用svg渲染: function (val) {
@@ -188,7 +186,15 @@ module.exports = {
     },
 
     获取当前元素数据: function ($event) {
-      if ($event && $event.attrs) {
+      if ($event.attrsproxy) {
+        return null;
+      }
+      if (
+        $event &&
+        $event.attrs &&
+        $event.id == this.对象数据.id &&
+        $event.updated >= this.对象数据.updated
+      ) {
         this.对象数据 = $event || this.对象数据;
         this.属性对象 = this.对象数据.attrs;
         this.当前对象名称 = this.对象数据.name;

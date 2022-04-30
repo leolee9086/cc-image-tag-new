@@ -137,12 +137,26 @@ module.exports = {
       liveQuery(() => this.$数据库.cards.toArray()).subscribe({
         next: async (result) => {
           this.卡片数组 = result;
+          this.$当前窗口状态.卡片数组 = this.卡片数组;
           this.$当前窗口状态.当前窗口状态提示 = "同步数据于:" + this.$生成毫秒时间戳();
         },
       });
       liveQuery(() => this.$数据库.links.toArray()).subscribe({
         next: async (result) => {
           this.链接数组 = result;
+          this.$当前窗口状态.链接数据 = this.链接数组;
+          this.$当前窗口状态.当前窗口状态提示 = "同步数据于:" + this.$生成毫秒时间戳();
+        },
+      });
+      liveQuery(() => this.$数据库.linkpresets.toArray()).subscribe({
+        next: async (result) => {
+          this.$当前窗口状态.链接预设数据 = result;
+          this.$当前窗口状态.当前窗口状态提示 = "同步数据于:" + this.$生成毫秒时间戳();
+        },
+      });
+      liveQuery(() => this.$数据库.cardpresets.toArray()).subscribe({
+        next: async (result) => {
+          this.$当前窗口状态.卡片预设数据 = result;
           this.$当前窗口状态.当前窗口状态提示 = "同步数据于:" + this.$生成毫秒时间戳();
         },
       });
@@ -285,7 +299,7 @@ module.exports = {
       }
     },
     开始拖拽($event) {
-      console.log($event);
+      // console.log($event);
       if (!$event.target.classList.contains("layer")) {
         return null;
       }
@@ -293,7 +307,7 @@ module.exports = {
       $event.button == 0 ? (this.左键拖拽中 = true) : null;
     },
     结束拖拽($event) {
-      console.log($event);
+      // console.log($event);
       this.光标形状 = "auto";
 
       this.左键拖拽中 = false;

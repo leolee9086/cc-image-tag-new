@@ -314,7 +314,15 @@ module.exports = {
           this.变更预设();
         }
         this.当前数据类型 = val.type;
-        this.属性对象 = val.attrs || this.属性对象;
+        if (val.attrs) {
+          for (属性名 in this.$预设属性默认值列表) {
+            console.log(属性名);
+            this.属性对象[属性名] = val.attrs[属性名];
+          }
+        }
+
+        this.属性对象.id = val.id;
+        this.属性对象 = JSON.parse(JSON.stringify(this.属性对象));
       },
       deep: true,
     },
@@ -332,13 +340,26 @@ module.exports = {
     },
     属性对象: {
       handler: function (val, oldval) {
-        //console.log(val.id, oldval.id);
+        console.log(val, oldval);
         let flag = false;
         if (val.id == oldval.id) {
           flag = true;
+          let temp = {};
+          temp.attrsproxy = val;
+          temp.id = val.id;
+          temp.type = this.当前数据类型;
+          this.$事件总线.$emit("保存数据", temp);
           this.变更预设();
         }
       },
+      deep: true,
+    },
+    显示: {
+      handler: async function (val, oldval) {
+        //console.log(val.id, oldval.id);
+        this.获取预设();
+      },
+
       deep: true,
     },
   },
@@ -364,10 +385,10 @@ module.exports = {
       this.$事件总线.$on("保存数据", ($event) => this.判断id($event));
     },
     判断id($event) {
-      if ($event && $event.attrs) {
+      if ($event && $event.attrs && !$event.attrsproxy) {
         if (
           $event == this.当前对象数据.id &&
-          $event.updated > this.当前对象数据.updated
+          $event.updated >= this.当前对象数据.updated
         ) {
           !$event.attrs.trashed ? (this.当前对象数据 = $event) : null;
         }
@@ -386,91 +407,24 @@ module.exports = {
     },
 
     变更预设: function () {
-      for (属性名 in this.预设.attrs) {
+      console.log(this.预设);
+
+      this.$内置属性名对照表.forEach((element) => {
+        let 属性名 = element["name"];
         if (this.预设.attrs[属性名] === "byref") {
+          console.log(属性名);
           return;
         }
+        console.log(属性名);
         this.预设.type = this.当前对象数据.type;
         this.预设.attrs[属性名] = this.属性对象[属性名];
+        console.log(this.属性对象);
+
+        console.log(this.预设);
         this.$事件总线.$emit("变更预设值", 属性名, this.预设);
-      }
+      });
     },
 
-    设为实例值: async function (属性名, 预设项目) {
-      预设项目.attrs[属性名] = "byref";
-      if (属性名.indexOf("to") >= 0) {
-        预设项目.attrs.to_anchor_rotate = "byref";
-        预设项目.attrs.to_anchor_image = "byref";
-        预设项目.attrs.to_anchor_size = "byref";
-        预设项目.attrs.to_anchor_rotate_offset = "byref";
-      }
-      if (属性名.indexOf("from") >= 0) {
-        预设项目.attrs.from_anchor_rotate = "byref";
-        预设项目.attrs.from_anchor_image = "byref";
-        预设项目.attrs.from_anchor_size = "byref";
-        预设项目.attrs.from_anchor_rotate_offset = "byref";
-      }
-      if (属性名.indexOf("mid") >= 0) {
-        预设项目.attrs.mid_anchor_rotate = "byref";
-        预设项目.attrs.mid_anchor_image = "byref";
-        预设项目.attrs.mid_anchor_size = "byref";
-        预设项目.attrs.mid_anchor_rotate_offset = "byref";
-      }
-      if (属性名.indexOf("path") >= 0) {
-        预设项目.attrs.path_width = "byref";
-        预设项目.attrs.path_type = "byref";
-        预设项目.attrs.path_color = "byref";
-      }
-      if (this.当前对象数据.type == "link") {
-        await this.$数据库.linkpresets.put(预设项目);
-        // console.log(this.预设列表);
-      }
-      if (this.当前对象数据.type == "card") {
-        //  console.log(this.预设列表);
-
-        await this.$数据库.cardpresets.put(预设项目);
-      }
-      await this.获取预设();
-    },
-    设为预设值: async function (属性名, 预设项目) {
-      预设项目.attrs[属性名] = undefined;
-      if (属性名.indexOf("to") >= 0) {
-        预设项目.attrs.to_anchor_rotate = undefined;
-        预设项目.attrs.to_anchor_image = undefined;
-        预设项目.attrs.to_anchor_size = undefined;
-        预设项目.attrs.to_anchor_rotate_offset = undefined;
-      }
-      if (属性名.indexOf("from") >= 0) {
-        预设项目.attrs.from_anchor_rotate = undefined;
-        预设项目.attrs.from_anchor_image = undefined;
-        预设项目.attrs.from_anchor_size = undefined;
-        预设项目.attrs.from_anchor_rotate_offset = undefined;
-      }
-      if (属性名.indexOf("mid") >= 0) {
-        预设项目.attrs.mid_anchor_rotate = undefined;
-        预设项目.attrs.mid_anchor_image = undefined;
-        预设项目.attrs.mid_anchor_size = undefined;
-        预设项目.attrs.mid_anchor_rotate_offset = undefined;
-      }
-      if (属性名.indexOf("path") >= 0) {
-        预设项目.attrs.path_width = undefined;
-        预设项目.attrs.path_type = undefined;
-        预设项目.attrs.path_color = undefined;
-      }
-      if (this.当前对象数据.type == "link") {
-        await this.$数据库.linkpresets.put(预设项目);
-        //console.log(this.预设列表);
-      }
-      if (this.当前对象数据.type == "card") {
-        // console.log(this.预设列表);
-
-        await this.$数据库.cardpresets.put(预设项目);
-      }
-      await this.获取预设();
-      let 预设名 = this.预设名 + "";
-      this.预设名 = "";
-      this.预设名 = 预设名;
-    },
     获取预设: async function (flag) {
       if (!this.当前对象数据.type) {
         return null;
@@ -478,7 +432,11 @@ module.exports = {
       let 预设表名 = this.当前对象数据.type + "presets";
       this.预设列表 = await this.$获取预设表(预设表名);
       if (this.预设名) {
-        this.预设 = (await this.$获取预设(预设表名, this.预设名)) || this.预设 || {};
+        this.预设 =
+          JSON.parse(JSON.stringify(await this.$获取预设(预设表名, this.预设名))) ||
+          this.预设 ||
+          {};
+        console.log(this.预设);
       }
     },
     新建预设: async function () {

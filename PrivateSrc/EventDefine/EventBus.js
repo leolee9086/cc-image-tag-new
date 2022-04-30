@@ -125,7 +125,6 @@ const 事务列表 = {
     if (传入数据.attrsproxy) {
       this.$数据库[数据表名].get(传入数据.id).then((原始数据) => {
         if (原始数据) {
-          原始数据.subtype = 传入数据.subtype || "属于";
           for (属性名 in 传入数据.attrsproxy) {
             原始数据["attrs"][属性名] = 传入数据["attrsproxy"][属性名];
           }
@@ -472,12 +471,14 @@ const 事务列表 = {
     
   },
   变更预设值: function (属性名, 预设项目) {
+    console.log(属性名,预设项目)
     if (!预设项目) {
       return null;
     }
     if (!预设项目.type) {
       return null;
     }
+    console.log(属性名,预设项目)
     let 预设表名 = 预设项目.type + "presets";
     let 数据表名 = 预设项目.type + "s";
     let 预设名 = 预设项目.name;
@@ -496,7 +497,7 @@ const 事务列表 = {
               预设项目.attrs[属性名] && 预设项目.attrs[属性名] !== "byref"
                 ? 预设项目.attrs[属性名]
                 : value.attrs[属性名];
-            this.$事件总线.$emit("保存数据", true);
+            this.$事件总线.$emit("保存数据", value);
           })
       );
     }
