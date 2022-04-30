@@ -342,6 +342,7 @@ module.exports = {
       handler: function (val, oldval) {
         console.log(val, oldval);
         let flag = false;
+        
         if (val.id == oldval.id) {
           flag = true;
           let temp = {};
