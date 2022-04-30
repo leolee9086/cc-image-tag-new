@@ -1,0 +1,20 @@
+[
+
+        {"name":"em","tips":"相对当前元素"},
+        {"name":"ex","tips":"相对小写x"},
+        {"name":"ch","tips":"指定数字0宽度"},
+        {"name":"rem","tips":"相对根元素"},
+        {"name":"vw","tips":"相对窗口宽度"},
+        {"name":"vh","tips":"相对窗口高度"},
+        {"name":"vmin","tips":"相对窗口高宽中较小值"},
+        {"name":"vmax","tips":"相对窗口高度中较大值"},
+        {"name":"%","tips":"百分比"},
+        {"name":"cm","tips":"厘米"},
+        {"name":"mm","tips":"毫米"},
+        {"name":"in","tips":"英寸"},
+        {"name":"px","tips":"像素"},
+        {"name":"pt","tips":"磅"},
+        {"name":"pc","tips":"派卡"},
+        {"name":"none","tips":"无单位"}
+            
+]
