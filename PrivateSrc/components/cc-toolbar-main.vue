@@ -13,7 +13,7 @@
       justify-content: center;
     "
   >
-    <el-row>
+    <el-row type="flex" align="middle">
       <el-col :span="21">
         <el-col :span="8">
           <el-popover trigger="click">
@@ -86,12 +86,22 @@
         </el-row>
       </el-col>
       <el-col :span="3">
-        <el-button
-          circle
-          @click="重新加载窗口()"
-          icon="el-icon-refresh"
-          aria-label="重新加载窗口"
-        ></el-button>
+        <div>
+          <el-button
+            circle
+            size="mini"
+            @click="重新加载窗口()"
+            icon="el-icon-refresh"
+            aria-label="重新加载窗口"
+          ></el-button>
+          <el-button
+            circle
+            size="mini"
+            @click="创建新画板()"
+            icon="el-icon-plus"
+            aria-label="创建新的画板"
+          ></el-button>
+        </div>
       </el-col>
     </el-row>
   </div>
@@ -160,6 +170,12 @@ module.exports = {
     },
   },
   methods: {
+    创建新画板: function () {
+      let id = Lute.NewNodeID();
+      window.location.reload(true);
+      let 链接 = `http://${this.思源伺服ip}/widgets/cc-image-tag-new/?baseid=${id}`;
+      this.$窗口内打开超链接(链接);
+    },
     重新加载窗口: function () {
       window.location.reload(true);
     },

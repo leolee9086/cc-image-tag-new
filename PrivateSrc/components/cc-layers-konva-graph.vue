@@ -55,13 +55,15 @@ module.exports = {
       $event ? (this.当前数据 = $event) : null
     );
     this.$事件总线.$on("激活数据", ($event) =>
-      $event ? (this.当前数据 = $event) : null
+      $event && !$event.attrsproxy ? (this.当前数据 = $event) : null
     );
     this.$事件总线.$on("缩放卡片", ($event) =>
-      $event ? (this.当前数据 = $event) : null
+      $event && !$event.attrsproxy ? (this.当前数据 = $event) : null
     );
     this.$事件总线.$on("保存数据", ($event) =>
-      $event.id == this.当前数据.id ? (this.当前数据 = $event) : null
+      $event.id == this.当前数据.id && !$event.attrsproxy
+        ? (this.当前数据 = $event)
+        : null
     );
   },
 

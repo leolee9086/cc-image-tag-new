@@ -1,6 +1,7 @@
 <template>
   <vue-draggable-resizable
     v-if="!hide"
+    v-show="vision"
     ref="container"
     @click="鼠标点击($event)"
     :resizable="显示控制柄"
@@ -302,6 +303,7 @@ module.exports = {
       保存计数: 0,
       强制隐藏: false,
       上次保存时间: 0,
+      vision: true,
     };
   },
   beforeMount() {
@@ -326,6 +328,12 @@ module.exports = {
     this.$事件总线.$on("保存数据", (event) => this.判断id(event));
     this.$事件总线.$on("删除数据", (event) => this.判断id(event));
     this.$事件总线.$on("接收数据", (event) => this.判断id(event));
+    this.$事件总线.$on("显示卡片", (event) => {
+      if (event.id == this.对象数据.id) {
+        this.对象数据.attrs.hidetag = false;
+        this.保存数据();
+      }
+    });
   },
 
   watch: {
@@ -946,11 +954,11 @@ module.exports = {
         this.hide = false;
       }
       if (对象数据.type == "link" && 对象数据.attrs.hidetag) {
-        this.hide = true;
+        this.vision = false;
       }
       if (对象数据.type == "link" && !对象数据.attrs.hidetag) {
-        this.hide = false;
-        this.hide = !this.$当前窗口状态.show_tag_by_default;
+        this.vision = true;
+        this.vision = this.$当前窗口状态.show_tag_by_default;
         this.$数据库.links
           .filter((data) => {
             if (data.attrs.from_id == 对象数据.id || data.attrs.to_id == 对象数据.id) {
