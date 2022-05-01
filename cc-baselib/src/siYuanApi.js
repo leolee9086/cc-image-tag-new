@@ -308,6 +308,11 @@ async function 插入前置子块(思源伺服ip,apitoken,data){
     let url = 'http://'+思源伺服ip+'/api/block/prependBlock'
     return 向思源请求数据(url,apitoken,data)
 }
+async function 获取集市挂件数据(思源伺服ip,apitoken,data){
+    let url = 'http://'+思源伺服ip+'/api/bazaar/getBazaarWidget'
+    return 向思源请求数据(url,apitoken,data)
+
+}
 async function 生成文档树(思源伺服ip,apitoken){
     let sql = 'select * from blocks where type ="d"'
     let 全文档数据 =  await 以sql向思源请求块数据(思源伺服ip,apitoken,sql)

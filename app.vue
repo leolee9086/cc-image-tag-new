@@ -63,6 +63,7 @@ module.exports = {
     if (this.$挂件模式()) {
       this.挂件自身元素 = self.frameElement.parentElement.parentElement;
     }
+    this.检查更新();
     this.开始获取数据();
     this.获取工作空间();
   },
@@ -99,6 +100,22 @@ module.exports = {
   },
 
   methods: {
+    检查更新: async function () {
+      let url1 = "widget.json";
+      let 本地版本信息 = await axios.get(url1);
+      console.log(本地版本信息.data);
+      本地版本信息 = 本地版本信息.data;
+      let 集市挂件数据 = await 获取集市挂件数据(window.location.host, "", {});
+      console.log(集市挂件数据.data);
+
+      let 集市版本信息 = {};
+      集市挂件数据.data.packages.forEach((package) => {
+        package.name == "cc-image-tag-new" ? (集市版本信息 = package) : null;
+      });
+      if (集市版本信息.version !== 本地版本信息.version) {
+        alert("有新版本发布,请检查集市更新");
+      }
+    },
     获取工作空间: async function () {
       if (window.isSecureContext) {
         let 句柄对象 = await this.$画板元数据库.workspace.get(00000);
