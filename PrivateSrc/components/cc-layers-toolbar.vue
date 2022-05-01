@@ -67,6 +67,14 @@
           aria-label="展开|关闭面板"
         ></span>
       </div>
+      <div class="drawer-button">
+        <span
+          @click="显示帮助 = true"
+          circle
+          class="el-icon-question"
+          aria-label="展开|关闭面板"
+        ></span>
+      </div>
     </div>
     <cc-toolbar-main
       :思源伺服ip="思源伺服ip"
@@ -93,6 +101,19 @@
       :思源伺服ip="思源伺服ip"
       :apitoken="''"
     ></cc-sydoc-searcherdialog>
+    <el-dialog title="帮助" :visible.sync="显示帮助" width="80%" height="80%" top="10">
+      <iframe
+        ref="siyuanEditor"
+        :src="`/widgets/cc-image-tag-new/?baseid=20131111000000-lpanybz`"
+        data-src=""
+        border="0"
+        :fullscreen="true"
+        frameborder="no"
+        framespacing="0"
+        allowfullscreen="true"
+        :style="`margin: 0%; padding: 0%; width: 100%; height: 90vh;`"
+      ></iframe>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -101,6 +122,7 @@ module.exports = {
   props: ["思源伺服ip", "卡片数组", "链接数组"],
   data() {
     return {
+      显示帮助: false,
       窗口状态数组: [],
       操作历史数组: [],
       当前卡片数据id: "",

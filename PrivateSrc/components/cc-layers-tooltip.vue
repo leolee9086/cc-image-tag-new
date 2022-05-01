@@ -35,6 +35,7 @@ module.exports = {
   methods: {
     async 读取提示($event) {
       let target = $event.target;
+      this.$当前窗口状态.当前元素类 = target.className;
       if (target.getAttribute("aria-label")) {
         this.当前提示内容 = target.getAttribute("aria-label");
       } else if (target.parentElement) {

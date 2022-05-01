@@ -89,18 +89,7 @@
       v-model="折叠时显示类别"
       active-text="折叠时显示类别"
     ></el-switch>
-    <el-switch
-      area-label="折叠时是否显示名称"
-      size="mini"
-      v-model="是否默认优先显示markdown"
-      active-text="优先显示markdown"
-    ></el-switch>
-    <el-switch
-      area-label="是否某认以思源markdown覆盖卡片markdown"
-      size="mini"
-      v-model="是否默认以思源块内容覆盖卡片markdown"
-      active-text="以内容块覆盖卡片markdown"
-    ></el-switch>
+
     <el-switch
       area-label="链接是否默认显示标记"
       size="mini"

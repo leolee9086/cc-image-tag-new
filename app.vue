@@ -192,20 +192,21 @@ module.exports = {
     从思源块加载数据: async function (id) {
       let that = this;
       let filepath = `assets/data-${id}.cccards`;
-      if (id == "20131111000000-lpanybz") {
-        filepath = "./widgets/cc-image-tag-new/help.cccards";
-        this.$数据库.cards.clear();
-        this.$数据库.links.clear();
-        this.$数据库.metadata.clear();
-        this.$数据库.cardpresets.clear();
-        this.$数据库.linkpresets.clear();
-      }
+
       if (this.$挂件模式()) {
         this.挂件自身元素 = window.frameElement.parentElement.parentElement;
         filepath =
           this.挂件自身元素.getAttribute("data-assets") ||
           this.挂件自身元素.getAttribute("custom-data-assets") ||
           `assets/data-${this.挂件自身元素.getAttribute("data-node-id")}.cccards`;
+      }
+      if (id == "20131111000000-lpanybz" || !id) {
+        filepath = "./widgets/cc-image-tag-new/help.cccards";
+        this.$数据库.cards.clear();
+        this.$数据库.links.clear();
+        this.$数据库.metadata.clear();
+        this.$数据库.cardpresets.clear();
+        this.$数据库.linkpresets.clear();
       }
       let url = this.思源伺服ip
         ? `http://${this.思源伺服ip}/${filepath}`
@@ -341,6 +342,7 @@ module.exports = {
           }
         }
       }
+
       this.当前鼠标坐标.x = $event.clientX;
       this.当前鼠标坐标.y = $event.clientY;
       this.保存计数器 = this.保存计数器 + 1;

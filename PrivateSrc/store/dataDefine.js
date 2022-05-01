@@ -5,9 +5,7 @@ let url参数 = Vue.prototype.$解析url(window.location.href);
 if (!Vue.prototype.$挂件模式()) {
   Vue.prototype.$baseid = url参数.baseid || "20131111000000-lpanybz";
 } else {
-  Vue.prototype.$baseid = Vue.prototype
-    .$挂件自身元素()
-    .getAttribute("data-node-id");
+  Vue.prototype.$baseid = Vue.prototype.$挂件自身元素().getAttribute("data-node-id")?Vue.prototype.$挂件自身元素().getAttribute("data-node-id"):"20131111000000-lpanybz";
 }
 const 数据库 = new Dexie(Vue.prototype.$baseid);
 数据库.version(3).stores({

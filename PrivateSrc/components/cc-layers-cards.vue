@@ -15,7 +15,7 @@
       class="cardscontainer layer"
       @dblclick="双击画板($event)"
       @drop="拖放($event)"
-      v-on:paste="黏贴内容($event)"
+      @paste="黏贴内容($event)"
       @click="点击画板($event)"
       @mousedown="按下鼠标($event)"
       :style="` 
@@ -205,10 +205,9 @@ module.exports = {
         : null;
     },
     黏贴内容: function ($event) {
-      if ($event.target == $event.curentarget) {
+      console.log(this.$当前窗口状态.当前元素类);
+      if (this.$当前窗口状态.当前元素类 == "cardscontainer layer") {
         let clipboardData = $event.clipboardData;
-
-        //console.log(event);
 
         if (!(clipboardData && clipboardData.items)) {
           return;
@@ -252,8 +251,9 @@ module.exports = {
         空标签.markdown = 剪贴板数据;
       }
 
-      //  //console.log(空标签);
+      console.log(空标签);
       await this.$数据库.cards.put(空标签);
+      this.$事件总线.$emit("保存数据", 空标签);
     },
     双击画板: function ($event) {
       //console.log($event.target);

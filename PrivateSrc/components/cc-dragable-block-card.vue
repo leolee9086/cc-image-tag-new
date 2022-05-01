@@ -439,6 +439,9 @@ module.exports = {
       if (this.$当前窗口状态.current_workspace_handle) {
         this.更新卡片markdown();
       }
+      if (this.对象数据.attrs.def_block) {
+        this.修改编辑器();
+      }
       if (val) {
         //    console.log("hhhh", this.对象数据);
         this.$事件总线.$emit("激活数据", this.对象数据);
@@ -704,6 +707,7 @@ module.exports = {
       let 思源markdown = lute.BlockDOM2Md(this.思源HTML);
       思源markdown = this.去除ial(思源markdown);
       this.markdown = 思源markdown;
+      console.log(this.markdown);
     },
     去除ial(markdown) {
       markdown = markdown.replace(/\n\{\:(.*?)\}\n/g, "");
@@ -752,19 +756,24 @@ module.exports = {
       if (!$event) {
         return null;
       }
+      if ($event.id !== this.对象数据.id) {
+        return null;
+      }
+      if ($event.id == this.对象数据.id && $event.attrsproxy) {
+        let 旧数据 = JSON.parse(JSON.stringify(this.对象数据 || {}));
 
+        for (属性名 in $event.attrsproxy) {
+          旧数据["attrs"][属性名] = $event["attrsproxy"][属性名];
+        }
+        this.对象数据 = 旧数据;
+      }
       if (
         $event.id == this.对象数据.id &&
         parseInt($event.updated) >= parseInt(this.对象数据.updated)
       ) {
         let 旧数据 = JSON.parse(JSON.stringify(this.对象数据 || {}));
         let 新数据 = JSON.parse(JSON.stringify($event || {}));
-        if ($event.attrsproxy) {
-          for (属性名 in 传入数据.attrsproxy) {
-            旧数据["attrs"][属性名] = 传入数据["attrsproxy"][属性名];
-          }
-          this.对象数据 = 旧数据;
-        }
+
         旧数据.updated = "";
         新数据.updated = "";
         if (旧数据 !== 新数据 && !新数据.attrs.trashed && !旧数据.trashed) {
