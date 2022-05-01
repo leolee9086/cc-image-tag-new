@@ -29,6 +29,8 @@ module.exports = {
     this.$事件总线.$on("保存卡片", (event) => this.判断id(event));
     this.$事件总线.$on("保存链接", (event) => this.判断id(event));
     this.$事件总线.$on("窗口缩放", (event) => (this.缩放倍数 = event));
+    this.$事件总线.$on("接收数据", (event) => this.判断id(event));
+
     this.链接.attrs.from_id
       ? (this.代理起始标记 =
           (await this.$数据库.cards.get(this.链接.attrs.from_id)) ||

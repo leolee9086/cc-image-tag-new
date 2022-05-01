@@ -401,11 +401,10 @@ module.exports = {
           JSON.stringify(拷贝对象) !== JSON.stringify(拷贝旧对象) &&
           !val.attrs.trashed
         ) {
-          console.log("保存数据");
+          console.log("保存数据", val.id);
           if (val.attrs.def_block) {
             this.修改编辑器();
           }
-          this.保存数据();
         }
 
         this.$refs.cardname ? this.$refs.cardname.focus() : null;

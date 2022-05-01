@@ -33,6 +33,8 @@ module.exports = {
     this.监听 = true;
     this.$事件总线.$on("保存卡片", (event) => this.判断id(event));
     this.$事件总线.$on("保存链接", (event) => this.判断id(event));
+    this.$事件总线.$on("接收数据", (event) => this.判断id(event));
+
     this.计算路径();
   },
   beforeDestroy() {
@@ -87,7 +89,7 @@ module.exports = {
   },
   methods: {
     判断id: async function ($event) {
-      //console.log($event);
+      console.log($event);
       if ($event.attrsproxy) {
         return null;
       }
