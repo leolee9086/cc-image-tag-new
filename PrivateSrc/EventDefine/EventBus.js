@@ -118,28 +118,14 @@ const 事务列表 = {
     if (!传入数据.type){
       return null
     }
+    if (传入数据.attrsproxy){
+      return null
+    }
     // 传入数据 = this.$更新数据时间戳(传入数据);
-   
+    
     let 数据表名 = 传入数据.type + "s";
     ////console.log(数据表名)
-    if (传入数据.attrsproxy) {
-      this.$数据库[数据表名].get(传入数据.id).then((原始数据) => {
-        if (原始数据) {
-          for (属性名 in 传入数据.attrsproxy) {
-            原始数据["attrs"][属性名] = 传入数据["attrsproxy"][属性名];
-          }
-
-          原始数据.updated =  this.$生成毫秒时间戳();
-          传入数据 = 原始数据;
-        }
-        this.$数据库[数据表名].put(传入数据)
-        数据共享总线.postMessage({"动作时间":this.$生成毫秒时间戳(),"对象数据":传入数据})
-        传入数据.type == "card"
-        ? this.$事件总线.$emit("保存卡片", 传入数据)
-        : this.$事件总线.$emit("保存链接", 传入数据);
-        return null;
-      });
-    } else if (传入数据.id) {
+   if (传入数据.id) {
       this.$数据库[数据表名].put(传入数据)
       传入数据.type == "card"
       ? this.$事件总线.$emit("保存卡片", 传入数据)

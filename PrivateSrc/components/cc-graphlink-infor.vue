@@ -120,7 +120,7 @@ module.exports = {
 
   methods: {
     async 修改编辑器() {
-      /* let that = this;
+      let that = this;
       //console.log("编辑器窗口加载");
       let 编辑器 = that.$refs.siyuanEditor;
       if (!编辑器) {
@@ -202,7 +202,7 @@ module.exports = {
       :root{--b3-theme-on-background:${this.当前数据.attrs.color};
       --b3-theme-background:${this.当前数据.attrs.backgroundColor}
       }`;
-      head.appendChild(style);*/
+      head.appendChild(style);
     },
     定位至卡片: function (卡片数据) {
       //console.log(卡片数据);

@@ -1,7 +1,6 @@
 <template>
   <vue-draggable-resizable
-    v-if="!hide"
-    v-show="vision"
+    v-show="!hide && vision"
     ref="container"
     @click="鼠标点击($event)"
     :resizable="显示控制柄"
@@ -394,8 +393,9 @@ module.exports = {
         attrs.offsety + "" == "NAN" ? (attrs.offsety = 0) : null;
         if (this.def_block + "" != val.attrs.def_block + "") {
           //   console.log(this.def_block, val.attrs.def_block);
-          this.def_block = val.attrs.def_block;
           this.生成html();
+
+          this.def_block = val.attrs.def_block;
         }
         if (this.markdown != val.markdown) {
           this.markdown = val.markdown;
@@ -701,11 +701,9 @@ module.exports = {
       this.markdown = 卡片markdown;
     },
     覆盖markdown() {
-      let html = this.思源html;
       let 思源markdown = lute.BlockDOM2Md(this.思源HTML);
       思源markdown = this.去除ial(思源markdown);
       this.markdown = 思源markdown;
-      this.生成html();
     },
     去除ial(markdown) {
       markdown = markdown.replace(/\n\{\:(.*?)\}\n/g, "");
@@ -754,15 +752,19 @@ module.exports = {
       if (!$event) {
         return null;
       }
-      if ($event.attrsproxy) {
-        return null;
-      }
+
       if (
         $event.id == this.对象数据.id &&
         parseInt($event.updated) >= parseInt(this.对象数据.updated)
       ) {
         let 旧数据 = JSON.parse(JSON.stringify(this.对象数据 || {}));
         let 新数据 = JSON.parse(JSON.stringify($event || {}));
+        if ($event.attrsproxy) {
+          for (属性名 in 传入数据.attrsproxy) {
+            旧数据["attrs"][属性名] = 传入数据["attrsproxy"][属性名];
+          }
+          this.对象数据 = 旧数据;
+        }
         旧数据.updated = "";
         新数据.updated = "";
         if (旧数据 !== 新数据 && !新数据.attrs.trashed && !旧数据.trashed) {
@@ -804,9 +806,7 @@ module.exports = {
             });
           }
           this.思源HTML = el.innerHTML;
-          if (this.$当前窗口状态.reload_markdown_by_default) {
-            this.覆盖markdown();
-          }
+          this.覆盖markdown();
         } else this.思源HTML = "获取思源块内容失败";
       }
     },
