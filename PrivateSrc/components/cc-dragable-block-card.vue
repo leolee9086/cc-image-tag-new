@@ -472,6 +472,16 @@ module.exports = {
       this.对象数据 = this.$更新数据时间戳(this.对象数据);
       this.生成html();
     },
+    hide(val) {
+      if (val) {
+        this.修改编辑器();
+      }
+    },
+    vision(val) {
+      if (val) {
+        this.修改编辑器();
+      }
+    },
   },
   computed: {
     tempLineConfig: function () {
@@ -516,7 +526,11 @@ module.exports = {
     async 修改编辑器() {
       let that = this;
       //console.log("编辑器窗口加载");
+
       let 编辑器 = that.$refs.siyuanEditor;
+      if (!this.对象数据.attrs.def_block) {
+        return null;
+      }
       if (!编辑器) {
         setTimeout(that.修改编辑器, 100);
         return null;

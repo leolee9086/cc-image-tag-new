@@ -4,9 +4,9 @@
     :style="`
     position:absolute; 
     top:0px; 
-    transform:scale(${$当前窗口状态.缩放倍数}); 
-    width: ${窗口大小.width / $当前窗口状态.缩放倍数}px; 
-    height: ${窗口大小.height / $当前窗口状态.缩放倍数}px;
+    transform:scale(${窗口缩放倍数}); 
+    width: ${窗口大小.width / 窗口缩放倍数}px; 
+    height: ${窗口大小.height / 窗口缩放倍数}px;
     transform-origin:0% 0%; 
     z-index:-1;
     background-color:${当前背景色}`"
@@ -54,6 +54,7 @@ module.exports = {
       图像宽度: 100,
       图像高度: 100,
       画板绘制数据: [],
+      窗口缩放倍数: 1,
     };
   },
   mounted() {
@@ -68,6 +69,7 @@ module.exports = {
     this.$事件总线.$on("缩放背景", ($event) => (this.图像缩放倍数 = $event));
     this.$事件总线.$on("改变背景图像模式", ($event) => (this.图像模式 = $event));
     this.$事件总线.$on("背景色改变", ($event) => (this.当前背景色 = $event));
+    this.$事件总线.$on("窗口缩放", ($event) => (this.窗口缩放倍数 = $event));
   },
   watch: {
     图像路径: {

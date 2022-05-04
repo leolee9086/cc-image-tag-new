@@ -259,7 +259,7 @@ module.exports = {
           .filter((value) => {
             if (value.markdown) {
               let markdown = value.markdown;
-              if (markdown.indexOf(关键词) > 0) {
+              if (markdown.indexOf(关键词) >= 0) {
                 return true;
               }
             } else {
@@ -271,7 +271,7 @@ module.exports = {
           .filter((value) => {
             if (value.markdown) {
               let markdown = value.markdown;
-              if (markdown.indexOf(关键词) > 0) {
+              if (markdown.indexOf(关键词) >= 0) {
                 return true;
               }
             } else {

@@ -284,7 +284,6 @@ module.exports = {
     },
     预设名: {
       handler: async function (val, oldval) {
-        let 数据表名 = this.当前对象数据.type + "s" || "cards";
         let 预设表名 = this.当前对象数据.type + "presets" || "cadpresets";
         //  this.$事件总线.$emit("改变数据预设", this.当前对象数据, val);
         await this.$数据库[预设表名]
@@ -298,6 +297,7 @@ module.exports = {
           );
         this.新预设名 = val || "未命名";
         this.预设id = this.预设.id;
+        this.$事件总线.$emit("改变数据预设", this.当前对象数据, val);
       },
     },
 
@@ -342,7 +342,7 @@ module.exports = {
       handler: function (val, oldval) {
         console.log(val, oldval);
         let flag = false;
-        
+
         if (val.id == oldval.id) {
           flag = true;
           let temp = {};
