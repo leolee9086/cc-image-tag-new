@@ -333,6 +333,7 @@ module.exports = {
         this.保存数据();
       }
     });
+    this.$事件总线.$on("窗口缩放", (event) => this.计算可见性(event));
   },
 
   watch: {

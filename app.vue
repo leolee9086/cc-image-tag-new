@@ -266,7 +266,6 @@ module.exports = {
     },
     挂载全局事件() {
       window.addEventListener("mousewheel", this.计算坐标, { passive: false });
-      window.addEventListener("mousewheel", this.缩放, { passive: false });
       window.addEventListener("mousemove", this.计算坐标, { passive: false });
       window.addEventListener("scroll", this.计算坐标);
       window.addEventListener("keydown", this.$快捷键处理器);
@@ -302,20 +301,7 @@ module.exports = {
       });
       return obj;
     },
-    缩放($event) {
-      /*  if ($event.altKey) {
-        $event.preventDefault();
-        delta = $event.wheelDelta / 120;
-        let 窗口缩放倍数 = this.$当前窗口状态.缩放倍数;
-        窗口缩放倍数 += delta / 5;
-        let id = "";
-        if (this.$当前窗口状态.current_cardid || this.$当前窗口状态.current_linkid) {
-          id = this.$当前窗口状态.current_cardid || this.$当前窗口状态.current_linkid;
-        }
-        this.$事件总线.$emit("窗口缩放", 窗口缩放倍数 > 0 ? 窗口缩放倍数 : 0.01);
-        id ? this.$事件总线.$emit("定位至卡片", id) : null;
-      }*/
-    },
+
     开始拖拽($event) {
       // console.log($event);
       if (!$event.target.classList.contains("layer")) {
