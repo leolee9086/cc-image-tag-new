@@ -94,13 +94,12 @@
             icon="el-icon-refresh"
             aria-label="重新加载窗口"
           ></el-button>
-          <el-button
-            circle
-            size="mini"
-            @click="创建新画板()"
-            icon="el-icon-plus"
-            aria-label="创建新的画板"
-          ></el-button>
+          <el-button circle size="mini" aria-label="创建新的画板">
+            <el-link
+              class="el-icon-plus"
+              :href="`http://${this.思源伺服ip}/widgets/cc-image-tag-new/?baseid=${新画板id}`"
+            ></el-link>
+          </el-button>
         </div>
       </el-col>
     </el-row>
@@ -127,9 +126,11 @@ module.exports = {
       当前对象名称: "",
       timer: {},
       使用svg渲染: false,
+      新画板id: "",
     };
   },
   mounted() {
+    this.新画板id = Lute.NewNodeID();
     this.$事件总线.$on("保存数据", ($event) => this.获取当前元素数据($event));
     this.$事件总线.$on("激活数据", ($event) => (this.对象数据 = $event));
   },
@@ -174,7 +175,8 @@ module.exports = {
       let id = Lute.NewNodeID();
       window.location.reload(true);
       let 链接 = `http://${this.思源伺服ip}/widgets/cc-image-tag-new/?baseid=${id}`;
-      this.$窗口内打开超链接(链接);
+      let newwindow = window.open(null, "");
+      newwindow.href = 链接;
     },
     重新加载窗口: function () {
       window.location.reload(true);
@@ -219,11 +221,8 @@ module.exports = {
       }
     },
     聚焦到卡片: function (对象数据) {
-      if (this.$当前窗口状态.缩放倍数 < 1) {
-        this.$事件总线.$emit("窗口缩放", 1);
-      } else {
-        this.$事件总线.$emit("窗口缩放", this.$当前窗口状态.缩放倍数);
-      }
+      this.$事件总线.$emit("窗口缩放", this.$当前窗口状态.缩放倍数);
+
       this.$事件总线.$emit("定位至卡片", 对象数据);
     },
     添加卡片: function (def) {

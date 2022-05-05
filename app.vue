@@ -320,14 +320,26 @@ module.exports = {
       if ($event.altKey && $event.wheelDelta) {
         $event.preventDefault();
         delta = $event.wheelDelta / 120;
+        let 当前屏幕中心x = window.pageXOffset + $event.clientX;
+        let 当前屏幕中心y = window.pageYOffset + $event.clientY;
         let 窗口缩放倍数 = this.$当前窗口状态.缩放倍数;
-        窗口缩放倍数 += delta / 5;
+        let 旧窗口缩放倍数 = 窗口缩放倍数 + 0;
+        窗口缩放倍数 > 1 ? (窗口缩放倍数 += delta / 5) : (窗口缩放倍数 += delta / 50);
+        窗口缩放倍数 > 10 ? (窗口缩放倍数 = 10) : null;
+        窗口缩放倍数 < 0.01 ? (窗口缩放倍数 = 0.01) : null;
+
         let id = "";
         if (this.$当前窗口状态.current_cardid || this.$当前窗口状态.current_linkid) {
           id = this.$当前窗口状态.current_cardid || this.$当前窗口状态.current_linkid;
         }
+
+        id
+          ? this.$事件总线.$emit("定位至卡片", id)
+          : window.scrollTo(
+              (当前屏幕中心x * 窗口缩放倍数) / 旧窗口缩放倍数 - $event.clientX,
+              (当前屏幕中心y * 窗口缩放倍数) / 旧窗口缩放倍数 - $event.clientY
+            );
         this.$事件总线.$emit("窗口缩放", 窗口缩放倍数 > 0 ? 窗口缩放倍数 : 0.01);
-        id ? this.$事件总线.$emit("定位至卡片", id) : null;
       }
       if (this.左键拖拽中) {
         $event.preventDefault();

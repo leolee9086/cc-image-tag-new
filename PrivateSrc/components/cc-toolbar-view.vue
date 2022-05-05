@@ -3,10 +3,10 @@
     <el-slider
       v-model="窗口缩放倍数"
       vertical
-      height="200px"
+      height="500px"
       :marks="比例标记"
       :format-tooltip="显示百分比"
-      :max="300"
+      :max="1000"
       :min="1"
     ></el-slider>
   </div>
@@ -24,6 +24,7 @@ module.exports = {
         150: "150%",
         200: "200%",
         300: "300%",
+        1000: "1000",
       },
     };
   },
@@ -50,7 +51,7 @@ module.exports = {
 <style>
 .toolbar-view {
   position: fixed;
-  top: 50vh;
+  top: 30vh;
   height: 10vh;
   width: 3vw;
   left: 1vw;

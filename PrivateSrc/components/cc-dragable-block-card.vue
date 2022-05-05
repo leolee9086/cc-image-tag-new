@@ -465,6 +465,7 @@ module.exports = {
         this.iframeindex = -10;
       } else {
         this.生成html();
+        this.修改编辑器();
         this.iframeindex = 0;
       }
     },
@@ -761,7 +762,7 @@ module.exports = {
     鼠标点击($event) {
       //  console.log($event);
       $event.stopPropagation();
-
+      $event.altKey ? (this.正在编辑 = true) : null;
       this.$事件总线.$emit("鼠标点击卡片", this.对象数据, $event.ctrlKey);
     },
     判断id: function ($event) {
@@ -798,6 +799,9 @@ module.exports = {
     },
     生成html: async function () {
       let that = this;
+      if (this.hide || !this.vision) {
+        return null;
+      }
       let el = window.document.createElement("div");
       el.innerHTML = await Vditor.md2html(this.对象数据.markdown);
       let images = el.querySelectorAll("img");
