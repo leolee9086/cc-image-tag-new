@@ -3,11 +3,14 @@
     :style="konvastyle"
     @mousedown="绘制中 = true"
     @mouseup="绘制中 = false"
+    @touchstart="绘制中 = true"
+    @touchstop="绘制中 = false"
     class="cc-block-card-draw"
     ref="draw"
     :config="configDraw()"
     @click="添加图形($event)"
     @mousemove="绘制($event)"
+    @touchmove="绘制($event)"
   >
     <v-layer>
       <v-line
@@ -99,9 +102,9 @@ module.exports = {
     konvastyle: function () {
       let configKonva = this.configDraw();
       if (configKonva.x == 0 && configKonva.y == 0) {
-        return "position:absolute";
+        return "position:absolute;touch-action:none";
       } else {
-        return "position:fixed !important;top:0;left:0";
+        return "position:fixed !important;top:0;left:0;touch-action:none";
       }
     },
     生成自然数数组(自然数) {
@@ -207,7 +210,7 @@ module.exports = {
     },
     绘制($event) {
       let evt = $event.evt;
-
+      console.log(evt);
       if (evt.altKey) {
         return null;
       }
@@ -223,6 +226,13 @@ module.exports = {
         evt.stopPropagation();
         evt.preventDefault();
         let 点 = [evt.offsetX + this.画布原点.x || 0, evt.offsetY + this.画布原点.y || 0];
+        if (evt.touches) {
+          let touche = evt.touches[0];
+          点 = [
+            touche.clientX + this.画布原点.x || 0,
+            touche.clientY + this.画布原点.y || 0,
+          ];
+        }
         if (this.窗口缩放倍数) {
           点 = [
             点[0] / this.窗口缩放倍数 / this.窗口缩放倍数,
