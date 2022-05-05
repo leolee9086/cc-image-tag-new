@@ -87,13 +87,9 @@
       </el-col>
       <el-col :span="3">
         <div>
-          <el-button
-            circle
-            size="mini"
-            @click="重新加载窗口()"
-            icon="el-icon-refresh"
-            aria-label="重新加载窗口"
-          ></el-button>
+          <el-button circle size="mini" @click="重新加载窗口()" aria-label="重新加载窗口">
+            <el-link class="el-icon-refresh"></el-link>
+          </el-button>
           <el-button circle size="mini" aria-label="创建新的画板">
             <el-link
               class="el-icon-plus"
