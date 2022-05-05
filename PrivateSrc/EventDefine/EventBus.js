@@ -518,6 +518,7 @@ const 事务列表 = {
     }
   },
   窗口状态初始化: function () {},
+  
 };
 
 for (let item in 事务列表) {

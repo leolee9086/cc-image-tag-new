@@ -478,6 +478,9 @@ module.exports = {
       if (val) {
         this.修改编辑器();
       }
+      if (!val) {
+        this.生成html();
+      }
     },
     vision(val) {
       if (val) {
@@ -613,8 +616,45 @@ module.exports = {
       --b3-theme-background:${this.对象数据.attrs.backgroundColor}
       }`;
       head.appendChild(style);
+      编辑器窗口.addEventListener("mousedown", that.直接上图);
     },
+    直接上图: function (event) {
+      let that = this;
+      if (!event.ctrlKey) {
+        return null;
+      }
+      let tar = event.target;
+      if (tar.getAttribute("data-type") == "block-ref") {
+        this.思源链接上图(tar.getAttribute("data-id"), "链接", true);
+      }
+    },
+    思源链接上图(id, 类型, 反向) {
+      let that = this;
+      let 属性对象 = this.对象数据.attrs;
+      let 待发送数据 = this.$根据属性生成卡片({
+        top: 属性对象.top,
+        left: 属性对象.left + 属性对象.width + 200,
+      });
+      // //console.log(待发送数据);
 
+      待发送数据.attrs.def_block = id;
+      let 卡片数组 = [];
+      // //console.log(this.当前对象数据);
+      if (!反向) {
+        卡片数组 = [this.对象数据, 待发送数据];
+      } else {
+        卡片数组 = [待发送数据, this.对象数据];
+      }
+      this.$数据库.cards
+        .put(待发送数据)
+        .then(() => {
+          this.$事件总线.$emit("添加卡片", 待发送数据);
+        })
+        .then(() => {
+          //  //console.log("链接", 卡片数组);
+          this.$事件总线.$emit("连接卡片", 卡片数组, 类型.replace("正向", ""));
+        });
+    },
     打开块id: function (id, 主界面) {
       let that = this;
       //  console.log("测试", 主界面);
